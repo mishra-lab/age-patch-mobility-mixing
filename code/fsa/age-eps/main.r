@@ -2,6 +2,7 @@ library('reshape2')
 library('ggplot2')
 source('../config.r')
 source('../ontario/plot.r')
+source('../ontario/mix.r')
 source('../ontario/data.r')
 
 plot.pmc.margins = function(pmc){
@@ -65,9 +66,8 @@ pmc.ratio = pmc.sum[[1]] / pmc.sum[[2]]
 
 figname = function(f){ root.path('out','fig','fsa','age-eps',paste0(f,'.pdf')) }
 
-g = plot.mix.vs(pmc,    clim=c(0,10)); ggsave(figname('polymod'),    width=14,height=3)
-g = plot.mix.vs(pmc.eps,clim=c(0,10)); ggsave(figname('polymod-eps'),width=14,height=3)
-g = plot.mix.vs(pmc.sum,clim=c(0,12)); ggsave(figname('polymod-vs'), width= 5,height=3)
-g = plot.mix(mix.melt(log10(pmc.ratio)),clim=c(-1,+1),cmap='cividis');
+g = plot.mix(pmc,    aggr=FALSE,clim=c(0,10)); ggsave(figname('polymod'),    width=14,height=3)
+g = plot.mix(pmc.eps,aggr=FALSE,clim=c(0,10)); ggsave(figname('polymod-eps'),width=14,height=3)
+g = plot.mix(pmc.sum,aggr=FALSE,clim=c(0,12)); ggsave(figname('polymod-vs'), width= 5,height=3)
+g = plot.mix(pmc.ratio,aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis');
   ggsave(figname('polymod-rs'),width=4,height=3)
-
