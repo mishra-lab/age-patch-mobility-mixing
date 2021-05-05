@@ -1,0 +1,22 @@
+# old files
+.old/
+
+# code
+Rplots.pdf
+.tags
+
+# tex
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*-blx.bib
+*.run.xml
+*.synctex
+*.synctex.gz
+*-converted-to.pdf
+
+# windows
+.DS_Store
