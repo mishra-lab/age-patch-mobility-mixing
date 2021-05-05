@@ -1,0 +1,23 @@
+\usepackage{geometry}
+\usepackage[colorlinks]{hyperref}
+\usepackage[osf,t]{ETbb}
+\usepackage[libertine]{newtxmath}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usepackage[hang]{footmisc}
+% graphics
+\graphicspath{{../../../../out/fig/fsa/}}
+\newcommand{\includebiggraphics}[1]{%
+  \makebox[\textwidth][c]{\includegraphics[width=1.3\linewidth]{#1}}}
+% spacing
+\setlength{\parskip}{1ex}
+\setlength{\parindent}{0ex}
+\addtolength{\skip\footins}{2ex plus 1ex}
+% appendix
+\let\xappendix\appendix
+\def\appendix{\xappendix\counterwithin{figure}{section}\clearpage}
+% meta data
+\title{\null\vskip-3em
+  Mixing Matrices for Quasi-Spatial Population Stratification:\\Using Mobility Data}
+\date{{v.2.0}\\[1ex]2021 April 26}
+\author{Jesse Knight}
