@@ -1,12 +1,12 @@
 source('../config.r')
 
 load.fsa.data = function(){
-  pop = read.csv(root.path('data','population.csv'))
+  pop = read.csv(root.path('data','fsa','population.csv'))
   return(pop)
 }
 
 load.fsa.mob = function(){
-  mob = read.csv(root.path('data','mobility.csv'))
+  mob = read.csv(root.path('data','fsa','mobility.csv'))
   B = matrix(mob$visiting_mean,nrow=10,ncol=10)
   colnames(B) = info$decile
   rownames(B) = info$decile
