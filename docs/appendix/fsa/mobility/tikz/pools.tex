@@ -1,0 +1,29 @@
+\definecolor{GX}{HTML}{999999}
+\begin{tikzpicture}[x=6ex,y=6ex]
+ \useasboundingbox (-6,-5) rectangle (+6,+4);
+  \node[align=center] at (-5.5,+3) {home\\pools};
+  \node[align=center] at (-5.5, 0) {FSA\\populations};
+  \node[align=center] at (-5.5,-4) {travel\\pools};
+  \node[align=center] at (+5.5, 0) {\dots};
+  \node[ pop={12ex}{G1},bx] (A)  at (-3, 0) {1};
+  \node[ pop={12ex}{G2}]    (B)  at ( 0, 0) {2};
+  \node[ pop={12ex}{G3},bx] (C)  at (+3, 0) {3};
+  \node[pool={12ex}{G1},bx] (Ah) at (-3,+3) {1\\home};
+  \node[pool={12ex}{G2}]    (Bh) at ( 0,+3) {2\\home};
+  \node[pool={12ex}{G3},bx] (Ch) at (+3,+3) {3\\home};
+  \node[pool={12ex}{GX}]    (At) at (-3,-4) {1\\travel};
+  \node[pool={12ex}{GX}]    (Bt) at ( 0,-4) {2\\travel};
+  \node[pool={12ex}{GX}]    (Ct) at (+3,-4) {3\\travel};
+  \draw[arrow,G1,->,bx] (A) edge (Ah);
+  \draw[arrow,G2,->]    (B) edge node[left]{(c)} (Bh);
+  \draw[arrow,G3,->,bx] (C) edge (Ch);
+  \draw[arrow,G1,->,bx] (A) edge (At);
+  \draw[arrow,G2,->]    (B) edge[bend left =10] node[above left ]{(a)} (At);
+  \draw[arrow,G3,->,bx] (C) edge[bend left =10] (At);
+  \draw[arrow,G1,->,bx] (A) edge[bend right=10] (Bt);
+  \draw[arrow,G2,->]    (B) edge node[left]{(b)} (Bt);
+  \draw[arrow,G3,->,bx] (C) edge[bend left =10] (Bt);
+  \draw[arrow,G1,->,bx] (A) edge[bend right=10] (Ct);
+  \draw[arrow,G2,->]    (B) edge[bend right=10] node[above right]{(a)} (Ct);
+  \draw[arrow,G3,->,bx] (C) edge (Ct);
+\end{tikzpicture}
