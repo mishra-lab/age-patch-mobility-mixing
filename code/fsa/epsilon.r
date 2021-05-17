@@ -44,7 +44,7 @@ get.pmc.error = function(pmc,pmc.eps){
   # return(mean(abs(pmc-pmc.eps)/pmc)) # relative difference # DEBUG
 }
 estimate.pmc.eps = function(pmc){
-  eps.0 = c('home'=.5,'work'=.5,'school'=.5,'transport'=.5,'leisure'=.5,'otherplace'=.5)
+  eps.0 = c('Home'=.5,'Other'=.5)
   obj.fun = function(eps,aggr=TRUE) {
     pmc.eps = mapply(get.pmc.eps,pmc,eps,SIMPLIFY=FALSE)
     error = mapply(get.pmc.error,pmc,pmc.eps)
@@ -67,11 +67,11 @@ main.epsilon = function(){
   ),function(x){ Reduce('+',x) })
   pmc.ratio = pmc.sum[[1]] / pmc.sum[[2]]
 
-  g = plot.mix(pmc,    aggr=FALSE,clim=c(0, 5)); ggsave(figname('polymod','age-eps'),    width=14,height=3)
-  g = plot.mix(pmc.eps,aggr=FALSE,clim=c(0, 5)); ggsave(figname('polymod-eps','age-eps'),width=14,height=3)
-  g = plot.mix(pmc.sum,aggr=FALSE,clim=c(0,12)); ggsave(figname('polymod-vs','age-eps'), width= 5,height=3)
-  g = plot.mix(pmc.ratio,aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis');
-    ggsave(figname('polymod-rs','age-eps'),width=4,height=3)
+  f = 'epsilon'
+  plot.mix(pmc,    aggr=FALSE,clim=c(0,12)); ggsave(figname('polymod',    f), width=5,height=3)
+  plot.mix(pmc.eps,aggr=FALSE,clim=c(0,12)); ggsave(figname('polymod-eps',f), width=5,height=3)
+  plot.mix(pmc.sum,aggr=FALSE,clim=c(0,12)); ggsave(figname('polymod-vs', f), width=5,height=3)
+  plot.mix(pmc.ratio,aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis'); ggsave(figname('polymod-rs',f),width=4,height=3)
 }
 
 

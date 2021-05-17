@@ -13,8 +13,9 @@ figname = function(name,...){
 
 info = list(
   age = c(
-    '<16'   = 0,
-    '16-39' = 16,
+    '<12'   = 0,
+    '13-16' = 13,
+    '17-39' = 17,
     '40-44' = 40,
     '45-49' = 45,
     '50-54' = 50,
@@ -25,12 +26,8 @@ info = list(
     '75-79' = 75,
     '80+  ' = 80),
   c.type = c(
-    'Home'      = 'home',
-    'Work'      = 'work',
-    'School'    = 'school',
-    'Transport' = 'transport',
-    'Leisure'   = 'leisure',
-    'Other'     = 'otherplace'),
+    'Home'  = 'Home',
+    'Other' = 'Other'),
   decile = c(1:10)
 )
 names(info$decile) = info$decile
@@ -40,21 +37,13 @@ N = list(
   g = length(info$decile)
 )
 eps = c(
-  'home'       = 0.08805234,
-  'work'       = 0.02565621,
-  'school'     = 0.22177813,
-  'transport'  = 0.12430744,
-  'leisure'    = 0.13311496,
-  'otherplace' = 0.05587195
+  'home'  = 0.08785141,
+  'other' = 0.18124466
 )
 OR.travel.unobs = .5
 h.y = c(
-  'home'       = 1,
-  'work'       = 0,
-  'school'     = 1,
-  'transport'  = 0,
-  'leisure'    = .5,
-  'otherplace' = .5
+  'home'  = 1,
+  'other' = 0
 )
 mo.ref = c('2020-01','2020-02')
 X.names = list(

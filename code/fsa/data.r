@@ -51,18 +51,16 @@ load.fsa.smartphones = function(){
 load.polymod = function(){
   pmc = list()
   f = 1
+  map = list(Home=c('home'),Other=c('work','school','transport','leisure','otherplace'))
   for (c.type in info$c.type){
-    names(f) = paste('cnt',c.type,sep='_')
-    pmc.y = suppressMessages(contact_matrix(
-      polymod,filter=f,
-      age.limits=info$age
-      # age.limits=c(0,20,40,60,80) # DEBUG
-      # age.limits=c(0,15,30,45,60,75) # DEBUG
-      # age.limits=c(0,10,20,30,40,50,60,70,80) # DEBUG
-    ))$matrix
-    rownames(pmc.y) = names(info$age)
-    colnames(pmc.y) = names(info$age)
-    pmc[[c.type]] = pmc.y
+    pmc[[c.type]] = matrix(0,nrow=length(info$age),ncol=length(info$age))
+    rownames(pmc[[c.type]]) = names(info$age)
+    colnames(pmc[[c.type]]) = names(info$age)
+    for (type in map[[c.type]]){
+      names(f) = paste0('cnt_',type)
+      pmc[[c.type]] = pmc[[c.type]] +
+        suppressMessages(contact_matrix(polymod,filter=f,age.limits=info$age))$matrix
+    }
   }
   return(pmc)
 }
