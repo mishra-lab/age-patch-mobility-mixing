@@ -1,3 +1,6 @@
+source('data.r')
+source('plot.r')
+
 a.sum = function(A,d){
   ds = seq(length(dim(A)))
   return(colSums(aperm(A,c(d,ds[-d])),dims=length(d)))
@@ -44,4 +47,27 @@ gaga.mix = function(C.ay,P.ga,B.gg,mo){
 
 pct.self = function(X){
   return(median(diag(X) / rowSums(X)))
+}
+
+main.mixing = function(t='ref'){
+  pmc  = load.polymod()
+  pop  = load.fsa.pop()
+  B.gg  = load.decile.mob()
+  C.ay = pmc.to.Cay(pmc)
+  P.ga = pop.to.Pga(pop)
+  X.gaga.y = gaga.mix(C.ay,P.ga,B.gg,t)
+
+  X.gaga = Reduce('+',X.gaga.y)
+  print(pct.self(a.sum(X.gaga,c(2,4))))
+  print(sapply(X.gaga.y,function(X){ pct.self(a.sum(X,c(2,4))) }))
+
+  g = plot.mix(B.gg,    'g',clim=c(0,.15),aggr=FALSE); ggsave(figname('mobility'),width= 8,height= 8)
+  g = plot.mix(X.gaga,  'g',clim=c(0, 18));            ggsave(figname('Xgg'),     width= 5,height= 4)
+  g = plot.mix(X.gaga,  'g',clim=c(0,  1),xfun=offd);  ggsave(figname('Xgg-o'),   width= 5,height= 4)
+  g = plot.mix(X.gaga,  'a',clim=c(0, 32));            ggsave(figname('Xaa'),     width= 5,height= 4)
+  g = plot.mix(X.gaga,  'a',clim=c(0, 13),xfun=offd);  ggsave(figname('Xaa-o'),   width= 5,height= 4)
+  g = plot.mix(X.gaga.y,'g',clim=c(0,  6));            ggsave(figname('Xggy'),    width=14,height= 3)
+  g = plot.mix(X.gaga.y,'g',clim=c(0,.50),xfun=offd);  ggsave(figname('Xggy-o'),  width=14,height= 3)
+  g = plot.mix(X.gaga.y,'a',clim=c(0, 10));            ggsave(figname('Xaay'),    width=14,height= 3)
+  g = plot.mix(pmc,     'a',clim=c(0,  5),aggr=FALSE); ggsave(figname('polymod'), width=14,height= 3)
 }

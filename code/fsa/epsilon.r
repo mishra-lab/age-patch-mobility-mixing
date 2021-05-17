@@ -1,9 +1,9 @@
 library('reshape2')
 library('ggplot2')
-source('../config.r')
-source('../ontario/plot.r')
-source('../ontario/mix.r')
-source('../ontario/data.r')
+source('config.r')
+source('plot.r')
+source('mixing.r')
+source('data.r')
 
 # Objective: estimate epsilon for approximate representation of POLYMOD data on age mixing
 
@@ -57,17 +57,25 @@ estimate.pmc.eps = function(pmc){
   return(eps.opt)
 }
 
-pmc = load.polymod()
-eps = estimate.pmc.eps(pmc)
-pmc.eps = mapply(get.pmc.eps,pmc,eps,SIMPLIFY=FALSE)
-pmc.sum = lapply(list(
-  'Original' = pmc,
-  'Approx'   = pmc.eps
-),function(x){ Reduce('+',x) })
-pmc.ratio = pmc.sum[[1]] / pmc.sum[[2]]
+main.epsilon = function(){
+  pmc = load.polymod()
+  eps = estimate.pmc.eps(pmc)
+  pmc.eps = mapply(get.pmc.eps,pmc,eps,SIMPLIFY=FALSE)
+  pmc.sum = lapply(list(
+    'Original' = pmc,
+    'Approx'   = pmc.eps
+  ),function(x){ Reduce('+',x) })
+  pmc.ratio = pmc.sum[[1]] / pmc.sum[[2]]
 
-g = plot.mix(pmc,    aggr=FALSE,clim=c(0, 5)); ggsave(figname('polymod','age-eps'),    width=14,height=3)
-g = plot.mix(pmc.eps,aggr=FALSE,clim=c(0, 5)); ggsave(figname('polymod-eps','age-eps'),width=14,height=3)
-g = plot.mix(pmc.sum,aggr=FALSE,clim=c(0,12)); ggsave(figname('polymod-vs','age-eps'), width= 5,height=3)
-g = plot.mix(pmc.ratio,aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis');
-  ggsave(figname('polymod-rs','age-eps'),width=4,height=3)
+  g = plot.mix(pmc,    aggr=FALSE,clim=c(0, 5)); ggsave(figname('polymod','age-eps'),    width=14,height=3)
+  g = plot.mix(pmc.eps,aggr=FALSE,clim=c(0, 5)); ggsave(figname('polymod-eps','age-eps'),width=14,height=3)
+  g = plot.mix(pmc.sum,aggr=FALSE,clim=c(0,12)); ggsave(figname('polymod-vs','age-eps'), width= 5,height=3)
+  g = plot.mix(pmc.ratio,aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis');
+    ggsave(figname('polymod-rs','age-eps'),width=4,height=3)
+}
+
+
+
+
+
+

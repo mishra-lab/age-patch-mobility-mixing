@@ -1,8 +1,8 @@
-source('../config.r')
+source('config.r')
 source('data.r')
 source('plot.r')
 
-do.mobility = function(do='plots'){
+main.mobility = function(do='plots'){
   pop = load.fsa.pop(age=FALSE)
   pop$decile = as.factor(pop$decile)
   X = load.fsa.mob()
@@ -57,5 +57,3 @@ do.mobility = function(do='plots'){
     write.csv(X.gg,root.path('data','fsa','mobility.csv'),row.names=FALSE)
   }
 }
-
-do.mobility()

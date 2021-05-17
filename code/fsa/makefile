@@ -1,6 +1,6 @@
 do.age-eps:
-	cd age-eps && Rscript main.r && echo [DONE]
+	Rscript main.r epsilon && echo [DONE]
 do.mixing:
-	cd ontario && Rscript main.r && echo [DONE]
+	Rscript main.r mixing && echo [DONE]
 do.mobility:
-	cd ontario && Rscript mob.r && echo [DONE]
+	Rscript main.r mobility && echo [DONE]

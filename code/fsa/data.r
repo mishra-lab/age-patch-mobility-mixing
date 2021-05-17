@@ -1,4 +1,4 @@
-source('../config.r')
+source('config.r')
 
 load.fsa.pop = function(age=TRUE){
   pop = read.csv(root.path('data','fsa','age_pop.csv'))
