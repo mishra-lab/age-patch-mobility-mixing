@@ -16,10 +16,9 @@ pmc.to.Cay = function(pmc){
   return(do.call(cbind,lapply(pmc,rowSums)))
 }
 
-gaga.mix = function(C.ay,P.ga,B.gg,h.y){
-  B.gg  = 0.25 * B.gg / rowSums(B.gg)
-  B.g   = rowSums(B.gg)
-  B.gg1 = B.gg + diag(1-B.g)
+gaga.mix = function(C.ay,P.ga,B.gg,mo){
+  B.gg[['ref']] = Reduce('+',B.gg[mo.ref]) / length(mo.ref)
+  B.gg1 = B.gg[[mo]] + diag(1-rowSums(B.gg[['ref']])) # n.b. does not sum to one unless B.gg = B.gg.ref
   Q.ga.y = lapply(info$c.type,function(y){ sweep(P.ga,2,C.ay[,y],'*') })
   X.gaga.y = list()
   for (y in seq(N$y)){

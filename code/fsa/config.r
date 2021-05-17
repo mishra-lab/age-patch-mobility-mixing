@@ -1,9 +1,14 @@
 suppressMessages({library(socialmixr)})
 options(width=150)
 
+fig.ext = '.pdf'
+
 root.path = function(...){
   root = strsplit(getwd(),file.path('','code',''))[[1]][1]
   return(file.path(root,...))
+}
+figname = function(name,...){
+  root.path('out','fig','fsa',...,paste0(name,fig.ext))
 }
 
 info = list(
@@ -42,6 +47,16 @@ eps = c(
   'leisure'    = 0.13311496,
   'otherplace' = 0.05587195
 )
+OR.travel.unobs = .5
+h.y = c(
+  'home'       = 1,
+  'work'       = 0,
+  'school'     = 1,
+  'transport'  = 0,
+  'leisure'    = .5,
+  'otherplace' = .5
+)
+mo.ref = c('2020-01','2020-02')
 X.names = list(
   'g'  = names(info$decile),
   'a'  = names(info$age),

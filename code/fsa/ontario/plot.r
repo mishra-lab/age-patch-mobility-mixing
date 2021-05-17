@@ -1,5 +1,7 @@
 library(reshape2)
+library(viridis)
 library(ggplot2)
+library(ggridges)
 
 offd  = function(x){ x-diag(rep(NA,nrow(x))) }
 
@@ -27,14 +29,34 @@ plot.mix = function(X,case='a',xfun=NULL,aggr=NULL,clim=NULL,cmap='inferno'){
     scale_y_discrete(expand=c(0,0)) +
     scale_x_discrete(expand=c(0,0)) +
     xlab(labels[[case]]$x) + ylab(labels[[case]]$y) +
-    viridis::scale_fill_viridis(option=cmap,limits=clim) +
-    viridis::scale_color_viridis(option=cmap,limits=clim) +
+    scale_fill_viridis(option=cmap,limits=clim) +
+    scale_color_viridis(option=cmap,limits=clim) +
     theme_light() +
     guides(color=FALSE,fill=guide_colorbar(barheight=5)) +
     switch(case,
       a = theme(axis.text.x=element_text(angle=90,hjust=1)),
       n = theme(axis.text.x=element_blank(),axis.text.y=element_blank())
     )
-  if (is.list(X)){ g = g + facet_grid(cols=vars(group)) }
+  if (is.list(X)){
+    if (length(X) <= 6) { g = g + facet_grid(cols=vars(group)) }
+    else { g = g + facet_wrap(vars(group)) }
+  }
+  return(g)
+}
+plot.device.density = function(X,x,y='month',bw=NULL,q=4,xmax=NULL,legend=FALSE){
+  if (is.null(xmax)){ xmax=max(X[[x]]) }
+  g = ggplot(X,aes_string(y=y,fill='factor(stat(quantile))',x=x)) +
+    stat_density_ridges(
+      geom='density_ridges_gradient',
+      calc_ecdf=TRUE,
+      quantiles=q,
+      bandwidth=bw) +
+    scale_fill_viridis(discrete=TRUE,option='inferno',alpha=.7,begin=.2,end=.8) +
+    scale_y_discrete(limits=rev(levels(X[[y]]))) +
+    xlim(0,xmax) + labs(x=x,y=y,fill='Quantile') +
+    theme_light()
+  if (!legend){
+    g = g + guides(fill=FALSE)
+  }
   return(g)
 }
