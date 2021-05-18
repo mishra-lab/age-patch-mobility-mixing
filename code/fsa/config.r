@@ -40,7 +40,10 @@ eps = c(
   'home'  = 0.08785141,
   'other' = 0.18124466
 )
-OR.travel.unobs = .5
+phi = c(
+  'unobs.device' = .8,
+  'no.device'    = .8
+)
 h.y = c(
   'home'  = 1,
   'other' = 0

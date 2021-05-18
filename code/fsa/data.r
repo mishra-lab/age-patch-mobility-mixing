@@ -33,7 +33,7 @@ load.fsa.mob = function(refresh=FALSE){
   } else {
     X = read.csv(root.path('data','fsa','mobility_fsa.csv'))
     X = X[X$visited_fsa %in% unique(X$home_fsa),] # remove external travel
-    colnames(X) = c('FSA.visited','FSA','month','devices.travel','travel.prop','devices.home')
+    colnames(X) = c('FSA.visited','FSA','month','devices.visit','travel.prop','devices.home')
     X$travel.prop = NULL
     FSA   = sort(unique(X$FSA))
     month = sort(unique(X$month))

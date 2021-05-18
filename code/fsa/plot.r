@@ -45,6 +45,7 @@ plot.mix = function(X,case='a',xfun=NULL,aggr=NULL,clim=NULL,cmap='inferno'){
 }
 plot.device.density = function(X,x,y='month',bw=NULL,q=4,xmax=NULL,legend=FALSE){
   if (is.null(xmax)){ xmax=max(X[[x]]) }
+  if (y=='month'){ y.lab='Month' } else { y.lab = y }
   g = ggplot(X,aes_string(y=y,fill='factor(stat(quantile))',x=x)) +
     stat_density_ridges(
       geom='density_ridges_gradient',
@@ -53,7 +54,7 @@ plot.device.density = function(X,x,y='month',bw=NULL,q=4,xmax=NULL,legend=FALSE)
       bandwidth=bw) +
     scale_fill_viridis(discrete=TRUE,option='inferno',alpha=.7,begin=.2,end=.8) +
     scale_y_discrete(limits=rev(levels(X[[y]]))) +
-    xlim(0,xmax) + labs(x=x,y=y,fill='Quantile') +
+    xlim(0,xmax) + labs(x=x,y=y.lab,fill='Quantile') +
     theme_light()
   if (!legend){
     g = g + guides(fill=FALSE)
