@@ -17,7 +17,7 @@ load.decile.mob = function(){
   mob = read.csv(root.path('data','fsa','mobility_decile.csv'))
   months = levels(mob$month)
   B.gg = lapply(months,function(mo){
-    B.m = matrix(mob[mob$month == mo,]$travel.prop,nrow=10,ncol=10)
+    B.m = matrix(mob[mob$month == mo,]$visit.prop,nrow=10,ncol=10)
     colnames(B.m) = info$decile
     rownames(B.m) = info$decile
     return(B.m)
@@ -33,8 +33,8 @@ load.fsa.mob = function(refresh=FALSE){
   } else {
     X = read.csv(root.path('data','fsa','mobility_fsa.csv'))
     X = X[X$visited_fsa %in% unique(X$home_fsa),] # remove external travel
-    colnames(X) = c('FSA.visited','FSA','month','devices.visit','travel.prop','devices.home')
-    X$travel.prop = NULL
+    colnames(X) = c('FSA.visited','FSA','month','devices.visit','visit.prop','devices.home')
+    X$visit.prop = NULL
     FSA   = sort(unique(X$FSA))
     month = sort(unique(X$month))
     X = merge(expand.grid(FSA=FSA,FSA.visited=FSA,month=month),X,all=TRUE)
