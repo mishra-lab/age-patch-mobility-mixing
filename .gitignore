@@ -5,6 +5,14 @@
 Rplots.pdf
 .tags
 
+# data
+.raw/
+*.rdata
+*.Rdata
+
+# outputs
+*.png # TEMP
+
 # tex
 *.aux
 *.log
