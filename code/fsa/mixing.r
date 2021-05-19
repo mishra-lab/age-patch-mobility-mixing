@@ -54,18 +54,18 @@ pct.self = function(X){
   return(median(diag(X) / rowSums(X)))
 }
 
-plot.mixing = function(B.gg,X.gaga,X.gaga.y,pmc,f='mixing'){
+plot.mixing = function(B.gg,X.gaga,X.gaga.y,pmc,t='ref',f='mixing'){
   B.gg = append(B.gg,list('REF'=Reduce('+',B.gg[mo.ref]) / length(mo.ref)),1)
   for (mo in mo.ref){ B.gg[[mo]] = NULL }
-  plot.mix(B.gg,    'g',clim=c(0,.21),aggr=FALSE); ggsave(figname('mobility',f),width=10,height=8)
-  plot.mix(X.gaga,  'g',clim=c(0, 12));            ggsave(figname('Xgg',     f),width= 5,height=4)
-  plot.mix(X.gaga,  'g',clim=c(0,2.5),xfun=offd);  ggsave(figname('Xgg-o',   f),width= 5,height=4)
-  plot.mix(X.gaga,  'a',clim=c(0, 35));            ggsave(figname('Xaa',     f),width= 5,height=4)
-  plot.mix(X.gaga,  'a',clim=c(0, 15),xfun=offd);  ggsave(figname('Xaa-o',   f),width= 5,height=4)
-  plot.mix(X.gaga.y,'g',clim=c(0,  8));            ggsave(figname('Xggy',    f),width= 8,height=4)
-  plot.mix(X.gaga.y,'g',clim=c(0,2.5),xfun=offd);  ggsave(figname('Xggy-o',  f),width= 8,height=4)
-  plot.mix(X.gaga.y,'a',clim=c(0, 30));            ggsave(figname('Xaay',    f),width= 8,height=4)
-  plot.mix(pmc,     'a',clim=c(0, 10),aggr=FALSE); ggsave(figname('polymod', f),width= 8,height=4)
+  plot.mix(B.gg,    'g',clim=c(0,.21),aggr=FALSE); ggsave(figname('mobility',f),  width=10,height=8)
+  plot.mix(X.gaga,  'g',clim=c(0, 12));            ggsave(figname('Xgg',     f,t),width= 5,height=4)
+  plot.mix(X.gaga,  'g',clim=c(0,2.5),xfun=offd);  ggsave(figname('Xgg-o',   f,t),width= 5,height=4)
+  plot.mix(X.gaga,  'a',clim=c(0, 35));            ggsave(figname('Xaa',     f,t),width= 5,height=4)
+  plot.mix(X.gaga,  'a',clim=c(0, 15),xfun=offd);  ggsave(figname('Xaa-o',   f,t),width= 5,height=4)
+  plot.mix(X.gaga.y,'g',clim=c(0,  8));            ggsave(figname('Xggy',    f,t),width= 8,height=4)
+  plot.mix(X.gaga.y,'g',clim=c(0,2.5),xfun=offd);  ggsave(figname('Xggy-o',  f,t),width= 8,height=4)
+  plot.mix(X.gaga.y,'a',clim=c(0, 30));            ggsave(figname('Xaay',    f,t),width= 8,height=4)
+  plot.mix(pmc,     'a',clim=c(0, 10),aggr=FALSE); ggsave(figname('polymod', f,t),width= 8,height=4)
 }
 
 main.mixing = function(t='ref'){
@@ -80,5 +80,5 @@ main.mixing = function(t='ref'){
   print(pct.self(a.sum(X.gaga,c(2,4))))
   print(sapply(X.gaga.y,function(X){ pct.self(a.sum(X,c(2,4))) }))
   
-  plot.mixing(B.gg,X.gaga,X.gaga.y,pmc,f='tmp')
+  plot.mixing(B.gg,X.gaga,X.gaga.y,pmc,t)
 }

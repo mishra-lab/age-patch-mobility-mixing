@@ -10,5 +10,7 @@ if (args[1] == 'mobility'){
 }
 if (args[1] == 'mixing')  {
   source('mixing.r')
-  main.mixing()
+  for (mo in c('ref',mo.covid)){
+    main.mixing(t=mo)
+  }
 }

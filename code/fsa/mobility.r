@@ -20,6 +20,7 @@ plot.mobility = function(X,S,pop,idx.ref,f='mobility'){
   print(summary(S[!idx.ref,]$devices.vr.hr))
   print(summary(100*S[ idx.ref,]$devices.home / S[ idx.ref,]$devices.total))
   print(summary(100*S[!idx.ref,]$devices.home / S[!idx.ref,]$devices.total))
+  print(summary(100*(S$pop - S$devices.total) / S$pop))
   plot.device.density(S,'devices.home', xmax=1500) + xlab('Devices at Home'); ggsave(figname('devices-n-month-home', f),width=5,heigh=5)
   plot.device.density(S,'devices.visit',xmax=1500) + xlab('Device Visits');   ggsave(figname('devices-n-month-visit',f),width=5,heigh=5)
   plot.device.density(S,'devices.vt.ht',xmax=2)    + xlab('Visits / Device'); ggsave(figname('devices-n-month-ratio',f),width=5,heigh=5)

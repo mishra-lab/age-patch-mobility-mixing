@@ -8,7 +8,9 @@ root.path = function(...){
   return(file.path(root,...))
 }
 figname = function(name,...){
-  root.path('out','fig','fsa',...,paste0(name,fig.ext))
+  path = root.path('out','fig','fsa',...)
+  dir.create(path)
+  return(file.path(path,paste0(name,fig.ext)))
 }
 
 info = list(
@@ -51,6 +53,9 @@ h.y = c(
   'other' = 0
 )
 mo.ref = c('2020-01','2020-02')
+mo.covid = c('2020-03','2020-04','2020-05','2020-06',
+  '2020-07','2020-08','2020-09','2020-10','2020-11','2020-12',
+  '2021-01')
 X.names = list(
   'g'  = names(info$decile),
   'a'  = names(info$age),
