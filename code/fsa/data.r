@@ -1,33 +1,57 @@
 source('config.r')
 
-load.fsa.pop = function(age=TRUE){
-  pop = read.csv(root.path('data','fsa','age_pop.csv'))
+aggr.age = function(pop,age=TRUE){
   if (age){
+    pop = aggregate(pop~FSA+cut(age,breaks=c(info$age,Inf),right=FALSE),pop,sum)
+    colnames(pop)[2] = 'age'
+    levels(pop$age) = names(info$age)
     return(pop)
   } else {
-    FSA = list(FSA=sort(pop$FSA))
-    return(merge(
-      aggregate(list(pop=pop$pop_agefsa),FSA,sum,drop=FALSE),
-      aggregate(list(decile=pop$decile),FSA,mean,drop=FALSE)
-    ))
+    return(aggregate(pop~FSA,pop,sum))
+  }  
+}
+
+aggr.mob.decile = function(B,pop){
+  P = aggregate(pop~decile+group,pop,sum)
+  p = ave(P$pop,P$group,FUN=function(pop){pop/sum(pop)})
+  M = t(tail(outer(c(0,info$group),seq(10),'<=') * outer(c(info$group,Inf),seq(10),'>'),-1))
+  B = t(p*M) %*% B %*% M
+  colnames(B) = info$group
+  rownames(B) = info$group
+  return(B)
+}
+
+map.decile = function(x){
+  x$group = cut(x$decile,breaks=c(info$group,Inf),right=FALSE)
+  levels(x$group) = names(info$group)
+  return(x)
+}
+
+load.fsa.pop = function(age=TRUE){
+  dec = read.csv(root.path('data','fsa','fsa_decile.csv'))
+  pop = read.csv(root.path('data','fsa','pop_age_fsa.csv'))
+  pop = merge(aggr.age(pop,age=age),map.decile(dec))
+  if (age){
+    return(pop[order(pop$FSA,pop$age),])
+  } else {
+    return(pop[order(pop$FSA),])
   }
 }
 
-load.decile.mob = function(){
+load.group.mob = function(pop){
   mob = read.csv(root.path('data','fsa','mobility_decile.csv'))
+  mob = map.decile(mob)
   months = levels(mob$month)
   B.gg = lapply(months,function(mo){
     B.m = matrix(mob[mob$month == mo,]$visit.prop,nrow=10,ncol=10)
-    colnames(B.m) = info$decile
-    rownames(B.m) = info$decile
-    return(B.m)
+    return(aggr.mob.decile(B.m,pop))
   })
   names(B.gg) = months
   return(B.gg)
 }
 
 load.fsa.mob = function(refresh=FALSE){
-  rdata = root.path('data','fsa','.rdata','mobility.fsa.rdata')
+  rdata = root.path('data','fsa','.rdata','mobility_fsa.rdata')
   if (file.exists(rdata) & !refresh){
     load(rdata)
   } else {
@@ -63,4 +87,23 @@ load.polymod = function(){
     }
   }
   return(pmc)
+}
+
+clean.raw.pop = function(){
+  fsa = read.csv(root.path('data','fsa','fsa.csv'))$FSA
+  pop = read.csv(root.path('data','fsa','.raw','pop_age_fsa.csv'))
+  pop$age = as.character(pop$Age_cat)
+  pop$Age = NULL
+  pop$Age_cat = NULL
+  pop$CENSUS_YEAR = NULL
+  pop$Female = NULL
+  pop$Male = NULL
+  pop$age[pop$age == 'Under 1 year'] = '0'
+  pop$age[pop$age == '100 years and over'] = '100'
+  pop = pop[grepl('^\\d+$',pop$age),]
+  pop$age = as.numeric(pop$age)
+  pop = col.rename(pop,'Total','pop')
+  pop = col.rename(pop,'GEO_NAME','FSA')
+  pop = pop[pop$FSA %in% fsa,]
+  write.csv(pop,root.path('data','fsa','pop_age_fsa.csv'),row.names=FALSE)
 }
