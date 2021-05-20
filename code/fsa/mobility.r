@@ -35,6 +35,16 @@ plot.mobility = function(X,S,pop,idx.ref,f='mobility'){
   plot.device.density(X.h,'visit.prop',y='decile',xmax=2); ggsave(figname('travel-p-decile',f),width=5,heigh=5)
 }
 
+save.mobility = function(X,S,pop){
+  X = g.merge(g.merge(X,pop,'h'),pop,'v') # WARNING: this is slow
+  pop.g = aggregate(pop~decile+month,S,sum,na.rm=TRUE,drop=FALSE)$pop
+  X.gg = aggregate(visit.total~decile+decile.visited+month,X,sum,na.rm=TRUE,drop=FALSE)
+  X.gg$visit.prop = X.gg$visit.total / pop.g
+  X.gg$visit.total = NULL
+  X.gg = X.gg[order(X.gg$month,X.gg$decile,X.gg$decile.visited),]
+  write.csv(X.gg,root.path('data','fsa','mobility_decile.csv'),row.names=FALSE)
+}
+
 main.mobility = function(do='plot'){
   pop = load.fsa.pop(age=FALSE)
   pop$decile = as.factor(pop$decile)
@@ -55,12 +65,6 @@ main.mobility = function(do='plot'){
     plot.mobility(X,S,pop,idx.ref)
   }
   if (do == 'csv'){
-    X = g.merge(g.merge(X,pop,'h'),pop,'v') # WARNING: this is slow
-    pop.g = aggregate(pop~decile+month,S,sum,na.rm=TRUE,drop=FALSE)$pop
-    X.gg = aggregate(visit.total~decile+decile.visited+month,X,sum,na.rm=TRUE,drop=FALSE)
-    X.gg$visit.prop = X.gg$visit.total / pop.g
-    X.gg$visit.total = NULL
-    X.gg = X.gg[order(X.gg$month,X.gg$decile,X.gg$decile.visited),]
-    write.csv(X.gg,root.path('data','fsa','mobility_decile.csv'),row.names=FALSE)
+    save.mobility(X,S,pop)
   }
 }

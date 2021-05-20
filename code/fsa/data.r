@@ -68,7 +68,7 @@ load.fsa.mob = function(refresh=FALSE){
 }
 
 load.fsa.smartphones = function(){
-  X = read.csv(root.path('data','fsa','smartphones.csv'))
+  X = read.csv(root.path('data','fsa','smartphones_fsa.csv'))
   return(X)
 }
 

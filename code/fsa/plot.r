@@ -1,7 +1,9 @@
+suppressPackageStartupMessages({
 library(reshape2)
 library(viridis)
 library(ggplot2)
 library(ggridges)
+})
 
 offd  = function(x){ x-diag(rep(NA,nrow(x))) }
 

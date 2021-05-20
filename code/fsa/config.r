@@ -2,7 +2,7 @@ suppressMessages({library(socialmixr)})
 options(width=150)
 
 fig.ext = '.pdf'
-mode = '2' # 10 = 10 deciles & 10+ age groups; 2 = 2 deciles & age groups
+mode = '10' # 10 = 10 deciles & 10+ age groups; 2 = 2 deciles & age groups
 
 root.path = function(...){
   root = strsplit(getwd(),file.path('','code',''))[[1]][1]
@@ -10,10 +10,9 @@ root.path = function(...){
 }
 figname = function(name,...){
   path = root.path('out','fig','fsa',mode,...)
-  dir.create(path)
+  dir.create(path,recursive=TRUE)
   return(file.path(path,paste0(name,fig.ext)))
 }
-
 col.rename = function(x,old.name,new.name){
   colnames(x)[grepl(old.name,colnames(x))] = new.name
   return(x)
@@ -22,11 +21,9 @@ col.rename = function(x,old.name,new.name){
 info = list(
   '10' = list(
     age = c(
-      # '<12'   = 0,
-      # '13-16' = 13,
-      # '17-39' = 17,
-      '<16'   = 0,
-      '16-39' = 16,
+      '<12'   = 0,
+      '12-16' = 12,
+      '17-39' = 17,
       '40-44' = 40,
       '45-49' = 45,
       '50-54' = 50,
