@@ -9,7 +9,7 @@ g.merge = function(X,pop,case){
   return(merge(X,g,all.x=TRUE))
 }
 
-plot.mobility = function(X,S,pop,idx.ref,f='mobility'){
+plot.mobility = function(X,S,pop,idx.ref,f='../mobility'){
   dh.ref = aggregate(devices.home ~FSA,S[idx.ref,],mean,drop=FALSE)$devices.home
   dv.ref = aggregate(devices.visit~FSA,S[idx.ref,],mean,drop=FALSE)$devices.visit
   S$devices.vt.ht = S$devices.visit / S$devices.home
