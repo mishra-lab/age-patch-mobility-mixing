@@ -31,8 +31,8 @@ plot.mix = function(X,case='a',xfun=NULL,aggr=NULL,clim=NULL,cmap='inferno'){
     scale_y_discrete(expand=c(0,0)) +
     scale_x_discrete(expand=c(0,0)) +
     xlab(labels[[case]]$x) + ylab(labels[[case]]$y) +
-    scale_fill_viridis(option=cmap,limits=clim) +
-    scale_color_viridis(option=cmap,limits=clim) +
+    scale_fill_viridis(option=cmap,limits=clim,na.value='transparent') +
+    scale_color_viridis(option=cmap,limits=clim,na.value='transparent') +
     theme_light() +
     guides(color=FALSE,fill=guide_colorbar(barheight=5)) +
     switch(case,

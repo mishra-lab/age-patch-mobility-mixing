@@ -8,7 +8,7 @@ aggr.age = function(pop,age=TRUE){
     return(pop)
   } else {
     return(aggregate(pop~FSA,pop,sum))
-  }  
+  }
 }
 
 aggr.mob.decile = function(B,pop){
@@ -72,21 +72,18 @@ load.fsa.smartphones = function(){
   return(X)
 }
 
-load.polymod = function(){
-  pmc = list()
-  f = 1
-  map = list(Home=c('home'),Other=c('work','school','transport','leisure','otherplace'))
-  for (c.type in info$c.type){
-    pmc[[c.type]] = matrix(0,nrow=length(info$age),ncol=length(info$age))
-    rownames(pmc[[c.type]]) = names(info$age)
-    colnames(pmc[[c.type]]) = names(info$age)
-    for (type in map[[c.type]]){
-      names(f) = paste0('cnt_',type)
-      pmc[[c.type]] = pmc[[c.type]] +
-        suppressMessages(contact_matrix(polymod,filter=f,age.limits=info$age))$matrix
-    }
+load.contacts = function(){
+  C.y = list()
+  map = list(Home='home',Other=c('work','school','other_locations'))
+  ctx = read.csv(root.path('data','fsa','contacts_age.csv'))
+  dnames = list(a=names(contact.age),a.=names(contact.age))
+  for (y in names(map)){
+    C.y[[y]] = matrix(
+      aggregate(contacts~a+a.,ctx[ctx$type %in% map[[y]],],sum)$contacts,
+      nrow=length(contact.age),dimnames=dnames)
   }
-  return(pmc)
+  # g = plot.mix(C.y,aggr=FALSE); ggsave(figname('polymod-canada-2'),width=8,height=4) # DEBUG
+  return(C.y)
 }
 
 clean.raw.pop = function(){
@@ -106,4 +103,22 @@ clean.raw.pop = function(){
   pop = col.rename(pop,'GEO_NAME','FSA')
   pop = pop[pop$FSA %in% fsa,]
   write.csv(pop,root.path('data','fsa','pop_age_fsa.csv'),row.names=FALSE)
+}
+
+clean.canada.contacts = function(){
+  library('readxl')
+  library('reshape2')
+  C.y = list()
+  for (y in c('home','work','school','other_locations')){
+    f = root.path('data','fsa','.raw','contacts-152',paste0('MUestimates_',y,'_1.xlsx'))
+    C.y. = as.matrix(read_excel(f,sheet='Canada'))
+    rownames(C.y.) = names(contact.age)
+    colnames(C.y.) = names(contact.age)
+    # C.y[[y]] = C.y. # DEBUG
+    C.y[[y]] = cbind('type'=y,melt(C.y.,value.name='contacts',varnames=c('a','a.')))
+  }
+  # C.y. = list(Home=C.y[['home']],Other=C.y[['work']]+C.y[['school']]+C.y[['other_locations']]) # DEBUG
+  # plot.mix(C.y,aggr=FALSE,clim=c(0,7)); ggsave(figname('polymod-canada'),width=12,height=4) # DEBUG
+  C.y = do.call(rbind,C.y)
+  write.csv(C.y,root.path('data','fsa','contacts_age.csv'),row.names=FALSE)
 }

@@ -7,14 +7,14 @@ source('data.r')
 
 # Objective: estimate epsilon for approximate representation of POLYMOD data on age mixing
 
-plot.pmc.margins = function(pmc){
+plot.cy.margins = function(C.y){
   margins = list(
     'Index' = rowSums,
     'Other' = colSums,
     'Ratio (Index / Other)' = function(x){ log(rowSums(x)/colSums(x)) }
   )
   c. = do.call(rbind,lapply(names(margins),function(m){
-    c.m = sapply(pmc,margins[[m]])
+    c.m = sapply(C.y,margins[[m]])
     c.m. = mix.melt(c.m)
     c.m.$margin = m
     return(c.m.)
@@ -28,26 +28,26 @@ plot.pmc.margins = function(pmc){
       facet_grid(cols=vars(margin)) + ylab('Age') + xlab('Contact Type')
   ggsave('../../out/fig/polymod-mr.pdf',width=4,height=5)
 }
-get.pmc.eps = function(pmc.y,eps.y){
-  c.mi = rowSums(pmc.y)
-  c.mo = colSums(pmc.y)
+get.cy.eps = function(C.yi,eps.y){
+  c.mi = rowSums(C.yi)
+  c.mo = colSums(C.yi)
   c.r = c.mi %*% t(c.mo) / sum(c.mo)
   c.a = diag(c.mi)
   c.x = (1-eps.y) * c.r + (eps.y) * c.a
   rownames(c.x) = colnames(c.x)
   return(c.x)
 }
-get.pmc.error = function(pmc,pmc.eps){
-  pmc = pmc + 1e-6
-  return(sum(pmc * log(pmc / pmc.eps), na.rm=TRUE)) # KL-Divergence
-  # return(mean(abs(pmc-pmc.eps)))     # absolute difference # DEBUG
-  # return(mean(abs(pmc-pmc.eps)/pmc)) # relative difference # DEBUG
+get.cy.error = function(C.yi,C.yi.eps){
+  C.yi = C.yi + 1e-6
+  return(sum(C.yi * log(C.yi / C.yi.eps), na.rm=TRUE)) # KL-Divergence
+  # return(mean(abs(C.yi-C.yi.eps)))      # absolute difference # DEBUG
+  # return(mean(abs(C.yi-C.yi.eps)/C.yi)) # relative difference # DEBUG
 }
-estimate.pmc.eps = function(pmc){
+estimate.cy.eps = function(C.y){
   eps.0 = c('Home'=.5,'Other'=.5)
   obj.fun = function(eps,aggr=TRUE) {
-    pmc.eps = mapply(get.pmc.eps,pmc,eps,SIMPLIFY=FALSE)
-    error = mapply(get.pmc.error,pmc,pmc.eps)
+    C.y.eps = mapply(get.cy.eps,C.y,eps,SIMPLIFY=FALSE)
+    error = mapply(get.cy.error,C.y,C.y.eps)
     if (aggr){ return(mean(error)) } else { return(error) }
   }
   opt = optim(eps.0,obj.fun,method='L-BFGS-B',lower=rep(0,6),upper=rep(1,6))
@@ -58,24 +58,19 @@ estimate.pmc.eps = function(pmc){
 }
 
 main.epsilon = function(){
-  pmc = load.polymod()
-  eps = estimate.pmc.eps(pmc)
-  pmc.eps = mapply(get.pmc.eps,pmc,eps,SIMPLIFY=FALSE)
-  pmc.sum = lapply(list(
-    'Original' = pmc,
-    'Approx'   = pmc.eps
+  C.y = load.contacts()
+  eps = estimate.cy.eps(C.y)
+  C.y.eps = mapply(get.cy.eps,C.y,eps,SIMPLIFY=FALSE)
+  C.y.sum = lapply(list(
+    'Original' = C.y,
+    'Approx'   = C.y.eps
   ),function(x){ Reduce('+',x) })
-  pmc.ratio = pmc.sum[[1]] / pmc.sum[[2]]
+  C.y.ratio = C.y.sum[[1]] / C.y.sum[[2]]
 
   f = 'epsilon'
-  plot.mix(pmc,    aggr=FALSE,clim=c(0,12)); ggsave(figname('polymod',    f), width=5,height=3)
-  plot.mix(pmc.eps,aggr=FALSE,clim=c(0,12)); ggsave(figname('polymod-eps',f), width=5,height=3)
-  plot.mix(pmc.sum,aggr=FALSE,clim=c(0,12)); ggsave(figname('polymod-vs', f), width=5,height=3)
-  plot.mix(pmc.ratio,aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis'); ggsave(figname('polymod-rs',f),width=4,height=3)
+  plot.mix(C.y,    aggr=FALSE,clim=c(0,12)); ggsave(figname('canada',    f), width=5,height=3)
+  plot.mix(C.y.eps,aggr=FALSE,clim=c(0,12)); ggsave(figname('canada-eps',f), width=5,height=3)
+  plot.mix(C.y.sum,aggr=FALSE,clim=c(0,12)); ggsave(figname('canada-vs', f), width=5,height=3)
+  plot.mix(C.y.ratio,aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis'); ggsave(figname('canadaf-rs',f),width=4,height=3)
 }
-
-
-
-
-
 

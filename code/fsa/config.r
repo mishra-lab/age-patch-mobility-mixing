@@ -1,6 +1,7 @@
 suppressMessages({library(socialmixr)})
 options(width=150)
 
+# TODO: add DEBUG, capitalize MODE
 fig.ext = '.pdf'
 mode = '10' # 10 = 10 deciles & 10+ age groups; 2 = 2 deciles & age groups
 
@@ -9,7 +10,7 @@ root.path = function(...){
   return(file.path(root,...))
 }
 figname = function(name,...){
-  path = root.path('out','fig','fsa',mode,...)
+  path = root.path('out','fig','fsa','DEBUG',...) # TODO: deal with mode/DEBUG better
   dir.create(path,recursive=TRUE)
   return(file.path(path,paste0(name,fig.ext)))
 }
@@ -32,7 +33,7 @@ info = list(
       '65-69' = 65,
       '70-74' = 70,
       '75-79' = 75,
-      '80+  ' = 80),
+      '80+'   = 80),
     c.type = c(
       'Home'  = 'Home',
       'Other' = 'Other'),
@@ -64,14 +65,9 @@ N = list(
   y = length(info$c.type),
   g = length(info$group)
 )
-eps = list(
-  '10' = c(
-    'home'  = 0.08785141,
-    'other' = 0.18124466),
-  '2' = c(
-    'home'  = 0.04232771,
-    'other' = 0.13193096)
-)[[mode]]
+eps = c(
+  'home'  = 0.2354799,
+  'other' = 0.1818460)
 phi = c(
   'unobs.device' = .9,
   'no.device'    = .9
@@ -95,3 +91,12 @@ labels = list(
   a = list(y='Index Age (a)',   x='Other Age (a\')'),
   n = list(y='Index FSA (n)',   x='Other FSA (n\')')
 )
+contact.age = c(
+  '00-04' =  0 , '05-09' =  5,
+  '10-14' = 10 , '15-19' = 15,
+  '20-24' = 20 , '25-29' = 25,
+  '30-34' = 30 , '35-39' = 35,
+  '40-44' = 40 , '45-49' = 45,
+  '50-54' = 50 , '55-59' = 55,
+  '60-64' = 60 , '65-69' = 65,
+  '70-74' = 70 , '75+?'  = 75) # TODO: double check defs

@@ -13,8 +13,14 @@ pop.to.Pga = function(pop){
   return(P.ga)
 }
 
-pmc.to.Cay = function(pmc){
-  return(do.call(cbind,lapply(pmc,rowSums)))
+Caay.to.Cay = function(C.y,age=NULL){
+  if (is.null(age)){ age = info$age }
+  mp = function(a){ a+c(diff(a)/2,0) }
+  return(do.call(cbind,lapply(C.y,function(c.y){
+    c.y.m = rowSums(c.y)
+    return(approx(x=mp(contact.age),y=c.y.m,xo=mp(age),
+      method='linear',yleft=c.y.m[1],yright=c.y.m[length(c.y.m)])$y)
+  })))
 }
 
 gaga.mix = function(C.ay,P.ga,B.gg,mo){
@@ -53,7 +59,7 @@ pct.self = function(X){
   return(median(diag(X) / rowSums(X)))
 }
 
-plot.mixing = function(B.gg,X.gaga,X.gaga.y,pmc,t='ref',f='mixing'){
+plot.mixing = function(B.gg,X.gaga,X.gaga.y,t='ref',f='mixing'){
   X.gaga = Reduce('+',X.gaga.y)
   print(pct.self(a.sum(X.gaga,c(2,4))))
   print(sapply(X.gaga.y,function(X){ pct.self(a.sum(X,c(2,4))) }))
@@ -67,7 +73,6 @@ plot.mixing = function(B.gg,X.gaga,X.gaga.y,pmc,t='ref',f='mixing'){
   plot.mix(X.gaga.y,'g',clim=c(0,NA));            ggsave(figname('Xggy',    f,t),width= 8,height=4)
   plot.mix(X.gaga.y,'g',clim=c(0,NA),xfun=offd);  ggsave(figname('Xggy-o',  f,t),width= 8,height=4)
   plot.mix(X.gaga.y,'a',clim=c(0,NA));            ggsave(figname('Xaay',    f,t),width= 8,height=4)
-  plot.mix(pmc,     'a',clim=c(0,NA),aggr=FALSE); ggsave(figname('polymod', f,t),width= 8,height=4)
 }
 
 mixing.fname = function(t,sub='.raw/mix'){
@@ -91,12 +96,12 @@ merge.save.mixing = function(){
 }
 
 main.mixing = function(t='ref'){
-  pmc  = load.polymod()
+  C.y  = load.contacts()
   pop  = load.fsa.pop()
   B.gg = load.group.mob(pop)
-  C.ay = pmc.to.Cay(pmc)
+  C.ay = Caay.to.Cay(C.y)
   P.ga = pop.to.Pga(pop)
   X.gaga.y = gaga.mix(C.ay,P.ga,B.gg,t)
-  plot.mixing(B.gg,X.gaga,X.gaga.y,pmc,t)
+  plot.mixing(B.gg,X.gaga,X.gaga.y,t)
   save.mixing(X.gaga.y,t)
 }
