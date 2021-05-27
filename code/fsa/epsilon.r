@@ -68,9 +68,9 @@ main.epsilon = function(){
   C.y.ratio = C.y.sum[[1]] / C.y.sum[[2]]
 
   f = 'epsilon'
-  plot.mix(C.y,    aggr=FALSE,clim=c(0,12)); ggsave(figname('canada',    f), width=5,height=3)
-  plot.mix(C.y.eps,aggr=FALSE,clim=c(0,12)); ggsave(figname('canada-eps',f), width=5,height=3)
-  plot.mix(C.y.sum,aggr=FALSE,clim=c(0,12)); ggsave(figname('canada-vs', f), width=5,height=3)
-  plot.mix(C.y.ratio,aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis'); ggsave(figname('canadaf-rs',f),width=4,height=3)
+  plot.mix(C.y,    aggr=FALSE,clim=c(0,12)); ggsave(figname('canada',    f), width=8,height=4)
+  plot.mix(C.y.eps,aggr=FALSE,clim=c(0,12)); ggsave(figname('canada-eps',f), width=8,height=4)
+  plot.mix(C.y.sum,aggr=FALSE,clim=c(0,12)); ggsave(figname('canada-vs', f), width=8,height=4)
+  plot.mix(C.y.ratio,aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis'); ggsave(figname('canadaf-rs',f),width=5,height=4)
 }
 

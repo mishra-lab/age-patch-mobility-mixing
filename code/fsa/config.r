@@ -1,16 +1,16 @@
 suppressMessages({library(socialmixr)})
 options(width=150)
 
-# TODO: add DEBUG, capitalize MODE
+DEBUG = TRUE
+MODE = '10x10' # 10x10 = 10 deciles & 10+ age groups; 2x2 = 2 deciles & age groups
 fig.ext = '.pdf'
-mode = '10' # 10 = 10 deciles & 10+ age groups; 2 = 2 deciles & age groups
 
 root.path = function(...){
   root = strsplit(getwd(),file.path('','code',''))[[1]][1]
   return(file.path(root,...))
 }
 figname = function(name,...){
-  path = root.path('out','fig','fsa','DEBUG',...) # TODO: deal with mode/DEBUG better
+  path = root.path('out','fig','fsa',ifelse(DEBUG,'.debug',''),...)
   dir.create(path,recursive=TRUE)
   return(file.path(path,paste0(name,fig.ext)))
 }
@@ -20,7 +20,7 @@ col.rename = function(x,old.name,new.name){
 }
 
 info = list(
-  '10' = list(
+  '10x10' = list(
     age = c(
       '<12'   = 0,
       '12-16' = 12,
@@ -49,7 +49,7 @@ info = list(
       '9'  = 9,
       '10' = 10)
   ),
-  '2' = list(
+  '2x2' = list(
     age = c(
       '16-59' = 16,
       '60+'   = 60),
@@ -59,7 +59,7 @@ info = list(
     group = c(
       '1-2'  = 1,
       '3-10' = 3)
-))[[mode]]
+))[[MODE]]
 N = list(
   a = length(info$age),
   y = length(info$c.type),

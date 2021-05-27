@@ -59,7 +59,8 @@ pct.self = function(X){
   return(median(diag(X) / rowSums(X)))
 }
 
-plot.mixing = function(B.gg,X.gaga,X.gaga.y,t='ref',f='mixing'){
+plot.mixing = function(B.gg,X.gaga,X.gaga.y,t='ref',f=NULL){
+  if (is.null(f)){ f = file.path('mixing',MODE) }
   X.gaga = Reduce('+',X.gaga.y)
   print(pct.self(a.sum(X.gaga,c(2,4))))
   print(sapply(X.gaga.y,function(X){ pct.self(a.sum(X,c(2,4))) }))
@@ -76,7 +77,7 @@ plot.mixing = function(B.gg,X.gaga,X.gaga.y,t='ref',f='mixing'){
 }
 
 mixing.fname = function(t,sub='.raw/mix'){
-  return(root.path('data','fsa',sub,paste0('mix_',mode,'x',mode,'_',t,'.csv')))
+  return(root.path('data','fsa',sub,paste0('mix_',MODE,'_',t,'.csv')))
 }
 
 save.mixing = function(X.gaga.y,t){
