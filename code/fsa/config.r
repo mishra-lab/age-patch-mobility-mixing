@@ -14,10 +14,6 @@ figname = function(name,...){
   dir.create(path,recursive=TRUE)
   return(file.path(path,paste0(name,fig.ext)))
 }
-col.rename = function(x,old.name,new.name){
-  colnames(x)[grepl(old.name,colnames(x))] = new.name
-  return(x)
-}
 
 info = list(
   '10x10' = list(
@@ -91,7 +87,7 @@ labels = list(
   a = list(y='Index Age (a)',   x='Other Age (a\')'),
   n = list(y='Index FSA (n)',   x='Other FSA (n\')')
 )
-contact.age = c(
+age.contact = c(
   '00-04' =  0 , '05-09' =  5,
   '10-14' = 10 , '15-19' = 15,
   '20-24' = 20 , '25-29' = 25,
@@ -99,4 +95,4 @@ contact.age = c(
   '40-44' = 40 , '45-49' = 45,
   '50-54' = 50 , '55-59' = 55,
   '60-64' = 60 , '65-69' = 65,
-  '70-74' = 70 , '75+?'  = 75) # TODO: double check defs
+  '70-74' = 70 , '75-80' = 75) # TODO: double check defs

@@ -1,9 +1,15 @@
 source('data.r')
 source('plot.r')
 
-a.sum = function(A,d){
-  ds = seq(length(dim(A)))
-  return(colSums(aperm(A,c(d,ds[-d])),dims=length(d)))
+resample.contacts = function(C5,ai,ao){
+  # WARNING: assumes C5 is 5-year age groups
+  midpoints = function(a){ a+c(diff(a)/2,.5) }
+  m1 = midpoints(seq(0,79))
+  C1 = interp2d(C5,midpoints(ai),m1)/5
+  M = t(tail(outer(c(0,ao),m1,'<') * outer(c(ao,Inf),m1,'>'),-1))
+  Co = t(apply(C1,1,interp1d,xi=m1,xo=midpoints(ao)) %*% M)
+  dimnames(Co) = list(a=names(ao),a.=names(ao))
+  return(Co)
 }
 
 pop.to.Pga = function(pop){
@@ -18,7 +24,7 @@ Caay.to.Cay = function(C.y,age=NULL){
   mp = function(a){ a+c(diff(a)/2,0) }
   return(do.call(cbind,lapply(C.y,function(c.y){
     c.y.m = rowSums(c.y)
-    return(approx(x=mp(contact.age),y=c.y.m,xo=mp(age),
+    return(approx(x=mp(age.contact),y=c.y.m,xo=mp(age),
       method='linear',yleft=c.y.m[1],yright=c.y.m[length(c.y.m)])$y)
   })))
 }
@@ -74,6 +80,7 @@ plot.mixing = function(B.gg,X.gaga,X.gaga.y,t='ref',f=NULL){
   plot.mix(X.gaga.y,'g',clim=c(0,NA));            ggsave(figname('Xggy',    f,t),width= 8,height=4)
   plot.mix(X.gaga.y,'g',clim=c(0,NA),xfun=offd);  ggsave(figname('Xggy-o',  f,t),width= 8,height=4)
   plot.mix(X.gaga.y,'a',clim=c(0,NA));            ggsave(figname('Xaay',    f,t),width= 8,height=4)
+  plot.mix(X.gaga.y,'a',clim=c(0,NA),xfun=offd);  ggsave(figname('Xaay-o',  f,t),width= 8,height=4)
 }
 
 mixing.fname = function(t,sub='.raw/mix'){

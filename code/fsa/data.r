@@ -76,11 +76,11 @@ load.contacts = function(){
   C.y = list()
   map = list(Home='home',Other=c('work','school','other_locations'))
   ctx = read.csv(root.path('data','fsa','contacts_age.csv'))
-  dnames = list(a=names(contact.age),a.=names(contact.age))
+  dnames = list(a=names(age.contact),a.=names(age.contact))
   for (y in names(map)){
     C.y[[y]] = matrix(
       aggregate(contacts~a+a.,ctx[ctx$type %in% map[[y]],],sum)$contacts,
-      nrow=length(contact.age),dimnames=dnames)
+      nrow=length(age.contact),dimnames=dnames)
   }
   # g = plot.mix(C.y,aggr=FALSE); ggsave(figname('polymod-canada-2'),width=8,height=4) # DEBUG
   return(C.y)
@@ -112,8 +112,8 @@ clean.canada.contacts = function(){
   for (y in c('home','work','school','other_locations')){
     f = root.path('data','fsa','.raw','contacts-152',paste0('MUestimates_',y,'_1.xlsx'))
     C.y. = as.matrix(read_excel(f,sheet='Canada'))
-    rownames(C.y.) = names(contact.age)
-    colnames(C.y.) = names(contact.age)
+    rownames(C.y.) = names(age.contact)
+    colnames(C.y.) = names(age.contact)
     # C.y[[y]] = C.y. # DEBUG
     C.y[[y]] = cbind('type'=y,melt(C.y.,value.name='contacts',varnames=c('a','a.')))
   }
