@@ -3,10 +3,12 @@ col.rename = function(x,old.name,new.name){
   return(x)
 }
 a.sum = function(A,d){
+  if (length(d)==0){ return(A) }
   ds = seq(length(dim(A)))
   return(colSums(aperm(A,c(d,ds[-d])),dims=length(d)))
 }
 a.mean = function(A,d,W=NULL){
+  if (length(d)==0){ return(A) }
   if (is.null(W)){ W = array(1,dim(A)) }
   ds = seq(length(dim(A)))
   dp = c(d,ds[-d])

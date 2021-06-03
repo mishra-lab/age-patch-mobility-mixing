@@ -81,9 +81,12 @@ CX.norm = function(CX.gaga.y,P.ga,C.ay){
 
 aggr.mix = function(C.gaga,what,vs,P.ga=NULL,aggr=TRUE){
   if (!aggr){ return(C.gaga) }
-  d = switch(vs,'a'=c(1,3),'g'=c(2,4))
+  d = switch(vs,'a'=c(1,3),'g'=c(2,4),'i'=c(3,4)) # 'o'=c(1,2) TODO: check interpretation of 'o'
   if (what=='CX'){ return( a.sum(C.gaga,d) / 1e6 )  }
-  if (what=='Ci'){ return( a.mean(C.gaga,d,array(P.ga,c(dim(P.ga),dim(P.ga)))) ) }
+  if (what=='Ci'){
+    P.gaga = array(P.ga,dim(C.gaga))
+    return( a.mean( a.sum(C.gaga,d[d>=3]), d[d<=2], a.sum(P.gaga,d[d>=3])) )
+  }
   if (what=='Cp'){ stop('aggr.mix for Cp not yet implemented') }
 }
 
@@ -131,7 +134,8 @@ main.mixing = function(t='ref'){
   CX.gaga.y = gen.mix.total(C.ay,P.ga,B.gg,t)   # absolute contacts
   Ci.gaga.y = CX.norm(CX.gaga.y,P.ga,C.ay/C.ay) # contacts per person
   Cp.gaga.y = CX.norm(CX.gaga.y,P.ga,C.ay)      # contact probability
-  plot.mixing(CX.gaga.y,'CX',t)
-  plot.mixing(Ci.gaga.y,'Ci',t,P.ga=P.ga)
-  save.mixing(Ci.gaga.y,'Ci',t)
+  # plot.mixing(CX.gaga.y,'CX',t)
+  # plot.mixing(Ci.gaga.y,'Ci',t,P.ga=P.ga)
+  # save.mixing(Ci.gaga.y,'Ci',t)
+  print(aggr.mix(Ci.gaga.y[[2]],'Ci','i',P.ga))
 }
