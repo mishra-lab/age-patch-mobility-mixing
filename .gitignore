@@ -1,6 +1,7 @@
 # old files
 .old/
 .debug/
+.tmp/
 
 # code
 Rplots.pdf
