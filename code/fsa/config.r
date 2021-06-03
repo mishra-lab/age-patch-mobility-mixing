@@ -11,7 +11,7 @@ root.path = function(...){
 }
 figname = function(name,...){
   path = root.path('out','fig','fsa',ifelse(DEBUG,'.debug',''),...)
-  dir.create(path,recursive=TRUE)
+  suppressWarnings({dir.create(path,recursive=TRUE)})
   return(file.path(path,paste0(name,fig.ext)))
 }
 
@@ -31,8 +31,8 @@ info = list(
       '75-79' = 75,
       '80+'   = 80),
     c.type = c(
-      'Home'  = 'Home',
-      'Other' = 'Other'),
+      'Household Contacts'     = 'Home',
+      'Non-Household Contacts' = 'Other'),
     group = c(
       '1'  = 1,
       '2'  = 2,
@@ -50,8 +50,8 @@ info = list(
       '16-59' = 16,
       '60+'   = 60),
     c.type = c(
-      'Home'  = 'Home',
-      'Other' = 'Other'),
+      'Household Contacts'     = 'Home',
+      'Non-Household Contacts' = 'Other'),
     group = c(
       '1-2'  = 1,
       '3-10' = 3)
@@ -83,9 +83,9 @@ X.names = list(
   'a.' = names(info$age)
 )
 labels = list(
-  g = list(y='Index Decile (g)',x='Other Decile (g\')'),
-  a = list(y='Index Age (a)',   x='Other Age (a\')'),
-  n = list(y='Index FSA (n)',   x='Other FSA (n\')')
+  g = list(y='Home Decile (g)',x='Other Decile (g\')'),
+  n = list(y='Home FSA (n)',   x='Other FSA (n\')'),
+  a = list(y='Self Age (a)',   x='Other Age (a\')')
 )
 age.contact = c(
   '00-04' =  0 , '05-09' =  5,

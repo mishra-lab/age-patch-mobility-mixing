@@ -28,11 +28,13 @@ plot.mobility = function(X,S,pop,idx.ref,f='mobility'){
   plot.device.density(S,'devices.vt.v0',xmax=2) + xlab('Visit Reduction');    ggsave(figname('devices-r-month-visit',f),width=5,heigh=5)
   plot.device.density(S,'devices.vr.hr',xmax=2) + xlab('Visit Reduction / Home Reduction'); ggsave(figname('devices-r-month-ratio',f),width=5,heigh=5)
   plot.device.density(S,'devices.vt.h0',xmax=2) + xlab('Visit / Reference Home'); ggsave(figname('devices-r-month-rx',f),width=5,heigh=5)
+  plot.device.density(S[idx.ref,],'devices.vt.h0',y='decile',xmax=2) + xlab('Visit / Reference Home'); ggsave(figname('devices-r-decile-rx',f),width=5,heigh=5)
   X.h = aggregate(visit.total~FSA+month,X,sum,na.rm=TRUE,drop=FALSE)
   X.h = merge(X.h,pop,all.x=TRUE)
   X.h$visit.prop = X.h$visit.total / X.h$pop
   plot.device.density(X.h,'visit.prop',xmax=2); ggsave(figname('travel-p-month',f),width=5,heigh=5)
   plot.device.density(X.h,'visit.prop',y='decile',xmax=2); ggsave(figname('travel-p-decile',f),width=5,heigh=5)
+  # TODO: plot monthly mobility here from mixing
 }
 
 save.mobility = function(X,S,pop){
@@ -45,7 +47,7 @@ save.mobility = function(X,S,pop){
   write.csv(X.gg,root.path('data','fsa','mobility_decile.csv'),row.names=FALSE)
 }
 
-main.mobility = function(do='plot'){
+main.mobility = function(do.plot=TRUE,do.csv=TRUE){
   pop = load.fsa.pop(age=FALSE)
   pop$decile = as.factor(pop$decile)
   X = load.fsa.mob()
@@ -60,11 +62,11 @@ main.mobility = function(do='plot'){
   dh.ref = aggregate(devices.home ~FSA,S[idx.ref,],mean,drop=FALSE)$devices.home
   X = X[order(X$month,X$FSA.visited,X$FSA),] # reshape for implicit repeat along FSA
   X$visit.total = X$devices.visit / dh.ref *
-    (1 + phi['unobs.device'] * (S$devices.total - dh.ref) + phi['no.device'] * (S$pop - S$devices.total))
-  if (do == 'plot'){
+  (1 + phi['unobs.device'] * (S$devices.total - dh.ref) + phi['no.device'] * (S$pop - S$devices.total))
+  if (do.plot){
     plot.mobility(X,S,pop,idx.ref)
   }
-  if (do == 'csv'){
+  if (do.csv){
     save.mobility(X,S,pop)
   }
 }

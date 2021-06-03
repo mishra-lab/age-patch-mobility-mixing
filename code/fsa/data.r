@@ -55,10 +55,12 @@ load.fsa.mob = function(refresh=FALSE){
   if (file.exists(rdata) & !refresh){
     load(rdata)
   } else {
+    FSA = unique(load.fsa.pop(age=FALSE)$FSA)
     X = read.csv(root.path('data','fsa','mobility_fsa.csv'))
-    X = X[X$visited_fsa %in% unique(X$home_fsa),] # remove external travel
-    colnames(X) = c('FSA.visited','FSA','month','devices.visit','visit.prop','devices.home')
+    colnames(X) = c('FSA.visited','FSA','month','devices.visit','visit.prop','province','devices.home')
+    X = X[X$FSA %in% FSA & X$FSA.visited %in% FSA,] # remove external travel
     X$visit.prop = NULL
+    X$province = NULL
     FSA   = sort(unique(X$FSA))
     month = sort(unique(X$month))
     X = merge(expand.grid(FSA=FSA,FSA.visited=FSA,month=month),X,all=TRUE)
