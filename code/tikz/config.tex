@@ -1,0 +1,42 @@
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\tikzset{
+  gpool/.style = {
+    circle,
+    minimum width = 16mm,
+    minimum height = 16mm,
+    inner sep = 0pt,
+    fill = #1!10!white,
+    draw = #1,
+    align = center,
+    thick,
+  },
+  arrow/.style = {
+    thick,
+  },
+  bx/.style = {opacity = 0.3},
+  fx/.style = {opacity = 1.0},
+}
+\definecolor{G1}{HTML}{f9766e}
+\definecolor{G2}{HTML}{629dff}
+\definecolor{G3}{HTML}{00b939}
+\newlength\htp
+\newcommand{\person}[4]{
+  \setlength{\htp}{#3}
+  \fill[#4,rounded corners=.05\htp]
+    (#1-.22\htp,#2+.24\htp) -- (#1+.22\htp,#2+.24\htp) --
+    (#1+.22\htp,#2-.10\htp) -- (#1+.12\htp,#2-.10\htp) --
+    (#1+.12\htp,#2-.50\htp) -- (#1-.12\htp,#2-.50\htp) --
+    (#1-.12\htp,#2-.10\htp) -- (#1-.22\htp,#2-.10\htp) --
+    cycle;
+  \fill[#4] (#1,#2+.38\htp) circle (.12\htp);}
+\newcommand{\persono}[4]{
+  \person{#1}{#2}{#3}{fill=white,draw=white,line width=.5mm}
+  \person{#1}{#2}{#3}{#4}}
+\newcommand{\community}[5]{
+  \foreach \yi in {#5,...,1}{
+    \foreach \xi in {1,...,\yi}{
+      \persono{#1-\yi*3mm+\xi*6mm-3mm}{#2+\yi*1mm-1mm}{#3}{#4}
+    }
+  }
+}

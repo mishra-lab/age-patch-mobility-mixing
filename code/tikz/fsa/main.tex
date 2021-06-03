@@ -1,0 +1,12 @@
+\documentclass[margin=5mm,multi=page]{standalone}
+\input{../config}
+\usepackage{helvet}\renewcommand*\familydefault{\sfdefault}
+%\usepackage[osf]{ETbb}
+\begin{document}
+  \footnotesize
+  \begin{page}\def\bxx{fx}\def\bxh{fx}\def\bxa{fx}\def\bxb{fx}\def\bxc{fx}\input{pools}\end{page}
+  \begin{page}\def\bxx{}{}\def\bxh{fx}\def\bxa{}{}\def\bxb{}{}\def\bxc{}{}\input{pools}\end{page}
+  \begin{page}\def\bxx{}{}\def\bxh{}{}\def\bxa{fx}\def\bxb{}{}\def\bxc{}{}\input{pools}\end{page}
+  \begin{page}\def\bxx{}{}\def\bxh{}{}\def\bxa{}{}\def\bxb{fx}\def\bxc{}{}\input{pools}\end{page}
+  \begin{page}\def\bxx{}{}\def\bxh{}{}\def\bxa{}{}\def\bxb{}{}\def\bxc{fx}\input{pools}\end{page}
+\end{document}

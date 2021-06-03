@@ -1,0 +1,33 @@
+\definecolor{GX}{HTML}{999999}
+\newcommand{\gpop}[5]{
+  \community{#1}{#2}{#3}{#4}{3}
+  \node[minimum height=#3*1.2,minimum width=#3*1.3,anchor=south] (#5) at (#1,#2-.55*#3) {};
+}
+\begin{tikzpicture}[x=8mm,y=8mm]
+ \useasboundingbox (-6,-5) rectangle (+6,+4);
+  \node[align=center] at (-5.5,+3) {home\\pools};
+  \node[align=center] at (-5.5, 0) {decile\\populations};
+  \node[align=center] at (-5.5,-4) {travel\\pools};
+  \node[align=center] at (+5.5, 0) {\dots};
+  \gpop{-24mm}{0mm}{15mm}{G1}{A}
+  \gpop{    0}{0mm}{15mm}{G2,bx,\bxx,\bxa,\bxb,\bxc}{B}
+  \gpop{ 24mm}{0mm}{15mm}{G3,bx,\bxx,\bxa,\bxb,\bxc}{C}
+  \node[bx,\bxx,\bxh,gpool=G1] (Ah) at (-3,+3) {home\\pool\\1};
+  \node[bx,\bxx,    ,gpool=G2] (Bh) at ( 0,+3) {home\\pool\\2};
+  \node[bx,\bxx,    ,gpool=G3] (Ch) at (+3,+3) {home\\pool\\3};
+  \node[bx,\bxx,\bxa,gpool=GX!67!G1] (At) at (-3,-4) {travel\\pool\\1};
+  \node[bx,\bxx,\bxb,gpool=GX!67!G2] (Bt) at ( 0,-4) {travel\\pool\\2};
+  \node[bx,\bxx,\bxc,gpool=GX!67!G3] (Ct) at (+3,-4) {travel\\pool\\3};
+  \draw[bx,\bxx,\bxh,arrow,G1,->] (A) edge (Ah);
+  \draw[bx,\bxx,    ,arrow,G2,->] (B) edge (Bh);
+  \draw[bx,\bxx,    ,arrow,G3,->] (C) edge (Ch);
+  \draw[bx,\bxx,\bxa,arrow,G1,->] (A) edge (At);
+  \draw[bx,\bxx,\bxa,arrow,G2,->] (B) edge[bend left =10] (At);
+  \draw[bx,\bxx,\bxa,arrow,G3,->] (C) edge[bend left =10] (At);
+  \draw[bx,\bxx,\bxb,arrow,G1,->] (A) edge[bend right=10] (Bt);
+  \draw[bx,\bxx,\bxb,arrow,G2,->] (B) edge (Bt);
+  \draw[bx,\bxx,\bxb,arrow,G3,->] (C) edge[bend left =10] (Bt);
+  \draw[bx,\bxx,\bxc,arrow,G1,->] (A) edge[bend right=10] (Ct);
+  \draw[bx,\bxx,\bxc,arrow,G2,->] (B) edge[bend right=10] (Ct);
+  \draw[bx,\bxx,\bxc,arrow,G3,->] (C) edge (Ct);
+\end{tikzpicture}
