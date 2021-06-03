@@ -13,7 +13,7 @@ if (args[1] == 'mixing'){
   for (mo in c('ref',mo.covid)){
     main.mixing(t=mo)
   }
-  merge.save.mixing()
+  merge.save.mixing('Ci')
 }
 if (args[1] == 'debug'){
   # DEBUG

@@ -7,40 +7,42 @@ library(ggridges)
 
 offd  = function(x){ x-diag(rep(NA,nrow(x))) }
 
-mix.melt = function(X,aggr,xfun=NULL){
-  if (isFALSE(aggr)){ aggr.fun = function(X){ X }}
-  if (aggr=='a')    { aggr.fun = function(X){ a.sum(X/1e6,c(1,3)) }}
-  if (aggr=='g')    { aggr.fun = function(X){ a.sum(X/1e6,c(2,4)) }}
+mix.melt = function(C,what,vs,aggr=TRUE,xfun=NULL,...){
   if (is.null(xfun)){ xfun = identity }
-  if (is.list(X)){
-    return(do.call(rbind,lapply(names(X),function(group){
-      x = melt(xfun(aggr.fun(X[[group]])),value.name='X',varnames=c('i','i.'))
-      x$group = factor(group,levels=names(X))
-      return(x)
+  if (is.list(C)){
+    return(do.call(rbind,lapply(names(C),function(name){
+      C.aggr = aggr.mix(C[[name]],what,vs,aggr=aggr,...)
+      C. = melt(xfun(C.aggr),value.name='X',varnames=c('i','i.'))
+      C.$group = factor(name,levels=names(C))
+      return(C.)
     })))
   } else {
-    return( melt(xfun(aggr.fun(X)),value.name='X',varnames=c('i','i.')) )
+    C.aggr = aggr.mix(C[[name]],what,vs,aggr=aggr,...)
+    return( melt(xfun(C.aggr),value.name='X',varnames=c('i','i.')) )
   }
 }
-plot.mix = function(X,case='a',xfun=NULL,aggr=NULL,clim=NULL,cmap='inferno'){
-  aggr = ifelse(is.null(aggr),case,aggr)
-  X. = mix.melt(X,aggr,xfun)
-  g = ggplot(X.,aes(x=factor(i.),y=factor(i),fill=X,color=X)) +
+plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,clim=NULL,cmap='inferno',...){
+  C. = mix.melt(C,what,vs,xfun=xfun,...)
+  v.name = switch(what,
+    CX = 'Total Contacts\n(Millions)',
+    Ci = 'Contacts\nPer Person',
+    Cp = 'Contact\nFormation\nProbability')
+  g = ggplot(C.,aes(x=factor(i.),y=factor(i),fill=X,color=X)) +
     geom_tile() +
     coord_fixed(ratio=1) +
     scale_y_discrete(expand=c(0,0)) +
     scale_x_discrete(expand=c(0,0)) +
-    xlab(labels[[case]]$x) + ylab(labels[[case]]$y) +
-    scale_fill_viridis(option=cmap,limits=clim,na.value='transparent') +
-    scale_color_viridis(option=cmap,limits=clim,na.value='transparent') +
+    labs(x=labels[[vs]]$x,y=labels[[vs]]$y,fill=v.name) +
+    scale_fill_viridis(option=cmap,limits=clim,end=.95,na.value='transparent') +
+    scale_color_viridis(option=cmap,limits=clim,end=.95,na.value='transparent') +
     theme_light() +
     guides(color=FALSE,fill=guide_colorbar(barheight=5)) +
-    switch(case,
+    switch(vs,
       a = theme(axis.text.x=element_text(angle=90,hjust=1)),
       n = theme(axis.text.x=element_blank(),axis.text.y=element_blank())
     )
-  if (is.list(X)){
-    if (length(X) <= 6) { g = g + facet_grid(cols=vars(group)) }
+  if (is.list(C)){
+    if (length(C) <= 6) { g = g + facet_grid(cols=vars(group)) }
     else { g = g + facet_wrap(vars(group)) }
   }
   return(g)
