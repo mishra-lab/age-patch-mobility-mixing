@@ -17,4 +17,7 @@ if (args[1] == 'mixing'){
 }
 if (args[1] == 'debug'){
   # DEBUG
+  source('runtime.r')
+  # gen.mix.runtime.data()
+  gen.Ci.gg.y()
 }

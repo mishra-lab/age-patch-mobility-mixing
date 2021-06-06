@@ -62,7 +62,7 @@ N = list(
   y = length(info$c.type),
   g = length(info$group)
 )
-eps = c(
+eps.y = c(
   'home'  = 0.2354799,
   'other' = 0.1818460)
 f.c.mean = c(

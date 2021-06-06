@@ -2,17 +2,6 @@ source('utils.r')
 source('data.r')
 source('plot.r')
 
-resample.contacts = function(C5,ai,ao){
-  # WARNING: assumes C5 is 5-year age groups
-  midpoints = function(a){ a+c(diff(a)/2,.5) }
-  m1 = midpoints(seq(0,79))
-  C1 = interp2d(C5,midpoints(ai),m1)/5
-  M = t(tail(outer(c(0,ao),m1,'<') * outer(c(ao,Inf),m1,'>'),-1))
-  Co = t(apply(C1,1,interp1d,xi=m1,xo=midpoints(ao)) %*% M)
-  dimnames(Co) = list(a=names(ao),a.=names(ao))
-  return(Co)
-}
-
 pop.to.Pga = function(pop){
   P = aggregate(pop~group+age,pop,sum)
   P.ga = matrix(P[order(P$age,P$group),]$pop,nrow=N$g,
@@ -20,20 +9,26 @@ pop.to.Pga = function(pop){
   return(P.ga)
 }
 
-Caay.to.Cgay = function(C.aa.y){
-  # WARNING: assume 10 deciles
-  S = map.decile(data.frame(decile=seq(10)))
+Caay.resample = function(C.aa.y){
   mp = function(a){ a+c(diff(a)/2,0) }
-  C.ga.y = lapply(names(C.aa.y),function(y){
-    S$scale = f.c.mean[[y]]+seq(+f.c.scale[[y]],-f.c.scale[[y]],l=10)
-    c.a.i = rowSums(C.aa.y[[y]])
+  return(lapply(C.aa.y,function(C.aa){
+    c.a.i = rowSums(C.aa)
     c.a.o = approx(x=mp(age.contact),y=c.a.i,xo=mp(info$age),
       method='linear',yleft=c.a.i[1],yright=c.a.i[length(c.a.i)])$y
+    names(c.a.o) = names(info$age)
+    return(c.a.o)
+  }))
+}
+
+Cay.to.Cgay = function(C.a.y){
+  S = map.decile(data.frame(decile=seq(10)))
+  C.ga.y = lapply(names(C.a.y),function(y){
+    S$scale = f.c.mean[[y]]+seq(+f.c.scale[[y]],-f.c.scale[[y]],l=10)
     return(matrix(aggregate(CS~group+age,
-        transform(merge(data.frame(C=c.a.o,age=info$age),S),CS=C*scale),mean)$CS,
-      nrow=N$g,dimnames=X.names[1:2]))
+      transform(merge(data.frame(C=C.a.y[[y]],age=info$age),S),CS=C*scale),
+      mean)$CS,nrow=N$g,dimnames=X.names[1:2]))
   })
-  names(C.ga.y) = names(C.aa.y)
+  names(C.ga.y) = names(C.a.y)
   return(C.ga.y)
 }
 
@@ -54,16 +49,16 @@ gen.mix.total = function(C.ga.y,P.ga,B.gg,mo){
       T    = sum(Q.ga)
       X.yx = outer(Q.ga,Q.ga)/T
       Xa   = a.sum(X.yx,4)
-      X.yx = X.yx * (1-eps[[y]])
-      for (a in seq(N$a)){ X.yx[,a,,a] = X.yx[,a,,a] + eps[[y]] * Xa[,a,] }
+      X.yx = X.yx * (1-eps.y[[y]])
+      for (a in seq(N$a)){ X.yx[,a,,a] = X.yx[,a,,a] + eps.y[[y]] * Xa[,a,] }
       X.y = X.y + (1-h.y[[y]]) * X.yx
     }
     for (g in seq(N$g)){ # non-travel-related
       Q.ga = Q.ga.y[[y]][g,]
       X.yg = outer(Q.ga,Q.ga) / sum(Q.ga)
       Xa   = a.sum(X.yg,2)
-      X.yg = X.yg * (1-eps[[y]])
-      for (a in seq(N$a)){ X.yg[a,a] = X.yg[a,a] + eps[[y]] * Xa[a] }
+      X.yg = X.yg * (1-eps.y[[y]])
+      for (a in seq(N$a)){ X.yg[a,a] = X.yg[a,a] + eps.y[[y]] * Xa[a] }
       X.y[g,,g,] = X.y[g,,g,] + (h.y[[y]]) * X.yg
     }
     X.gaga.y[[y]] = X.y
@@ -137,7 +132,7 @@ main.mixing = function(t='ref'){
   pop    = load.fsa.pop()
   C.aa.y = load.contacts()
   B.gg   = load.group.mob(pop)
-  C.ga.y = Caay.to.Cgay(C.aa.y)
+  C.ga.y = Cay.to.Cgay(Caay.resample(C.aa.y))
   P.ga   = pop.to.Pga(pop)
   CX.gaga.y = gen.mix.total(C.ga.y,P.ga,B.gg,t) # absolute contacts
   Ci.gaga.y = CX.norm(CX.gaga.y,P.ga)           # contacts per person
