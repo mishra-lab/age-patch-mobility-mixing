@@ -17,16 +17,17 @@ mix.melt = function(C,what,vs,aggr=TRUE,xfun=NULL,...){
       return(C.)
     })))
   } else {
-    C.aggr = aggr.mix(C[[name]],what,vs,aggr=aggr,...)
+    C.aggr = aggr.mix(C,what,vs,aggr=aggr,...)
     return( melt(xfun(C.aggr),value.name='X',varnames=c('i','i.')) )
   }
 }
 plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,clim=NULL,cmap='inferno',...){
-  C. = mix.melt(C,what,vs,xfun=xfun,...)
+  C. = mix.melt(C,what,vs,aggr=aggr,xfun=xfun,...)
   v.name = switch(what,
     CX = 'Total Contacts\n(Millions)',
     Ci = 'Contacts\nPer Person',
-    Cp = 'Contact\nFormation\nProbability')
+    Cp = 'Contact\nFormation\nProbability',
+    B  = '% Decile Pop\nwho Travelled\nto Other Decile')
   g = ggplot(C.,aes(x=factor(i.),y=factor(i),fill=X,color=X)) +
     geom_tile() +
     coord_fixed(ratio=1) +
