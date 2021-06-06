@@ -2,7 +2,7 @@ suppressMessages({library(socialmixr)})
 options(width=150)
 
 DEBUG = TRUE
-MODE = '2x2' # 10x10 = 10 deciles & 10+ age groups; 2x2 = 2 deciles & age groups
+MODE = '10x10' # 10x10 = 10 deciles & 10+ age groups; 2x2 = 2 deciles & age groups
 fig.ext = '.pdf'
 
 root.path = function(...){
@@ -31,8 +31,8 @@ info = list(
       '75-79' = 75,
       '80+'   = 80),
     c.type = c(
-      'Household Contacts'     = 'Home',
-      'Non-Household Contacts' = 'Other'),
+      'Household Contacts'     = 'home',
+      'Non-Household Contacts' = 'other'),
     group = c(
       '1'  = 1,
       '2'  = 2,
@@ -51,8 +51,8 @@ info = list(
       '16-59' = 16,
       '60+'   = 60),
     c.type = c(
-      'Household Contacts'     = 'Home',
-      'Non-Household Contacts' = 'Other'),
+      'Household Contacts'     = 'home',
+      'Non-Household Contacts' = 'other'),
     group = c(
       '1-2'  = 1,
       '3-10' = 3)
@@ -65,6 +65,12 @@ N = list(
 eps = c(
   'home'  = 0.2354799,
   'other' = 0.1818460)
+f.c.mean = c(
+  'home'  = 1,
+  'other' = .15)
+f.c.scale = c(
+  'home'  = 1,
+  'other' = .3)
 phi = c(
   'unobs.device' = .9,
   'no.device'    = .9

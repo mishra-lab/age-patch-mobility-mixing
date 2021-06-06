@@ -44,7 +44,7 @@ get.cy.error = function(C.yi,C.yi.eps){
   # return(mean(abs(C.yi-C.yi.eps)/C.yi)) # relative difference # DEBUG
 }
 estimate.cy.eps = function(C.y){
-  eps.0 = c('Home'=.5,'Other'=.5)
+  eps.0 = c('home'=.5,'other'=.5)
   obj.fun = function(eps,aggr=TRUE) {
     C.y.eps = mapply(get.cy.eps,C.y,eps,SIMPLIFY=FALSE)
     error = mapply(get.cy.error,C.y,C.y.eps)

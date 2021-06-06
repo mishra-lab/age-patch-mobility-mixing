@@ -20,25 +20,32 @@ pop.to.Pga = function(pop){
   return(P.ga)
 }
 
-Caay.to.Cay = function(C.y,age=NULL){
-  if (is.null(age)){ age = info$age }
+Caay.to.Cgay = function(C.aa.y){
+  # WARNING: assume 10 deciles
+  S = map.decile(data.frame(decile=seq(10)))
   mp = function(a){ a+c(diff(a)/2,0) }
-  return(do.call(cbind,lapply(C.y,function(c.y){
-    c.y.m = rowSums(c.y)
-    return(approx(x=mp(age.contact),y=c.y.m,xo=mp(age),
-      method='linear',yleft=c.y.m[1],yright=c.y.m[length(c.y.m)])$y)
-  })))
+  C.ga.y = lapply(names(C.aa.y),function(y){
+    S$scale = f.c.mean[[y]]+seq(+f.c.scale[[y]],-f.c.scale[[y]],l=10)
+    c.a.i = rowSums(C.aa.y[[y]])
+    c.a.o = approx(x=mp(age.contact),y=c.a.i,xo=mp(info$age),
+      method='linear',yleft=c.a.i[1],yright=c.a.i[length(c.a.i)])$y
+    return(matrix(aggregate(CS~group+age,
+        transform(merge(data.frame(C=c.a.o,age=info$age),S),CS=C*scale),mean)$CS,
+      nrow=N$g,dimnames=X.names[1:2]))
+  })
+  names(C.ga.y) = names(C.aa.y)
+  return(C.ga.y)
 }
 
-gen.mix.total = function(C.ay,P.ga,B.gg,mo){
+gen.mix.total = function(C.ga.y,P.ga,B.gg,mo){
   # estimates the total number of contacts between all combinations of age/geo groups
-  # C.ay: contacts per age & contact type
+  # C.ga.y: contacts per group, age & contact type
   # P.ga: population per geo & age
   # B.gg: mobility between geo groups (home / other)
   # mo:   month (t)
   B.gg[['ref']] = Reduce('+',B.gg[mo.ref]) / length(mo.ref)
   B.tgg = B.gg[[mo]] + diag(1-rowSums(B.gg[['ref']])) # n.b. does not sum to one unless mo = ref
-  Q.ga.y = lapply(info$c.type,function(y){ sweep(P.ga,2,C.ay[,y],'*') })
+  Q.ga.y = lapply(info$c.type,function(y){ P.ga * C.ga.y[[y]] })
   X.gaga.y = list()
   for (y in seq(N$y)){
     X.y = array(0,c(N$g,N$a,N$g,N$a),dimnames=X.names)
@@ -66,12 +73,13 @@ gen.mix.total = function(C.ay,P.ga,B.gg,mo){
   return(X.gaga.y)
 }
 
-CX.norm = function(CX.gaga.y,P.ga,C.ay){
+CX.norm = function(CX.gaga.y,P.ga,C.ga.y=NULL){
   C.gaga.y = lapply(CX.gaga.y,function(X){ X*0 })
   for (y in seq(N$y)){
     for (g in seq(N$g)){
       for (a in seq(N$a)){
-        C.gaga.y[[y]][g,a,,] = CX.gaga.y[[y]][g,a,,] / P.ga[g,a] / C.ay[a,y]
+        c.ga.y = ifelse(is.null(C.ga.y),1,C.ga.y[[y]][g,a])
+        C.gaga.y[[y]][g,a,,] = CX.gaga.y[[y]][g,a,,] / P.ga[g,a] / c.ga.y
       }
     }
   }
@@ -126,16 +134,15 @@ merge.save.mixing = function(what){
 }
 
 main.mixing = function(t='ref'){
-  C.y  = load.contacts()
-  pop  = load.fsa.pop()
-  B.gg = load.group.mob(pop)
-  C.ay = Caay.to.Cay(C.y)
-  P.ga = pop.to.Pga(pop)
-  CX.gaga.y = gen.mix.total(C.ay,P.ga,B.gg,t)   # absolute contacts
-  Ci.gaga.y = CX.norm(CX.gaga.y,P.ga,C.ay/C.ay) # contacts per person
-  Cp.gaga.y = CX.norm(CX.gaga.y,P.ga,C.ay)      # contact probability
-  # plot.mixing(CX.gaga.y,'CX',t)
-  # plot.mixing(Ci.gaga.y,'Ci',t,P.ga=P.ga)
-  # save.mixing(Ci.gaga.y,'Ci',t)
-  print(aggr.mix(Ci.gaga.y[[2]],'Ci','i',P.ga))
+  pop    = load.fsa.pop()
+  C.aa.y = load.contacts()
+  B.gg   = load.group.mob(pop)
+  C.ga.y = Caay.to.Cgay(C.aa.y)
+  P.ga   = pop.to.Pga(pop)
+  CX.gaga.y = gen.mix.total(C.ga.y,P.ga,B.gg,t) # absolute contacts
+  Ci.gaga.y = CX.norm(CX.gaga.y,P.ga)           # contacts per person
+  Cp.gaga.y = CX.norm(CX.gaga.y,P.ga,C.ga.y)    # contact probability
+  plot.mixing(CX.gaga.y,'CX',t)
+  plot.mixing(Ci.gaga.y,'Ci',t,P.ga=P.ga)
+  save.mixing(Ci.gaga.y,'Ci',t)
 }

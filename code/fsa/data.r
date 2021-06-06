@@ -76,7 +76,7 @@ load.fsa.smartphones = function(){
 
 load.contacts = function(){
   C.y = list()
-  map = list(Home='home',Other=c('work','school','other_locations'))
+  map = list(home='home',other=c('work','school','other_locations'))
   ctx = read.csv(root.path('data','fsa','contacts_age.csv'))
   dnames = list(a=names(age.contact),a.=names(age.contact))
   for (y in names(map)){
@@ -119,7 +119,7 @@ clean.canada.contacts = function(){
     # C.y[[y]] = C.y. # DEBUG
     C.y[[y]] = cbind('type'=y,melt(C.y.,value.name='contacts',varnames=c('a','a.')))
   }
-  # C.y. = list(Home=C.y[['home']],Other=C.y[['work']]+C.y[['school']]+C.y[['other_locations']]) # DEBUG
+  # C.y. = list(home=C.y[['home']],other=C.y[['work']]+C.y[['school']]+C.y[['other_locations']]) # DEBUG
   # plot.mix(C.y,aggr=FALSE,clim=c(0,7)); ggsave(figname('polymod-canada'),width=12,height=4) # DEBUG
   C.y = do.call(rbind,C.y)
   write.csv(C.y,root.path('data','fsa','contacts_age.csv'),row.names=FALSE)
