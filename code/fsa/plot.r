@@ -21,7 +21,7 @@ mix.melt = function(C,what,vs,aggr=TRUE,xfun=NULL,...){
     return( melt(xfun(C.aggr),value.name='X',varnames=c('i','i.')) )
   }
 }
-plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,clim=NULL,cmap='inferno',...){
+plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,clim=c(0,NA),cmap='inferno',...){
   C. = mix.melt(C,what,vs,aggr=aggr,xfun=xfun,...)
   v.name = switch(what,
     CX = 'Total Contacts\n(Millions)',
@@ -33,7 +33,7 @@ plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,clim=NULL,cmap='inferno',...){
     coord_fixed(ratio=1) +
     scale_y_discrete(expand=c(0,0)) +
     scale_x_discrete(expand=c(0,0)) +
-    labs(x=labels[[vs]]$x,y=labels[[vs]]$y,fill=v.name) +
+    labs(x=config$labels[[vs]]$x,y=config$labels[[vs]]$y,fill=v.name) +
     scale_fill_viridis(option=cmap,limits=clim,end=.95,na.value='transparent') +
     scale_color_viridis(option=cmap,limits=clim,end=.95,na.value='transparent') +
     theme_light() +

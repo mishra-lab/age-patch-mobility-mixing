@@ -15,7 +15,7 @@ figname = function(name,...){
   return(file.path(path,paste0(name,fig.ext)))
 }
 
-info = list(
+config = list( # see [[MODE]] below
   '10x10' = list(
     age = c(
       '<12'   = 0,
@@ -30,9 +30,6 @@ info = list(
       '70-74' = 70,
       '75-79' = 75,
       '80+'   = 80),
-    c.type = c(
-      'Household Contacts'     = 'home',
-      'Non-Household Contacts' = 'other'),
     group = c(
       '1'  = 1,
       '2'  = 2,
@@ -50,56 +47,63 @@ info = list(
       '12-15' = 12,
       '16-59' = 16,
       '60+'   = 60),
-    c.type = c(
-      'Household Contacts'     = 'home',
-      'Non-Household Contacts' = 'other'),
     group = c(
       '1-2'  = 1,
       '3-10' = 3)
 ))[[MODE]]
-N = list(
-  a = length(info$age),
-  y = length(info$c.type),
-  g = length(info$group)
+# add config stuff that doesn't depend on MODE
+config = c(config,list(
+  c.type = c( # contact types
+    'Household Contacts'     = 'home',
+    'Non-Household Contacts' = 'other'
+  ),
+  eps.y = c( # assortative parameter for age
+    'home'  = 0.2354799,
+    'other' = 0.1818460
+  ),
+  f.c.mean = c( # global scaling factor for contacts
+    'home'  = 1,
+    'other' = 1
+  ),
+  f.c.slope = c( # "range" of sloped scaling factor for contacts by decile
+    # e.g. .30 -> lowest decile has .85x contacts, highest has 1.15x contacts
+    'home'  = .15,
+    'other' = .30
+  ),
+  phi = c( # odds of mobility vs observed devices
+    'unobs.device' = .9,
+    'no.device'    = .9
+  ),
+  h.y = c( # proportion of contacts formed at home
+    'home'  = 1,
+    'other' = 0
+  ),
+  t.ref   = c('2020-01','2020-02'), # REF period
+  t.covid = c('2020-03','2020-04','2020-05','2020-06', # covid periods
+              '2020-07','2020-08','2020-09','2020-10','2020-11','2020-12','2021-01'),
+  X.names = list( # convenience list for naming matrix dims
+    'g'  = names(config$group),
+    'a'  = names(config$age),
+    'g.' = names(config$group),
+    'a.' = names(config$age)
+  ),
+  labels = list( # convenience for plotting labels
+    g = list(y='Home Decile (g)',x='Other Decile (g\')'),
+    n = list(y='Home FSA (n)',   x='Other FSA (n\')'),
+    a = list(y='Self Age (a)',   x='Other Age (a\')')
+  ),
+  age.contact = c( # Prem 2017 POLYMOD age groups
+    '00-04' =  0 , '05-09' =  5,
+    '10-14' = 10 , '15-19' = 15,
+    '20-24' = 20 , '25-29' = 25,
+    '30-34' = 30 , '35-39' = 35,
+    '40-44' = 40 , '45-49' = 45,
+    '50-54' = 50 , '55-59' = 55,
+    '60-64' = 60 , '65-69' = 65,
+    '70-74' = 70 , '75-80' = 75) # TODO: double check defs
+))
+config$N = list( # convenience
+  a = length(config$age),
+  y = length(config$c.type),
+  g = length(config$group)
 )
-eps.y = c(
-  'home'  = 0.2354799,
-  'other' = 0.1818460)
-f.c.mean = c(
-  'home'  = 1,
-  'other' = 1)
-f.c.scale = c(
-  'home'  = .15,
-  'other' = .30)
-phi = c(
-  'unobs.device' = .9,
-  'no.device'    = .9
-)
-h.y = c(
-  'home'  = 1,
-  'other' = 0
-)
-mo.ref = c('2020-01','2020-02')
-mo.covid = c('2020-03','2020-04','2020-05','2020-06',
-  '2020-07','2020-08','2020-09','2020-10','2020-11','2020-12',
-  '2021-01')
-X.names = list(
-  'g'  = names(info$group),
-  'a'  = names(info$age),
-  'g.' = names(info$group),
-  'a.' = names(info$age)
-)
-labels = list(
-  g = list(y='Home Decile (g)',x='Other Decile (g\')'),
-  n = list(y='Home FSA (n)',   x='Other FSA (n\')'),
-  a = list(y='Self Age (a)',   x='Other Age (a\')')
-)
-age.contact = c(
-  '00-04' =  0 , '05-09' =  5,
-  '10-14' = 10 , '15-19' = 15,
-  '20-24' = 20 , '25-29' = 25,
-  '30-34' = 30 , '35-39' = 35,
-  '40-44' = 40 , '45-49' = 45,
-  '50-54' = 50 , '55-59' = 55,
-  '60-64' = 60 , '65-69' = 65,
-  '70-74' = 70 , '75-80' = 75) # TODO: double check defs

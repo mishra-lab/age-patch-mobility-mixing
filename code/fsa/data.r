@@ -2,9 +2,9 @@ source('config.r')
 
 aggr.age = function(pop,age=TRUE){
   if (age){
-    pop = aggregate(pop~FSA+cut(age,breaks=c(info$age,Inf),right=FALSE),pop,sum)
+    pop = aggregate(pop~FSA+cut(age,breaks=c(config$age,Inf),right=FALSE),pop,sum)
     colnames(pop)[2] = 'age'
-    levels(pop$age) = names(info$age)
+    levels(pop$age) = names(config$age)
     return(pop)
   } else {
     return(aggregate(pop~FSA,pop,sum))
@@ -14,16 +14,16 @@ aggr.age = function(pop,age=TRUE){
 aggr.mob.decile = function(B,pop){
   P = aggregate(pop~decile+group,pop,sum)
   p = ave(P$pop,P$group,FUN=function(pop){pop/sum(pop)})
-  M = t(tail(outer(c(0,info$group),seq(10),'<=') * outer(c(info$group,Inf),seq(10),'>'),-1))
+  M = t(tail(outer(c(0,config$group),seq(10),'<=') * outer(c(config$group,Inf),seq(10),'>'),-1))
   B = t(p*M) %*% B %*% M
-  colnames(B) = info$group
-  rownames(B) = info$group
+  colnames(B) = config$group
+  rownames(B) = config$group
   return(B)
 }
 
 map.decile = function(x){
-  x$group = cut(x$decile,breaks=c(info$group,Inf),right=FALSE)
-  levels(x$group) = names(info$group)
+  x$group = cut(x$decile,breaks=c(config$group,Inf),right=FALSE)
+  levels(x$group) = names(config$group)
   return(x)
 }
 
@@ -78,11 +78,11 @@ load.contacts = function(){
   C.y = list()
   map = list(home='home',other=c('work','school','other_locations'))
   ctx = read.csv(root.path('data','fsa','contacts_age.csv'))
-  dnames = list(a=names(age.contact),a.=names(age.contact))
+  dnames = list(a=names(config$age.contact),a.=names(config$age.contact))
   for (y in names(map)){
     C.y[[y]] = matrix(
       aggregate(contacts~a+a.,ctx[ctx$type %in% map[[y]],],sum)$contacts,
-      nrow=length(age.contact),dimnames=dnames)
+      nrow=length(config$age.contact),dimnames=dnames)
   }
   # g = plot.mix(C.y,aggr=FALSE); ggsave(figname('polymod-canada-2'),width=8,height=4) # DEBUG
   return(C.y)

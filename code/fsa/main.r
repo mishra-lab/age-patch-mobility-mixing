@@ -10,14 +10,11 @@ if (args[1] == 'mobility'){
 }
 if (args[1] == 'mixing'){
   source('mixing.r')
-  for (mo in c('ref',mo.covid)){
-    main.mixing(t=mo)
+  for (t in c('REF',config$t.covid)){
+    main.mixing(t=t);
   }
   merge.save.mixing('Ci')
 }
 if (args[1] == 'debug'){
   # DEBUG
-  source('runtime.r')
-  # gen.mix.runtime.data()
-  gen.Ci.gg.y()
 }
