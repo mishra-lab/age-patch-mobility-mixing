@@ -56,7 +56,7 @@ gen.mix.total = function(C.ga.y,P.ga,B.gg.t,t){
   B.g.0 = rowSums(B.gg.t[['REF']]) # total probability of being mobile during REF
   B.g.t = rowSums(B.gg.t[[t]])     # total probability of begin mobile this t
   B.gg = B.gg.t[[t]] + (B.g.t / B.g.0) * diag(1-B.g.0) # adding "mobility" within same g
-  Q.ga.y = lapply(config$c.type,function(y){ P.ga * C.ga.y[[y]] }) # total contacts offered by group & age, by type
+  Q.ga.y = lapply(seq(config$N$y),function(y){ P.ga * C.ga.y[[y]] }) # total contacts offered by group & age, by type
   N = config$N; eps.y = config$eps.y; h.y = config$h.y; # convenience
   X.gaga.y = list() # initialize output
   for (y in seq(N$y)){ # for each contact type
@@ -83,7 +83,7 @@ gen.mix.total = function(C.ga.y,P.ga,B.gg.t,t){
       }
       X.gaga[g,,g,] = X.gaga[g,,g,] + (h.y[[y]]) * X.aa. # add contribution of this home-pool to the total mixing
     }
-    X.gaga.y[[y]] = X.gaga # copy result into output 
+    X.gaga.y[[y]] = X.gaga # copy result into output
   }
   names(X.gaga.y) = names(config$c.type)
   # for (y in seq(N$y)){ print(a.sum(X.gaga.y[[y]],c(3,4))/Q.ga.y[[y]]) } # DEBUG: should all = 1
