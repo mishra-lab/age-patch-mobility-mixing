@@ -13,7 +13,6 @@ Rplots.pdf
 *.Rdata
 
 # outputs
-*.png # TEMP
 
 # tex
 *.aux
