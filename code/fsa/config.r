@@ -2,7 +2,7 @@ suppressMessages({library(socialmixr)})
 options(width=150)
 
 DEBUG = TRUE
-MODE = '10x10' # 10x10 = 10 deciles & 10+ age groups; 2x2 = 2 deciles & age groups
+MODE = '2x2' # 10x10 = 10 deciles & 10+ age groups; 2x2 = 2 deciles & age groups
 fig.ext = '.pdf'
 
 root.path = function(...){
