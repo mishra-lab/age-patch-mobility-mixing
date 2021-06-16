@@ -5,6 +5,8 @@ library(ggplot2)
 library(ggridges)
 })
 
+# supporting functions for plotting stuff
+
 offd  = function(x){ x-diag(rep(NA,nrow(x))) }
 
 mix.melt = function(C,what,vs,aggr=TRUE,xfun=NULL,...){

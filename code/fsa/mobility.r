@@ -1,6 +1,8 @@
-source('config.r')
 source('data.r')
 source('plot.r')
+
+# Objective: 1. estimate mobility matrix (decile) from cell-phone count data (FSA)
+#            2. plot some marginal distributions of the mobility data
 
 g.merge = function(X,pop,case){
   cols = c('FSA','decile')
@@ -9,7 +11,7 @@ g.merge = function(X,pop,case){
   return(merge(X,g,all.x=TRUE))
 }
 
-plot.mobility = function(X,S,pop,idx.ref,f='mobility'){
+plot.mobility.margins = function(X,S,pop,idx.ref,f='mobility'){
   dh.ref = aggregate(devices.home ~FSA,S[idx.ref,],mean,drop=FALSE)$devices.home
   dv.ref = aggregate(devices.visit~FSA,S[idx.ref,],mean,drop=FALSE)$devices.visit
   S$devices.vt.ht = S$devices.visit / S$devices.home
@@ -61,10 +63,10 @@ main.mobility = function(do.plot=TRUE,do.csv=TRUE){
   idx.ref = S$month %in% mo.ref
   dh.ref = aggregate(devices.home ~FSA,S[idx.ref,],mean,drop=FALSE)$devices.home
   X = X[order(X$month,X$FSA.visited,X$FSA),] # reshape for implicit repeat along FSA
-  X$visit.total = X$devices.visit / dh.ref *
-  (1 + phi['unobs.device'] * (S$devices.total - dh.ref) + phi['no.device'] * (S$pop - S$devices.total))
+  X$visit.total = X$devices.visit / dh.ref * # "extrapolate" the unobserved people
+    (1 + phi['unobs.device'] * (S$devices.total - dh.ref) + phi['no.device'] * (S$pop - S$devices.total))
   if (do.plot){
-    plot.mobility(X,S,pop,idx.ref)
+    plot.mobility.margins(X,S,pop,idx.ref)
   }
   if (do.csv){
     save.mobility(X,S,pop)

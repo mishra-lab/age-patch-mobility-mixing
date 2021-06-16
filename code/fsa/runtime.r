@@ -1,3 +1,8 @@
+# Objective: Same as mixing.r except pre-compute as much as possible
+#            and save/load things from (fsa.mix.data(mode)) .rdata file
+# 1. Run "gen.mix.runtime.data" once to generate the .rdata file
+# 2. Run "gen.Ci.gaga.y" during model fitting with input values sampled as needed
+
 fsa.mix.data = function(mode='10x10'){
   return(paste0('.fsa-mix-',mode,'.rdata'))
 }
@@ -17,7 +22,7 @@ gen.mix.runtime.data = function(){
   )})
   B.gg.t[['REF']] = Reduce('+',B.gg.t[config$t.ref]) / length(config$t.ref)
   B.gg.t = B.gg.t[c('REF',config$t.covid)]
-  save(B.gg.t,P.ga,C.df.y,config,file=fsa.mix.data(MODE))
+  save(B.gg.t,P.ga,C.df.y,config,file=fsa.mix.data(config$mode))
 }
 
 a.sum = function(A,d){
@@ -25,11 +30,11 @@ a.sum = function(A,d){
   return(colSums(aperm(A,c(d,ds[-d])),dims=length(d)))
 }
 
-gen.Ci.gg.y = function(t='REF', c.mean=c(1,1), c.slope=c(.15,.30), mode='10x10'){
+gen.Ci.gaga.y = function(t='REF', RR.C.global=c(1,1), RR.C.decile=c(.30,.60), mode='10x10'){
   load(fsa.mix.data(mode))
   N = config$N; eps.y = config$eps.y; h.y = config$h.y; # convenience
   C.ga.y = lapply(seq(N$y),function(y){ # 2nd 1/2 of Cay.to.Cgay
-    C.df.y[[y]]$CS = C.df.y[[y]]$C * (c.mean[y]+seq(+c.slope[y],-c.slope[y],l=10)) # C scaling
+    C.df.y[[y]]$CS = C.df.y[[y]]$C * RR.C.global[y] * (1 + seq(+RR.C.decile[y],-RR.C.decile[y],l=10)/2) # C scale
     CS = aggregate(CS~group+age,C.df.y[[y]],mean)$CS # aggregate CS by group
     return(matrix(CS,nrow=config$N$g,dimnames=config$X.names[1:2])) # reshape as matrix by group & age
   })
@@ -72,4 +77,17 @@ gen.Ci.gg.y = function(t='REF', c.mean=c(1,1), c.slope=c(.15,.30), mode='10x10')
   }
   names(X.gaga.y) = names(config$c.type)
   return(X.gaga.y) # "Ci"
+}
+
+test.runtime = function(mode='10x10'){
+  source('config.r'); set.config(mode)
+  source('mixing.r')
+  Ci.original = main.mixing(do.plot=FALSE,do.save=FALSE)
+  gen.mix.runtime.data()
+  Ci.runtime = gen.Ci.gaga.y(mode=mode)
+  for (y in seq(config$N$y)){ # only print if we fail
+    if (!isTRUE(all.equal(Ci.original[[y]],Ci.runtime[[y]]))){
+      print(paste('Ci.original =/= Ci.runtime: y =',y))
+    }
+  }
 }

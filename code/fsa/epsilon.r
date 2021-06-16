@@ -1,6 +1,5 @@
 library('reshape2')
 library('ggplot2')
-source('config.r')
 source('plot.r')
 source('mixing.r')
 source('data.r')
@@ -66,11 +65,10 @@ main.epsilon = function(){
     'Approx'   = C.y.eps
   ),function(x){ Reduce('+',x) })
   C.y.ratio = C.y.sum[[1]] / C.y.sum[[2]]
-
   f = 'epsilon'
-  plot.mix(C.y,    aggr=FALSE,clim=c(0,10)); ggsave(figname('canada',    f), width=8,height=4)
-  plot.mix(C.y.eps,aggr=FALSE,clim=c(0,10)); ggsave(figname('canada-eps',f), width=8,height=4)
-  plot.mix(C.y.sum,aggr=FALSE,clim=c(0,10)); ggsave(figname('canada-vs', f), width=8,height=4)
-  plot.mix(C.y.ratio,aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis'); ggsave(figname('canadaf-rs',f),width=5,height=4)
+  plot.mix(C.y,      'Ci','a',aggr=FALSE,clim=c(0,10)); ggsave(figname('canada',    f), width=8,height=4)
+  plot.mix(C.y.eps,  'Ci','a',aggr=FALSE,clim=c(0,10)); ggsave(figname('canada-eps',f), width=8,height=4)
+  plot.mix(C.y.sum,  'Ci','a',aggr=FALSE,clim=c(0,10)); ggsave(figname('canada-vs', f), width=8,height=4)
+  plot.mix(C.y.ratio,'Ci','a',aggr=FALSE,xfun=log10,clim=c(-1,+1),cmap='cividis'); ggsave(figname('canadaf-rs',f),width=5,height=4)
 }
 

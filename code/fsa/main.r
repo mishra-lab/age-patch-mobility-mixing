@@ -1,4 +1,6 @@
 args = commandArgs(trailingOnly=TRUE)
+source('config.r')
+set.config('10x10')
 
 if (args[1] == 'epsilon'){
   source('epsilon.r')
@@ -18,6 +20,6 @@ if (args[1] == 'mixing'){
 if (args[1] == 'debug'){
   # DEBUG
   source('runtime.r')
-  gen.mix.runtime.data()
-  gen.Ci.gg.y(mode='2x2')
+  test.runtime('2x2')
+  test.runtime('10x10')
 }

@@ -1,4 +1,4 @@
-source('config.r')
+# supporting functions for loading & cleaning various data sources
 
 aggr.age = function(pop,age=TRUE){
   if (age){

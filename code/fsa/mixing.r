@@ -2,6 +2,18 @@ source('utils.r')
 source('data.r')
 source('plot.r')
 
+# Objective: produce age & group (decile) mixing matrix,
+#            stratified by contact type, for a specific time period (month)
+# Notation: C: contact numbers. C & Ci: per-person; CX: total number in model
+#           P: population size
+#           B: mobility matrix
+# Most things are matrices, where the subscripts are denoted like:
+#   *.g: stratified by group = decile if mode = 10x10, or deciles 1-2/3-10 if mode = 2x2
+#   *.a: stratified by age
+#   *.gg/.aa: stratified by self & other group / age
+# A few things are lists of matrices, one for each contact type (*.**.y)
+# Everything here runs for one time period (t) only.
+
 pop.to.Pga = function(pop){
   # pop: dataframe with columns (at least): group, age, pop(ulation)
   # P.ga: matrix of population by group & age
@@ -36,8 +48,8 @@ Cay.to.Cgay = function(C.a.y){
   # C.ga.y: list by contact type of matrices: contacts by group & age
   S = map.decile(data.frame(decile=seq(10)))
   C.ga.y = lapply(names(C.a.y),function(y){ # for each contact type
-    S$scale = config$f.c.mean[[y]]+seq(+config$f.c.slope[[y]],-config$f.c.slope[[y]],l=10) # C scaling
-    df = transform(merge(data.frame(C=C.a.y[[y]],age=config$age),S),CS=C*scale) # CS = scaled contacts
+    S$RR.C  = config$RR.C.global[[y]] * (1 + seq(+config$RR.C.decile[[y]],-config$RR.C.decile[[y]],l=10)/2) # C scale
+    df = transform(merge(data.frame(C=C.a.y[[y]],age=config$age),S),CS=C*RR.C) # CS = scaled contacts
     CS = aggregate(CS~group+age,df,mean)$CS # aggregate CS by group (easier to do after scaling)
     return(matrix(CS,nrow=config$N$g,dimnames=config$X.names[1:2])) # reshape as matrix by group & age
   })
@@ -130,17 +142,17 @@ prop.self = function(X){ # what proportion of X is along the diagonal?
 
 plot.mixing = function(C.gaga.y,what,t='REF',...){
   # print(sapply(C.gaga.y,function(C){ prop.self( aggr.mix(C,what,'g',...) ) }))
-  plot.mix(C.gaga.y,what,'g',...);            ggsave(figname(paste0(what,'ggy'),  'mixing',MODE,t),width=8,height=4)
-  plot.mix(C.gaga.y,what,'g',...,xfun=offd);  ggsave(figname(paste0(what,'ggy-o'),'mixing',MODE,t),width=8,height=4)
-  plot.mix(C.gaga.y,what,'a',...);            ggsave(figname(paste0(what,'aay'),  'mixing',MODE,t),width=8,height=4)
-  plot.mix(C.gaga.y,what,'a',...,xfun=offd);  ggsave(figname(paste0(what,'aay-o'),'mixing',MODE,t),width=8,height=4)
+  plot.mix(C.gaga.y,what,'g',...);            ggsave(figname(paste0(what,'ggy'),  'mixing',config$mode,t),width=8,height=4)
+  plot.mix(C.gaga.y,what,'g',...,xfun=offd);  ggsave(figname(paste0(what,'ggy-o'),'mixing',config$mode,t),width=8,height=4)
+  plot.mix(C.gaga.y,what,'a',...);            ggsave(figname(paste0(what,'aay'),  'mixing',config$mode,t),width=8,height=4)
+  plot.mix(C.gaga.y,what,'a',...,xfun=offd);  ggsave(figname(paste0(what,'aay-o'),'mixing',config$mode,t),width=8,height=4)
 }
 
 mixing.fname = function(what,t,sub='.tmp/mix'){
   # standard filename for saving data
   path = root.path('data','fsa',sub)
   suppressWarnings({ dir.create(path,recursive=TRUE) })
-  return(file.path(path,paste0(what,'_',MODE,'_',t,'.csv')))
+  return(file.path(path,paste0(what,'_',config$mode,'_',t,'.csv')))
 }
 
 save.mixing = function(X.gaga.y,what,t){
@@ -162,7 +174,7 @@ merge.save.mixing = function(what){
   write.csv(mix,mixing.fname(what,'all',''),row.names=FALSE)
 }
 
-main.mixing = function(t='REF'){
+main.mixing = function(t='REF',do.plot=TRUE,do.save=TRUE,do.return=TRUE){
   pop    = load.fsa.pop()
   C.aa.y = load.contacts()
   B.gg.t = load.group.mob(pop)
@@ -170,8 +182,16 @@ main.mixing = function(t='REF'){
   P.ga   = pop.to.Pga(pop)
   CX.gaga.y = gen.mix.total(C.ga.y,P.ga,B.gg.t,t) # total absolute contacts
   Ci.gaga.y = CX.norm(CX.gaga.y,P.ga)             # contacts per person
-  # Cp.gaga.y = CX.norm(CX.gaga.y,P.ga,C.ga.y)      # contact probability
-  plot.mixing(CX.gaga.y,'CX',t)
-  plot.mixing(Ci.gaga.y,'Ci',t,P.ga=P.ga)
-  save.mixing(Ci.gaga.y,'Ci',t)
+  # Cp.gaga.y = CX.norm(CX.gaga.y,P.ga,C.ga.y)      # contact probability (TBC)
+  if (do.plot){
+    plot.mixing(CX.gaga.y,'CX',t)
+    plot.mixing(Ci.gaga.y,'Ci',t,P.ga=P.ga)
+    B.gg.t[['REF']] = Reduce('+',B.gg.t[config$t.ref]) / length(config$t.ref);
+    B.gg.t = B.gg.t[c('REF',config$t.covid)]
+    plot.mix(B.gg.t,'B','g',aggr=FALSE); ggsave(figname('Bgg','mobility'),width=8,height=6)
+  }
+  if (do.save){
+    save.mixing(Ci.gaga.y,'Ci',t)
+  }
+  return(Ci.gaga.y)
 }
