@@ -17,9 +17,11 @@ if (args[1] == 'mixing'){
   }
   merge.save.mixing('Ci')
 }
-if (args[1] == 'debug'){
-  # DEBUG
+if (args[1] == 'runtime'){
   source('runtime.r')
   test.runtime('2x2')
   test.runtime('10x10')
+}
+if (args[1] == 'debug'){
+  # DEBUG
 }

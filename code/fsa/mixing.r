@@ -189,6 +189,7 @@ main.mixing = function(t='REF',do.plot=TRUE,do.save=TRUE,do.return=TRUE){
     B.gg.t[['REF']] = Reduce('+',B.gg.t[config$t.ref]) / length(config$t.ref);
     B.gg.t = B.gg.t[c('REF',config$t.covid)]
     plot.mix(B.gg.t,'B','g',aggr=FALSE); ggsave(figname('Bgg','mobility'),width=8,height=6)
+    plot.pop.density(); ggsave(figname('Pga','pop'),width=8,height=4)
   }
   if (do.save){
     save.mixing(Ci.gaga.y,'Ci',t)

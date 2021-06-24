@@ -23,7 +23,7 @@ mix.melt = function(C,what,vs,aggr=TRUE,xfun=NULL,...){
     return( melt(xfun(C.aggr),value.name='X',varnames=c('i','i.')) )
   }
 }
-plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,clim=c(0,NA),cmap='inferno',...){
+plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,trans=NULL,clim=c(0,NA),cmap='inferno',...){
   C. = mix.melt(C,what,vs,aggr=aggr,xfun=xfun,...)
   v.name = switch(what,
     CX = 'Total Contacts\n(Millions)',
@@ -36,10 +36,10 @@ plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,clim=c(0,NA),cmap='inferno',..
     scale_y_discrete(expand=c(0,0)) +
     scale_x_discrete(expand=c(0,0)) +
     labs(x=config$labels[[vs]]$x,y=config$labels[[vs]]$y,fill=v.name) +
-    scale_fill_viridis(option=cmap,limits=clim,end=.95,na.value='transparent') +
-    scale_color_viridis(option=cmap,limits=clim,end=.95,na.value='transparent') +
+    scale_fill_viridis(option=cmap,limits=clim,end=.95,na.value='transparent',trans=trans) +
+    scale_color_viridis(option=cmap,limits=clim,end=.95,na.value='transparent',trans=trans) +
     theme_light() +
-    guides(color=FALSE,fill=guide_colorbar(barheight=5)) +
+    guides(color='none',fill=guide_colorbar(barheight=5)) +
     switch(vs,
       a = theme(axis.text.x=element_text(angle=90,hjust=1)),
       n = theme(axis.text.x=element_blank(),axis.text.y=element_blank())
@@ -64,7 +64,16 @@ plot.device.density = function(X,x,y='month',bw=NULL,q=4,xmax=NULL,legend=FALSE)
     xlim(0,xmax) + labs(x=x,y=y.lab,fill='Quantile') +
     theme_light()
   if (!legend){
-    g = g + guides(fill=FALSE)
+    g = g + guides(fill='none')
   }
+  return(g)
+}
+plot.pop.density = function(){
+  pop = load.fsa.pop(aggr=FALSE)
+  P = aggregate(pop~group+age,pop,sum)
+  g = ggplot(P,aes(x=age,y=pop,group=group,color=group,fill=group)) +
+    geom_density(stat='smooth',alpha=.05,span=.1) +
+    labs(x='Age',y='Population',color='Decile',fill='Decile') +
+    theme_light()
   return(g)
 }

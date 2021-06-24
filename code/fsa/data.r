@@ -27,10 +27,11 @@ map.decile = function(x){
   return(x)
 }
 
-load.fsa.pop = function(age=TRUE){
+load.fsa.pop = function(age=TRUE,aggr=TRUE){
   dec = read.csv(root.path('data','fsa','fsa_decile.csv'))
   pop = read.csv(root.path('data','fsa','pop_age_fsa.csv'))
-  pop = merge(aggr.age(pop,age=age),map.decile(dec))
+  if (aggr){ pop = aggr.age(pop,age=age) }
+  pop = merge(pop,map.decile(dec))
   if (age){
     return(pop[order(pop$FSA,pop$age),])
   } else {
