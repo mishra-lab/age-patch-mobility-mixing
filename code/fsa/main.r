@@ -22,6 +22,11 @@ if (args[1] == 'runtime'){
   test.runtime('2x2')
   test.runtime('10x10')
 }
+if (args[1] == 'contacts'){
+  source('contacts.r')
+  set.seed(123)
+  main.contacts()
+}
 if (args[1] == 'debug'){
   # DEBUG
 }

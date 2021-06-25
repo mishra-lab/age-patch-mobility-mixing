@@ -77,3 +77,11 @@ plot.pop.density = function(){
     theme_light()
   return(g)
 }
+plot.distr = function(C,y,ylabel,...){
+  g = ggplot(C,aes_string(y=y,...)) +
+    geom_boxplot(alpha=.2,aes(x=decile)) +
+    labs(y=ylabel,x='Decile') +
+    lims(y=c(0,30)) +
+    theme_light()
+  return(g)
+}

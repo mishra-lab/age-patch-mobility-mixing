@@ -89,6 +89,12 @@ load.contacts = function(){
   return(C.y)
 }
 
+load.cases = function(){
+  X = read.csv(root.path('data','covid','new-cases.csv'))
+  X$decile = as.factor(X$decile)
+  return(X)
+}
+
 clean.raw.pop = function(){
   fsa = read.csv(root.path('data','fsa','fsa.csv'))$FSA
   pop = read.csv(root.path('data','fsa','.raw','pop_age_fsa.csv'))
