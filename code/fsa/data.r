@@ -43,12 +43,14 @@ load.group.mob = function(pop){
   mob = read.csv(root.path('data','fsa','mobility_decile.csv'))
   mob = map.decile(mob)
   months = levels(mob$month)
-  B.gg = lapply(months,function(mo){
+  B.gg.t = lapply(months,function(mo){
     B.m = matrix(mob[mob$month == mo,]$visit.prop,nrow=10,ncol=10)
     return(aggr.mob.decile(B.m,pop))
   })
-  names(B.gg) = months
-  return(B.gg)
+  names(B.gg.t) = months
+  B.gg.t[['REF']] = Reduce('+',B.gg.t[config$t.ref]) / length(config$t.ref)
+  B.gg.t = B.gg.t[c('REF',config$t.covid)]
+  return(B.gg.t)
 }
 
 load.fsa.mob = function(refresh=FALSE){
@@ -75,18 +77,18 @@ load.fsa.smartphones = function(){
   return(X)
 }
 
-load.contacts = function(){
-  C.y = list()
-  map = list(home='home',other=c('work','school','other_locations'))
-  ctx = read.csv(root.path('data','fsa','contacts_age.csv'))
-  dnames = list(a=names(config$age.contact),a.=names(config$age.contact))
+load.contacts = function(map=NULL){
+  if (is.null(map)){ map = list(home='home',other=c('work','school','others')) }
+  load(root.path('data','fsa','.rdata','Prem2017.rdata'))
+  P.mean = mean(Prem2017$P.a)
+  C.aa.y = list()
   for (y in names(map)){
-    C.y[[y]] = matrix(
-      aggregate(contacts~a+a.,ctx[ctx$type %in% map[[y]],],sum)$contacts,
-      nrow=length(config$age.contact),dimnames=dnames)
+    C.aa = Reduce('+',Prem2017$C.aa.y[map[[y]]])
+    C.aa = sweep(sweep(C.aa,1,Prem2017$P.a,'/'),2,Prem2017$P.a,'/') * P.mean^2
+    dimnames(C.aa) = list('a'=names(config$age.contact),'a.'=names(config$age.contact))
+    C.aa.y[[y]] = symmetric(C.aa)
   }
-  # g = plot.mix(C.y,aggr=FALSE); ggsave(figname('polymod-canada-2'),width=8,height=4) # DEBUG
-  return(C.y)
+  return(C.aa.y)
 }
 
 load.cases = function(){
@@ -114,20 +116,19 @@ clean.raw.pop = function(){
   write.csv(pop,root.path('data','fsa','pop_age_fsa.csv'),row.names=FALSE)
 }
 
-clean.canada.contacts = function(){
-  library('readxl')
-  library('reshape2')
-  C.y = list()
-  for (y in c('home','work','school','other_locations')){
-    f = root.path('data','fsa','.raw','contacts-152',paste0('MUestimates_',y,'_1.xlsx'))
-    C.y. = as.matrix(read_excel(f,sheet='Canada'))
-    rownames(C.y.) = names(age.contact)
-    colnames(C.y.) = names(age.contact)
-    # C.y[[y]] = C.y. # DEBUG
-    C.y[[y]] = cbind('type'=y,melt(C.y.,value.name='contacts',varnames=c('a','a.')))
+clean.Prem2017 = function(){
+  rdata = function(name){
+    load(root.path('data','fsa','.raw',paste0(name,'.rdata')))
+    return(get(name))
   }
-  # C.y. = list(home=C.y[['home']],other=C.y[['work']]+C.y[['school']]+C.y[['other_locations']]) # DEBUG
-  # plot.mix(C.y,aggr=FALSE,clim=c(0,7)); ggsave(figname('polymod-canada'),width=12,height=4) # DEBUG
-  C.y = do.call(rbind,C.y)
-  write.csv(C.y,root.path('data','fsa','contacts_age.csv'),row.names=FALSE)
+  P.raw = rdata('poptotal')
+  c.types = list('home','work','school','others')
+  names(c.types) = c.types
+  Prem2017 = list(
+    P.a = as.numeric(P.raw[P.raw$countryname=='Canada',paste0('age',seq(0,75,5))]),
+    C.aa.y = lapply(c.types,function(c.type){
+      return(rdata(paste0('contact_',c.type))$CAN)
+    })
+  )
+  save(Prem2017,file=root.path('data','fsa','.rdata','Prem2017.rdata')) # TODO: save as CSV?
 }

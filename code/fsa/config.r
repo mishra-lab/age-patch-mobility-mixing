@@ -1,13 +1,13 @@
-suppressMessages({library(socialmixr)})
 options(width=150)
 
-root.path = function(...){ # find project root above /code/ & build path from ...
+root.path = function(...,create=FALSE){ # find project root above /code/ & build path from ...
   root = strsplit(getwd(),file.path('','code',''))[[1]][1]
-  return(file.path(root,...))
+  path = file.path(root,...)
+  if (create){ suppressWarnings({ dir.create(path,recursive=TRUE) }) }
+  return(path)
 }
 figname = function(name,...){ # e.g. /out/fig/fsa/.../name.pdf
-  path = root.path('out','fig','fsa',...)
-  suppressWarnings({dir.create(path,recursive=TRUE)})
+  path = root.path('out','fig','fsa',...,create=TRUE)
   return(file.path(path,paste0(name,'.pdf')))
 }
 set.config = function(mode='10x10'){ # set config stuff in global list variable
@@ -54,18 +54,13 @@ set.config = function(mode='10x10'){ # set config stuff in global list variable
   )
     # add config stuff that doesn't depend on mode
   config = c(config,list(
-    eps.y = c( # assortative parameter for age
-      'home'  = 0.2354799,
-      'other' = 0.1818460
-    ),
     RR.C.global = c( # global scaling factor for contacts
       'home'  = 1,
       'other' = 1
     ),
-    RR.C.decile = c( # "range" of sloped scaling factor for contacts by decile
-      # e.g. .30 -> lowest decile has .85x contacts, highest has 1.15x contacts
-      'home'  = .30,
-      'other' = .60
+    RR.C.decile = c(1 # TODO
+      # 13.029573,9.067338,6.610766,5.409403,4.522559,
+      #  4.068002,3.286063,2.687275,1.839832,1.000000
     ),
     phi = c( # odds of mobility vs observed devices
       'unobs.device' = .9,
@@ -104,6 +99,7 @@ set.config = function(mode='10x10'){ # set config stuff in global list variable
       '60-64' = 60 , '65-69' = 65,
       '70-74' = 70 , '75-80' = 75)
   ))
+  config$age.max = max(config$age)+5
   config <<- config # make global
 }
 set.config()

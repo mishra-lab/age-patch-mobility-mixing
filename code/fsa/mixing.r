@@ -16,102 +16,82 @@ source('plot.r')
 
 pop.to.Pga = function(pop){
   # pop: dataframe with columns (at least): group, age, pop(ulation)
-  # P.ga: matrix of population by group & age
+  # P.ga: [value] matrix of population by group & age
   P = aggregate(pop~group+age,pop,sum)
   P.ga = matrix(P[order(P$age,P$group),]$pop,nrow=config$N$g,
     dimnames=list(g=names(config$group),a=names(config$age)))
   return(P.ga)
 }
 
-Caay.to.Cay.resample = function(C.aa.y){
-  # C.aa.y: list by contact type of matrices: contacts by age & other age
-  #         but not necessarily the right age bins
-  # C.a.y:  list by contact type of vectors: contacts by age, with the right bins
-  midpoint = function(a){ a+c(diff(a)/2,0) }
-  C.a.y = lapply(C.aa.y,function(C.aa){ # for each contact type
-    c.a.i = rowSums(C.aa) # total contacts by age group (sum across "other" ages)
-    c.a.o = approx( # linearly interpolate c.a.i (original age bins) to get c.a.o (new age bins)
-      y  = c.a.i,
-      x  = midpoint(config$age.contact),
-      xo = midpoint(config$age),
-      method = 'linear',
-      yleft  = c.a.i[1],
-      yright = c.a.i[length(c.a.i)])$y
-    names(c.a.o) = names(config$age)
-    return(c.a.o)
-  })
-  return(C.a.y)
+resample.contacts = function(Ci,xi,xo,x.max){
+  # Ci:    contact matrix stratified by xi & xi (square)
+  # xi:    list of cut points in Ci (lower cut points of each strata)
+  # xo:    list of cut points in Co (lower cut points of each strata)
+  # x.max: max cut point for both
+  # Co:    [value] contact matrix re-stratified by xo * xo (square)
+  # We cannot simply interp2d, since the number of contacts per person would change;
+  # that's why we interpolate to m. * m. first, then aggregate using M
+  # and normalize by the strata sizes (diff);
+  # the number of contacts per person might change a little.
+  m. = midpoint(seq(0,x.max-1,1))
+  C. = interp2d(Ci/bin.size(xi,x.max),midpoint(xi),m.)
+  M = tail(outer(c(0,xo),m.,'<') * outer(c(xo,Inf),m.,'>'),-1)
+  Co = (M %*% C. %*% t(M)) / bin.size(xo,x.max)
+  return(Co)
 }
 
-Cay.to.Cgay = function(C.a.y){
-  # C.a.y:  list by contact type of vectors: contacts by age
-  # C.ga.y: list by contact type of matrices: contacts by group & age
-  S = map.decile(data.frame(decile=seq(10)))
-  C.ga.y = lapply(names(C.a.y),function(y){ # for each contact type
-    S$RR.C  = config$RR.C.global[[y]] * (1 + seq(+config$RR.C.decile[[y]],-config$RR.C.decile[[y]],l=10)/2) # C scale
-    df = transform(merge(data.frame(C=C.a.y[[y]],age=config$age),S),CS=C*RR.C) # CS = scaled contacts
-    CS = aggregate(CS~group+age,df,mean)$CS # aggregate CS by group (easier to do after scaling)
-    return(matrix(CS,nrow=config$N$g,dimnames=config$X.names[1:2])) # reshape as matrix by group & age
-  })
-  names(C.ga.y) = names(C.a.y)
-  return(C.ga.y)
+CAAy.to.Caay = function(C.AA.y){
+  # C.AA.y: list of contact matrices in original age stratification
+  # C.aa.y: [value] list of contact matrices in desired age stratification
+  return(lapply(C.AA.y,resample.contacts,
+    xi=config$age.contact,
+    xo=config$age,
+    x.max=config$age.max))
 }
 
-gen.mix.total = function(C.ga.y,P.ga,B.gg.t,t){
+gen.mix.main = function(C.aa.y,P.ga,B.gg.t,t){
   # estimates the total number of contacts between all combinations of age/geo groups
   # C.ga.y: list by contact type of matrices: contacts by group & age
   # P.ga:   matrix of population by group & age
   # B.gg.t: list by time of matrices: mobility by group & other group
   # t:      month
-  # X.gaga.y: list by type of matrices: total # contacts by age, group, other age, other group (not per person)
-  B.gg.t[['REF']] = Reduce('+',B.gg.t[config$t.ref]) / length(config$t.ref) # mobility in REF
-  B.g.0 = rowSums(B.gg.t[['REF']]) # total probability of being mobile during REF
-  B.g.t = rowSums(B.gg.t[[t]])     # total probability of begin mobile this t
-  B.gg = B.gg.t[[t]] + (B.g.t / B.g.0) * diag(1-B.g.0) # adding "mobility" within same g
-  Q.ga.y = lapply(seq(config$N$y),function(y){ P.ga * C.ga.y[[y]] }) # total contacts offered by group & age, by type
-  N = config$N; eps.y = config$eps.y; h.y = config$h.y; # convenience
+  # X.gaga.y: [value] list by type of arrays: total number of contacts
+  #           by age, group, other age, other group (not per person)
+  N = config$N; h.y = config$h.y; # convenience
+  B.g.0 = rowSums(B.gg.t[['REF']]) # total mobility during REF
+  B.g.t = rowSums(B.gg.t[[t]])     # total mobility during t
+  B.gg = B.gg.t[[t]] + (B.g.t / B.g.0) * diag(1-B.g.0) # add mobility in same "g"
+  B.hh = diag(N$g) # dummy "mobillity" for household contacts
+  a.size = bin.size(config$age,config$age.max,norm=TRUE) # expected age distribution
   X.gaga.y = list() # initialize output
   for (y in seq(N$y)){ # for each contact type
-    X.gaga = array(0,c(N$g,N$a,N$g,N$a),dimnames=config$X.names) # initialize output for thie type
-    # non-home contacts
+    X.gaga = array(0,c(N$g,N$a,N$g,N$a),dimnames=config$X.names) # initialize X for this y
+    C.gaga = aperm(replicate(N$g,replicate(N$g,C.aa.y[[y]])),c(3,1,4,2)) # pad C.aa to C.gaga
     for (. in seq(N$g)){ # for each mixing pool (group)
-      Q.ga    = Q.ga.y[[y]] * B.gg[,.] # contacts made available to the pool from all groups by group & age
-      X.gaga. = outer(Q.ga,Q.ga) / sum(Q.ga) # proportionate distribution of contacts
-      X.gag   = a.sum(X.gaga.,4) # sum across "other" age groups
-      X.gaga. = X.gaga. * (1-eps.y[[y]]) # proportionate part of age-mixing for this pool
-      for (a in seq(N$a)){ # for each age group
-        X.gaga.[,a,,a] = X.gaga.[,a,,a] + eps.y[[y]] * X.gag[,a,] # assortative part of age-mixing for this pool
-      }
-      X.gaga = X.gaga + (1-h.y[[y]]) * X.gaga. # add contribution of this away-pool to the total mixing
+      P. = P.ga * ((1 - h.y[y]) * B.gg[,.] + (h.y[y] * B.hh[,.])) # pop of each "g" mixing here
+      PR = sweep(P.,2,a.size,'/') / sum(P.) # normalize by expected age distrib & overall pop
+      X = outer(P.,PR) * C.gaga # proportionate mixing * age mixing
+      X.gaga = X.gaga + X # add contribution of this pool to the total mixing
     }
-    # home contacts
-    for (g in seq(N$g)){ # for each group
-      Q.a   = Q.ga.y[[y]][g,] # contacts made available to this pool (no mobility/decile involved)
-      X.aa. = outer(Q.a,Q.a) / sum(Q.a) # proportionate distribution of contacts
-      X.a   = a.sum(X.aa.,2) # sum across "other" age groups
-      X.aa. = X.aa. * (1-eps.y[[y]]) # proportionate part of age-mixing for this pool
-      for (a in seq(N$a)){ # for each age group
-        X.aa.[a,a] = X.aa.[a,a] + eps.y[[y]] * X.a[a] # assortative part of age-mixing for this pool
-      }
-      X.gaga[g,,g,] = X.gaga[g,,g,] + (h.y[[y]]) * X.aa. # add contribution of this home-pool to the total mixing
-    }
+    X.gaga = symmetric(X.gaga) # ensure contacts balance
+    # print(X.gaga / aperm(X.gaga,c(3,4,1,2))) # DEBUG == 1 (exact) or NaN from 0/0
+    # print(sweep(P.ga,2,rowSums(C.aa.y[[y]]),'*') / a.sum(X.gaga,c(3,4))) # DEBUG == 1 (approx)
     X.gaga.y[[y]] = X.gaga # copy result into output
   }
   names(X.gaga.y) = names(config$c.type)
-  # for (y in seq(N$y)){ print(a.sum(X.gaga.y[[y]],c(3,4))/Q.ga.y[[y]]) } # DEBUG: should all = 1
   return(X.gaga.y) # "CX"
 }
 
-CX.norm = function(CX.gaga.y,P.ga,C.ga.y=NULL){
+CX.norm = function(CX.gaga.y,P.ga,C.a.y=NULL){
   # convert CX (total contacts) to:
   # - Ci: per person, divide by P.ga (if C.ga.y is NULL)
-  # - Cp probability, divide by P.ga & C.ga (if C.ga.y is given)
+  # - Cp: probability, divide by P.ga & C.ga (if C.ga.y is given)
   C.gaga.y = lapply(CX.gaga.y,function(X){ X*0 }) # initialize output
   for (y in seq(config$N$y)){
     for (g in seq(config$N$g)){
       for (a in seq(config$N$a)){
-        c.ga.y = ifelse(is.null(C.ga.y),1,C.ga.y[[y]][g,a])
-        C.gaga.y[[y]][g,a,,] = CX.gaga.y[[y]][g,a,,] / P.ga[g,a] / c.ga.y
+        c.a.y = ifelse(is.null(C.a.y),1,C.a.y[[y]][a])
+        C.gaga.y[[y]][g,a,,] = CX.gaga.y[[y]][g,a,,] / P.ga[g,a] / c.a.y
       }
     }
   }
@@ -136,63 +116,28 @@ aggr.mix = function(C.gaga,what,vs,P.ga=NULL,aggr=TRUE){
   if (what=='Cp'){ stop('aggr.mix for Cp not yet implemented') }
 }
 
-prop.self = function(X){ # what proportion of X is along the diagonal?
-  return(median(diag(X) / rowSums(X)))
-}
-
-plot.mixing = function(C.gaga.y,what,t='REF',...){
-  # print(sapply(C.gaga.y,function(C){ prop.self( aggr.mix(C,what,'g',...) ) }))
-  plot.mix(C.gaga.y,what,'g',...);            ggsave(figname(paste0(what,'ggy'),  'mixing',config$mode,t),width=8,height=4)
-  plot.mix(C.gaga.y,what,'g',...,xfun=offd);  ggsave(figname(paste0(what,'ggy-o'),'mixing',config$mode,t),width=8,height=4)
-  plot.mix(C.gaga.y,what,'a',...);            ggsave(figname(paste0(what,'aay'),  'mixing',config$mode,t),width=8,height=4)
-  plot.mix(C.gaga.y,what,'a',...,xfun=offd);  ggsave(figname(paste0(what,'aay-o'),'mixing',config$mode,t),width=8,height=4)
-}
-
-mixing.fname = function(what,t,sub='.tmp/mix'){
-  # standard filename for saving data
-  path = root.path('data','fsa',sub)
-  suppressWarnings({ dir.create(path,recursive=TRUE) })
-  return(file.path(path,paste0(what,'_',config$mode,'_',t,'.csv')))
-}
-
-save.mixing = function(X.gaga.y,what,t){
-  # melt the contents of X.gaga.y to csv with colnames shown below
-  mix. = do.call(expand.grid,dimnames(X.gaga.y[[1]]))
-  mix = do.call(rbind,lapply(names(X.gaga.y),function(y){
-    cbind(mix.,y=config$c.type[[y]],X=as.vector(X.gaga.y[[y]]))
-  }))
-  v.name = switch(what,CX='n.contacts',Ci='n.contact.pp',Cp='prob.contact')
-  colnames(mix) = c('index.decile','index.age','other.decile','other.age','contact.type',v.name)
-  write.csv(mix,mixing.fname(what,t),row.names=FALSE)
-}
-
-merge.save.mixing = function(what){
-  # main.mixing only does one t; this function merges the csv files & re-saves as one
-  mix = do.call(rbind,lapply(c('REF',config$t.covid),function(t){
-    mix. = cbind(month=t,read.csv(mixing.fname(what,t)))
-  }))
-  write.csv(mix,mixing.fname(what,'all',''),row.names=FALSE)
-}
-
-main.mixing = function(t='REF',do.plot=TRUE,do.save=TRUE,do.return=TRUE){
+main.mixing = function(t='REF',do.plot=TRUE){
   pop    = load.fsa.pop()
-  C.aa.y = load.contacts()
+  C.AA.y = load.contacts()
+  names(C.AA.y) = names(config$c.type)
   B.gg.t = load.group.mob(pop)
-  C.ga.y = Cay.to.Cgay(Caay.to.Cay.resample(C.aa.y))
+  C.aa.y = CAAy.to.Caay(C.AA.y)
   P.ga   = pop.to.Pga(pop)
-  CX.gaga.y = gen.mix.total(C.ga.y,P.ga,B.gg.t,t) # total absolute contacts
-  Ci.gaga.y = CX.norm(CX.gaga.y,P.ga)             # contacts per person
-  # Cp.gaga.y = CX.norm(CX.gaga.y,P.ga,C.ga.y)      # contact probability (TBC)
+  # TODO: apply g scaling
+  CX.gaga.y = gen.mix.main(C.aa.y,P.ga,B.gg.t,t)
+  Ci.gaga.y = CX.norm(CX.gaga.y,P.ga)
+  Cp.gaga.y = CX.norm(CX.gaga.y,P.ga,lapply(C.aa.y,rowSums)) # unused for now
   if (do.plot){
-    plot.mixing(CX.gaga.y,'CX',t)
-    plot.mixing(Ci.gaga.y,'Ci',t,P.ga=P.ga)
-    B.gg.t[['REF']] = Reduce('+',B.gg.t[config$t.ref]) / length(config$t.ref);
-    B.gg.t = B.gg.t[c('REF',config$t.covid)]
-    plot.mix(B.gg.t,'B','g',aggr=FALSE); ggsave(figname('Bgg','mobility'),width=8,height=6)
-    plot.pop.density(); ggsave(figname('Pga','pop'),width=8,height=4)
-  }
-  if (do.save){
-    save.mixing(Ci.gaga.y,'Ci',t)
+    plot.contact.margins(C.AA.y,C.aa.y); ggsave(figname('C-restrat','contacts'),w=8,h=4)
+    C.aa.y.diff = mapply(function(C.,C){ aggr.mix(C.,'Ci','a',P.ga) - C }, Ci.gaga.y, C.aa.y,SIMPLIFY=FALSE)
+    plot.mix(C.aa.y,'Ci','a',trans='sqrt',clim=c(0,8.5));                        ggsave(figname('Caay','contacts'),w=8,h=4)
+    plot.mix(C.aa.y.diff,'Ci','a',trans='nsqrt',clim=c(-2,+2),cmap='RdBu');      ggsave(figname('Caay-diff','contacts'),w=8,h=4)
+    plot.mix(CX.gaga.y,'CX','a',P.ga=P.ga,trans='sqrt',aggr=TRUE);               ggsave(figname('CXaay','mixing',config$mode,t),w=8,h=4)
+    plot.mix(CX.gaga.y,'CX','g',P.ga=P.ga,trans='sqrt',aggr=TRUE);               ggsave(figname('CXggy','mixing',config$mode,t),w=8,h=4)
+    plot.mix(Ci.gaga.y,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE,clim=c(0,8.5)); ggsave(figname('Ciaay','mixing',config$mode,t),w=8,h=4)
+    plot.mix(Ci.gaga.y,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE,clim=c(0,8.5)); ggsave(figname('Ciggy','mixing',config$mode,t),w=8,h=4)
+    # plot.mix(Cp.gaga.y,'Cp','a',P.ga=P.ga,trans='sqrt'); ggsave(figname('Cpaay','mixing',config$mode,t),width=8,height=4)
+    # plot.mix(Cp.gaga.y,'Cp','g',P.ga=P.ga,trans='sqrt'); ggsave(figname('Cpggy','mixing',config$mode,t),width=8,height=4)
   }
   return(Ci.gaga.y)
 }

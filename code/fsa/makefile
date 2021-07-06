@@ -1,7 +1,5 @@
 do.debug:
 	Rscript main.r debug && echo [DONE]
-do.epsilon:
-	Rscript main.r epsilon && echo [DONE]
 do.contacts:
 	Rscript main.r contacts && echo [DONE]
 do.mixing:

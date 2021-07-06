@@ -3,6 +3,7 @@ library(reshape2)
 library(viridis)
 library(ggplot2)
 library(ggridges)
+library(scales)
 })
 
 # supporting functions for plotting stuff
@@ -23,7 +24,20 @@ mix.melt = function(C,what,vs,aggr=TRUE,xfun=NULL,...){
     return( melt(xfun(C.aggr),value.name='X',varnames=c('i','i.')) )
   }
 }
-plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,trans=NULL,clim=c(0,NA),cmap='inferno',...){
+nsqrt_trans = function(){
+  trans_new('nsqrt',function(x){sign(x)*sqrt(abs(x))},function(x){sign(x)*x^2})
+}
+cmap.fun = function(do='color',cmap='inferno',discrete=FALSE,...){
+  if (cmap %in% c('inferno')){
+    return(get(paste('scale',do,'viridis',sep='_'))(
+      option=cmap,end=.95,discrete=discrete,...))
+  }
+  if (cmap %in% c('Spectral','RdBu')){
+    return(get(paste('scale',do,ifelse(discrete,'brewer','distiller'),sep='_'))(
+      palette=cmap,...))
+  }
+}
+plot.mix = function(C,what,vs,aggr=FALSE,xfun=NULL,trans='identity',clim=c(0,NA),cmap='inferno',...){
   C. = mix.melt(C,what,vs,aggr=aggr,xfun=xfun,...)
   v.name = switch(what,
     CX = 'Total Contacts\n(Millions)',
@@ -36,8 +50,8 @@ plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,trans=NULL,clim=c(0,NA),cmap='
     scale_y_discrete(expand=c(0,0)) +
     scale_x_discrete(expand=c(0,0)) +
     labs(x=config$labels[[vs]]$x,y=config$labels[[vs]]$y,fill=v.name) +
-    scale_fill_viridis(option=cmap,limits=clim,end=.95,na.value='transparent',trans=trans) +
-    scale_color_viridis(option=cmap,limits=clim,end=.95,na.value='transparent',trans=trans) +
+    cmap.fun('fill', cmap=cmap,limits=clim,na.value='transparent',trans=trans) +
+    cmap.fun('color',cmap=cmap,limits=clim,na.value='transparent',trans=trans) +
     theme_light() +
     guides(color='none',fill=guide_colorbar(barheight=5)) +
     switch(vs,
@@ -46,7 +60,7 @@ plot.mix = function(C,what,vs,aggr=TRUE,xfun=NULL,trans=NULL,clim=c(0,NA),cmap='
     )
   if (is.list(C)){
     if (length(C) <= 6) { g = g + facet_grid(cols=vars(group)) }
-    else { g = g + facet_wrap(vars(group)) }
+    else { g = g + facet_wrap(vars(group),ncol=6) }
   }
   return(g)
 }
@@ -72,14 +86,41 @@ plot.pop.density = function(){
   pop = load.fsa.pop(aggr=FALSE)
   P = aggregate(pop~group+age,pop,sum)
   g = ggplot(P,aes(x=age,y=pop,group=group,color=group,fill=group)) +
-    geom_density(stat='smooth',alpha=.05,span=.1) +
+    geom_density(stat='smooth',alpha=.1,span=.1) +
+    cmap.fun('color','Spectral',discrete=TRUE) +
+    cmap.fun('fill','Spectral',discrete=TRUE) +
     labs(x='Age',y='Population',color='Decile',fill='Decile') +
+    theme_light()
+  return(g)
+}
+plot.contact.margins = function(C.AA.y,C.aa.y){
+  c.melt = function(C,age,vs){
+    return(do.call('rbind',lapply(seq(2),function(y){
+      return(data.frame(Contacts=rowSums(C[[y]]),Age=age,Type=names(config$c.type)[y],vs=vs))
+    })))
+  }
+  C.A = c.melt(C.AA.y,age=midpoint(config$age.contact),vs='Original')
+  C.a = c.melt(C.aa.y,age=midpoint(config$age),vs='Restratified')
+  g = ggplot(map=aes(x=Age,y=Contacts,group=vs,color=vs)) +
+    geom_line(data=C.A) + geom_point(data=C.A) +
+    geom_line(data=C.a) + geom_point(data=C.a) +
+    facet_grid(cols=vars(Type)) +
+    theme_light()
+  return(g)
+}
+plot.cases = function(cases){
+  g = ggplot(cases,aes(x=as.Date(t),y=cases,group=decile,color=decile)) +
+    geom_line() +
+    cmap.fun('color','Spectral',discrete=TRUE) +
+    labs(y='Cases',x='Date') +
     theme_light()
   return(g)
 }
 plot.distr = function(C,y,ylabel,...){
   g = ggplot(C,aes_string(y=y,...)) +
     geom_boxplot(alpha=.2,aes(x=decile)) +
+    cmap.fun('color','Spectral',discrete=TRUE) +
+    cmap.fun('fill','Spectral',discrete=TRUE) +
     labs(y=ylabel,x='Decile') +
     lims(y=c(0,30)) +
     theme_light()
