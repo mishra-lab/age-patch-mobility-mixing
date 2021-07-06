@@ -116,11 +116,11 @@ plot.cases = function(cases){
     theme_light()
   return(g)
 }
-plot.distr = function(C,y,ylabel,...){
+plot.distr = function(C,y,ylabel,cmap='',...){
   g = ggplot(C,aes_string(y=y,...)) +
     geom_boxplot(alpha=.2,aes(x=decile)) +
-    cmap.fun('color','Spectral',discrete=TRUE) +
-    cmap.fun('fill','Spectral',discrete=TRUE) +
+    cmap.fun('color',cmap=cmap,discrete=TRUE) +
+    cmap.fun('fill',cmap=cmap,discrete=TRUE) +
     labs(y=ylabel,x='Decile') +
     lims(y=c(0,30)) +
     theme_light()
