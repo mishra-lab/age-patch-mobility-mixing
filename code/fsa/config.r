@@ -54,11 +54,11 @@ set.config = function(mode='10x10'){ # set config stuff in global list variable
   )
     # add config stuff that doesn't depend on mode
   config = c(config,list(
-    RR.C.global = c( # global scaling factor for contacts
+    RC.global = c( # global scaling factor for contacts
       'home'  = 1,
       'other' = 1
     ),
-    RR.C.decile = c(
+    RC.decile = c(
       7.643163, 5.755709, 4.448017, 3.846107, 3.246633,
       2.983167, 2.539929, 2.136271, 1.625427, 1.000000
       # 13.029573, 9.067338, 6.610766, 5.409403, 4.522559,

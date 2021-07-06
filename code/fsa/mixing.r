@@ -49,7 +49,14 @@ CAAy.to.Caay = function(C.AA.y){
     x.max=config$age.max))
 }
 
-gen.mix.main = function(C.aa.y,P.ga,B.gg.t,t){
+gen.RC.g.y = function(){
+  # RC.g.y: [value] list by contact type of vectors: relative C by group
+  return(lapply(config$c.type,function(c.type){
+    return(config$RC.global[c.type] * config$RC.decile/mean(config$RC.decile))
+  }))
+}
+
+gen.mix.main = function(P.ga,C.aa.y,RC.g.y,B.gg.t,t){
   # estimates the total number of contacts between all combinations of age/geo groups
   # C.ga.y: list by contact type of matrices: contacts by group & age
   # P.ga:   matrix of population by group & age
@@ -68,7 +75,7 @@ gen.mix.main = function(C.aa.y,P.ga,B.gg.t,t){
     X.gaga = array(0,c(N$g,N$a,N$g,N$a),dimnames=config$X.names) # initialize X for this y
     C.gaga = aperm(replicate(N$g,replicate(N$g,C.aa.y[[y]])),c(3,1,4,2)) # pad C.aa to C.gaga
     for (. in seq(N$g)){ # for each mixing pool (group)
-      P. = P.ga * ((1 - h.y[y]) * B.gg[,.] + (h.y[y] * B.hh[,.])) # pop of each "g" mixing here
+      P. = P.ga * ((1 - h.y[y]) * B.gg[,.] + (h.y[y] * B.hh[,.])) * RC.g.y[[y]] # pop of each "g" mixing here
       PR = sweep(P.,2,a.size,'/') / sum(P.) # normalize by expected age distrib & overall pop
       X = outer(P.,PR) * C.gaga # proportionate mixing * age mixing
       X.gaga = X.gaga + X # add contribution of this pool to the total mixing
@@ -123,19 +130,19 @@ main.mixing = function(t='REF',do.plot=TRUE){
   B.gg.t = load.group.mob(pop)
   C.aa.y = CAAy.to.Caay(C.AA.y)
   P.ga   = pop.to.Pga(pop)
-  # TODO: apply g scaling
-  CX.gaga.y = gen.mix.main(C.aa.y,P.ga,B.gg.t,t)
+  RC.g.y = gen.RC.g.y()
+  CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,t)
   Ci.gaga.y = CX.norm(CX.gaga.y,P.ga)
   Cp.gaga.y = CX.norm(CX.gaga.y,P.ga,lapply(C.aa.y,rowSums)) # unused for now
   if (do.plot){
     plot.contact.margins(C.AA.y,C.aa.y); ggsave(figname('C-restrat','contacts'),w=8,h=4)
     C.aa.y.diff = mapply(function(C.,C){ aggr.mix(C.,'Ci','a',P.ga) - C }, Ci.gaga.y, C.aa.y,SIMPLIFY=FALSE)
-    plot.mix(C.aa.y,'Ci','a',trans='sqrt',clim=c(0,8.5));                        ggsave(figname('Caay','contacts'),w=8,h=4)
+    plot.mix(C.aa.y,'Ci','a',trans='sqrt'); ggsave(figname('Caay','contacts'),w=8,h=4)
     plot.mix(C.aa.y.diff,'Ci','a',trans='nsqrt',clim=c(-2,+2),cmap='RdBu');      ggsave(figname('Caay-diff','contacts'),w=8,h=4)
-    plot.mix(CX.gaga.y,'CX','a',P.ga=P.ga,trans='sqrt',aggr=TRUE);               ggsave(figname('CXaay','mixing',config$mode,t),w=8,h=4)
-    plot.mix(CX.gaga.y,'CX','g',P.ga=P.ga,trans='sqrt',aggr=TRUE);               ggsave(figname('CXggy','mixing',config$mode,t),w=8,h=4)
-    plot.mix(Ci.gaga.y,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE,clim=c(0,8.5)); ggsave(figname('Ciaay','mixing',config$mode,t),w=8,h=4)
-    plot.mix(Ci.gaga.y,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE,clim=c(0,8.5)); ggsave(figname('Ciggy','mixing',config$mode,t),w=8,h=4)
+    plot.mix(CX.gaga.y,'CX','a',P.ga=P.ga,trans='sqrt',aggr=TRUE);  ggsave(figname('CXaay','mixing',config$mode,t),w=8,h=4)
+    plot.mix(CX.gaga.y,'CX','g',P.ga=P.ga,trans='sqrt',aggr=TRUE);  ggsave(figname('CXggy','mixing',config$mode,t),w=8,h=4)
+    plot.mix(Ci.gaga.y,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE);  ggsave(figname('Ciaay','mixing',config$mode,t),w=8,h=4)
+    plot.mix(Ci.gaga.y,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE);  ggsave(figname('Ciggy','mixing',config$mode,t),w=8,h=4)
     # plot.mix(Cp.gaga.y,'Cp','a',P.ga=P.ga,trans='sqrt'); ggsave(figname('Cpaay','mixing',config$mode,t),width=8,height=4)
     # plot.mix(Cp.gaga.y,'Cp','g',P.ga=P.ga,trans='sqrt'); ggsave(figname('Cpggy','mixing',config$mode,t),width=8,height=4)
   }
