@@ -9,49 +9,57 @@ library(scales)
 # supporting functions for plotting stuff
 
 offd  = function(x){ x-diag(rep(NA,nrow(x))) }
-
-mix.melt = function(C,what,vs,aggr=TRUE,xfun=NULL,...){
-  if (is.null(xfun)){ xfun = identity }
-  if (is.list(C)){
-    return(do.call(rbind,lapply(names(C),function(name){
-      C.aggr = aggr.mix(C[[name]],what,vs,aggr=aggr,...)
-      C. = melt(xfun(C.aggr),value.name='X',varnames=c('i','i.'))
-      C.$group = factor(name,levels=names(C))
-      return(C.)
+list.bind = function(X,gname='group',fun=identity,...){
+  # if X is a list, rbind its elements & add a new column bearing the list name
+  if (is.list(X)){
+    return(do.call(rbind,lapply(names(X),function(name){
+      Xi = fun(X[[name]],name,...)
+      Xi[[gname]] = factor(name,levels=names(X))
+      return(Xi)
     })))
   } else {
-    C.aggr = aggr.mix(C,what,vs,aggr=aggr,...)
-    return( melt(xfun(C.aggr),value.name='X',varnames=c('i','i.')) )
+    return(fun(X))
   }
 }
-nsqrt_trans = function(){
+mix.melt = function(C,what,vs,aggr=TRUE,xfun=NULL,...){
+  # list.bind + need to aggregate & melt each individual matrix
+  if (is.null(xfun)){ xfun = identity }
+  return(list.bind(C,gname='group',fun=function(Ci,name){
+    return(melt(xfun(aggr.mix(Ci,what,vs,aggr=aggr,...)),
+      value.name='X',varnames=c('i','i.')))
+  }))
+}
+nsqrt_trans = function(){ # sqrt transform that preserves -/+
   trans_new('nsqrt',function(x){sign(x)*sqrt(abs(x))},function(x){sign(x)*x^2})
 }
-cmap.fun = function(do='color',cmap='inferno',discrete=FALSE,...){
+cmap.fun = function(do='color',cmap='inferno',discrete=FALSE,end=.95,...){
+  # it adds joy to my life that every package uses different conventions
   if (cmap %in% c('inferno')){
     return(get(paste('scale',do,'viridis',sep='_'))(
-      option=cmap,end=.95,discrete=discrete,...))
+      option=cmap,end=end,discrete=discrete,...))
   }
   if (cmap %in% c('Spectral','RdBu')){
     return(get(paste('scale',do,ifelse(discrete,'brewer','distiller'),sep='_'))(
       palette=cmap,...))
   }
 }
-plot.mix = function(C,what,vs,aggr=FALSE,xfun=NULL,trans='identity',clim=c(0,NA),cmap='inferno',...){
+plot.mix = function(C,what,vs,aggr=FALSE,xfun=NULL,
+    trans='identity',clim=c(0,NA),cmap='inferno',gez=TRUE,...){
   C. = mix.melt(C,what,vs,aggr=aggr,xfun=xfun,...)
+  if (gez){ C.$X[C.$X<0] = 0 }
   v.name = switch(what,
     CX = 'Total Contacts\n(Millions)',
     Ci = 'Contacts\nPer Person',
     Cp = 'Contact\nFormation\nProbability',
     B  = '% Decile Pop\nwho Travelled\nto Other Decile')
-  g = ggplot(C.,aes(x=factor(i.),y=factor(i),fill=X,color=X)) +
+  g = ggplot(C.,aes(x=factor(i),y=factor(i.),fill=X,color=X)) +
     geom_tile() +
     coord_fixed(ratio=1) +
     scale_y_discrete(expand=c(0,0)) +
     scale_x_discrete(expand=c(0,0)) +
     labs(x=config$labels[[vs]]$x,y=config$labels[[vs]]$y,fill=v.name) +
-    cmap.fun('fill', cmap=cmap,limits=clim,na.value='transparent',trans=trans) +
-    cmap.fun('color',cmap=cmap,limits=clim,na.value='transparent',trans=trans) +
+    cmap.fun('fill', cmap=cmap,limits=clim,na.value='gray',trans=trans) +
+    cmap.fun('color',cmap=cmap,limits=clim,na.value='gray',trans=trans) +
     theme_light() +
     guides(color='none',fill=guide_colorbar(barheight=5)) +
     switch(vs,
@@ -64,48 +72,54 @@ plot.mix = function(C,what,vs,aggr=FALSE,xfun=NULL,trans='identity',clim=c(0,NA)
   }
   return(g)
 }
+void = function(){
+  return(theme_void() +
+    theme(strip.text.x=element_blank(),strip.text.y=element_blank()))
+}
 plot.device.density = function(X,x,y='month',bw=NULL,q=4,xmax=NULL,legend=FALSE){
   if (is.null(xmax)){ xmax=max(X[[x]]) }
   if (y=='month'){ y.lab='Month' } else { y.lab = y }
-  g = ggplot(X,aes_string(y=y,fill='factor(stat(quantile))',x=x)) +
+  X. = list.bind(X)
+  g = ggplot(X.,aes_string(y=y,fill='factor(stat(quantile))',x=x)) +
     stat_density_ridges(
       geom='density_ridges_gradient',
       calc_ecdf=TRUE,
       quantiles=q,
       bandwidth=bw) +
     scale_fill_viridis(discrete=TRUE,option='inferno',alpha=.7,begin=.2,end=.8) +
-    scale_y_discrete(limits=rev(levels(X[[y]]))) +
+    scale_y_discrete(limits=rev) +
     xlim(0,xmax) + labs(x=x,y=y.lab,fill='Quantile') +
     theme_light()
   if (!legend){
     g = g + guides(fill='none')
   }
+  if (is.list(X)) { g = g + facet_grid(cols=vars(group)) }
   return(g)
 }
 plot.pop.density = function(){
   pop = load.fsa.pop(aggr=FALSE)
   P = aggregate(pop~group+age,pop,sum)
-  g = ggplot(P,aes(x=age,y=pop,group=group,color=group,fill=group)) +
-    geom_density(stat='smooth',alpha=.1,span=.1) +
+  g = ggplot(P,aes(x=age,y=pop/mean(pop))) +
+    geom_line(aes(color=group)) +
     cmap.fun('color','Spectral',discrete=TRUE) +
-    cmap.fun('fill','Spectral',discrete=TRUE) +
-    labs(x='Age',y='Population',color='Decile',fill='Decile') +
+    labs(x='Age',y='Relative Population Proportion',color='Decile') +
     theme_light()
   return(g)
 }
-plot.contact.margins = function(C.AA.y,C.aa.y){
-  c.melt = function(C,age,vs){
-    return(do.call('rbind',lapply(seq(2),function(y){
-      return(data.frame(Contacts=rowSums(C[[y]]),Age=age,Type=names(config$c.type)[y],vs=vs))
-    })))
-  }
-  C.A = c.melt(C.AA.y,age=midpoint(config$age.contact),vs='Original')
-  C.a = c.melt(C.aa.y,age=midpoint(config$age),vs='Restratified')
-  g = ggplot(map=aes(x=Age,y=Contacts,group=vs,color=vs)) +
-    geom_line(data=C.A) + geom_point(data=C.A) +
-    geom_line(data=C.a) + geom_point(data=C.a) +
+plot.contact.margins = function(C.aa.y.list,age.list,style='line'){
+  C.a.y. = list.bind(C.aa.y.list,gname='vs',function(C.aa.y,C.name){
+    list.bind(C.aa.y,gname='Type',function(C.aa,...){
+      return(data.frame(Contacts=rowSums(C.aa),Age=midpoint(age.list[[C.name]])))
+    })
+  })
+  g = ggplot(C.a.y.,aes(x=Age,y=Contacts,group=vs,color=vs)) +
     facet_grid(cols=vars(Type)) +
+    cmap.fun('color','inferno',discrete=TRUE,begin=.15,end=.85) +
     theme_light()
+  if (style=='line'){ g = g + geom_line() }
+  if (style=='dots'){ g = g + geom_line() + geom_point(size=1,alpha=.5) }
+  if (style=='area'){ g = g + geom_area(aes(fill=vs),position='identity',alpha=.5) }
+  if (style=='bars'){ g = g + geom_bar(aes(fill=vs),stat='identity',position='identity',alpha=.5) }
   return(g)
 }
 plot.cases = function(cases){

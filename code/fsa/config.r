@@ -97,9 +97,9 @@ set.config = function(mode='10x10',n.y=2){ # set config stuff in global list var
       g = length(config$group)
     ),
     labels = list( # convenience for plotting labels
-      g = list(y='Home Decile (g)',x='Other Decile (g\')'),
-      n = list(y='Home FSA (n)',   x='Other FSA (n\')'),
-      a = list(y='Self Age (a)',   x='Other Age (a\')')
+      g = list(x='Home Decile (g)',y='Other Decile (g\')'),
+      n = list(x='Home FSA (n)',   y='Other FSA (n\')'),
+      a = list(x='Self Age (a)',   y='Other Age (a\')')
     ),
     age.contact = c( # Prem 2017 POLYMOD age groups
       '00-04' =  0 , '05-09' =  5,
