@@ -23,6 +23,11 @@ plot.mobility.margins = function(X,S,pop,idx.ref,f='mobility'){
   print(summary(100*S[ idx.ref,]$devices.home / S[ idx.ref,]$devices.total))
   print(summary(100*S[!idx.ref,]$devices.home / S[!idx.ref,]$devices.total))
   print(summary(100*(S$pop - S$devices.total) / S$pop))
+  g = plot.device.density(list(
+    'Home Reduction'         = data.frame(month=S$month,Ratio=S$devices.ht.h0),
+    'Visit Reduction'        = data.frame(month=S$month,Ratio=S$devices.vt.v0),
+    'Visit / Reference Home' = data.frame(month=S$month,Ratio=S$devices.vt.h0)
+  ),'Ratio',xmax=2); ggsave(figname('devices-panel','mx'),w=15,h=5)
   plot.device.density(S,'devices.home', xmax=1500) + xlab('Devices at Home'); ggsave(figname('devices-n-month-home', f),width=5,heigh=5)
   plot.device.density(S,'devices.visit',xmax=1500) + xlab('Device Visits');   ggsave(figname('devices-n-month-visit',f),width=5,heigh=5)
   plot.device.density(S,'devices.vt.ht',xmax=2)    + xlab('Visits / Device'); ggsave(figname('devices-n-month-ratio',f),width=5,heigh=5)
@@ -60,11 +65,12 @@ main.mobility = function(do.plot=TRUE,do.csv=TRUE){
   S = merge(S,merge(pop,load.fsa.smartphones()),all.x=TRUE)
   S = S[order(S$month,S$FSA),] # reshape for implicit repeat along FSA
   # get reference numbers of devices per FSA
-  idx.ref = S$month %in% mo.ref
+  idx.ref = S$month %in% config$t.ref
   dh.ref = aggregate(devices.home ~FSA,S[idx.ref,],mean,drop=FALSE)$devices.home
   X = X[order(X$month,X$FSA.visited,X$FSA),] # reshape for implicit repeat along FSA
-  X$visit.total = X$devices.visit / dh.ref * # "extrapolate" the unobserved people
-    (1 + phi['unobs.device'] * (S$devices.total - dh.ref) + phi['no.device'] * (S$pop - S$devices.total))
+  X$visit.total = X$devices.visit / dh.ref * (1 # "extrapolate" the unobserved people
+    + config$phi['unobs.device'] * (S$devices.total - dh.ref)
+    + config$phi['no.device'] * (S$pop - S$devices.total))
   if (do.plot){
     plot.mobility.margins(X,S,pop,idx.ref)
   }
