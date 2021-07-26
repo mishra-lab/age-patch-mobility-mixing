@@ -23,30 +23,35 @@ pop.to.Pga = function(pop){
   return(P.ga)
 }
 
-resample.contacts = function(Ci,xi,xo,x.max){
-  # Ci:    contact matrix stratified by xi & xi (square)
-  # xi:    list of cut points in Ci (lower cut points of each strata)
-  # xo:    list of cut points in Co (lower cut points of each strata)
-  # x.max: max cut point for both
-  # Co:    [value] contact matrix re-stratified by xo * xo (square)
+resample.contacts = function(Ci,xi,xo){
+  # Ci: contact matrix stratified by xi & xi (square)
+  # xi: list of cut points in Ci (lower cut points of each strata)
+  # xo: list of cut points in Co (lower cut points of each strata)
+  # Co: [value] contact matrix re-stratified by xo * xo (square)
   # We cannot simply interp2d, since the number of contacts per person would change;
-  # that's why we interpolate to m. * m. first, then aggregate using M
-  # and normalize by the strata sizes (diff);
-  # the number of contacts per person might change a little.
-  m. = midpoint(seq(0,x.max-1,1))
-  C. = interp2d(Ci/bin.size(xi,x.max),midpoint(xi),m.)
-  M = tail(outer(c(0,xo),m.,'<') * outer(c(xo,Inf),m.,'>'),-1)
-  Co = (M %*% C. %*% t(M)) / bin.size(xo,x.max)
+  # that's why we interpolate to m1 * m1 first, then aggregate using A
+  # and normalize by the strata sizes (bin.size);
+  # the number of contacts per person might change a little;
+  # we also pad Ci diagonally before interp to avoid any NA or edge effects.
+  xie = bin.extrap(xi,x.max=max(bin.extrap(xo)))
+  xip = bin.extrap(xie,pre=1,post=1)
+  Cip = diag.pad(Ci,pre=1,post=1+length(xie)-length(xi))
+  x1  = seq(min(xip),max(xip))
+  m1  = midpoint(x1)
+  C1  = interp2d(Cip/bin.size(xip),midpoint(xip),m1)
+  i   = (m1 > xie[1]) & (x1 < xie[length(xie)])
+  # plot.mix(C1[i,i],'Ci','a'); ggsave('Rplots.pdf'); # DEBUG
+  A  = tail(outer(c(0,xo),m1[i],'<') * outer(c(xo,Inf),m1[i],'>'),-1)
+  Co = (A %*% C1[i,i] %*% t(A)) / bin.size(xo)
   return(Co)
 }
 
-CAAy.to.Caay = function(C.AA.y){
+CAAy.to.Caay = function(C.AA.y,age.out=NULL){
   # C.AA.y: list of contact matrices in original age stratification
+  # age.out: list of cut points in C.aa.y (desired age stratification)
   # C.aa.y: [value] list of contact matrices in desired age stratification
-  return(lapply(C.AA.y,resample.contacts,
-    xi=config$age.contact,
-    xo=config$age,
-    x.max=config$age.max))
+  if (is.null(age.out)){ age.out = config$age }
+  return(lapply(C.AA.y,resample.contacts,xi=config$age.contact,xo=age.out))
 }
 
 gen.RC.g.y = function(){
@@ -69,16 +74,26 @@ gen.mix.main = function(P.ga,C.aa.y,RC.g.y,B.gg.t,t){
   B.g.t = rowSums(B.gg.t[[t]])     # total mobility during t
   B.gg = B.gg.t[[t]] + (B.g.t / B.g.0) * diag(1-B.g.0) # add mobility in same "g"
   B.hh = diag(N$g) # dummy "mobillity" for household contacts
-  a.size = bin.size(config$age,config$age.max,norm=TRUE) # expected age distribution
+  a.size = bin.size(config$age,norm=TRUE) # expected age distribution
   X.gaga.y = list() # initialize output
   for (y in seq(N$y)){ # for each contact type
     X.gaga = array(0,c(N$g,N$a,N$g,N$a),dimnames=config$X.names) # initialize X for this y
     C.gaga = aperm(replicate(N$g,replicate(N$g,C.aa.y[[y]])),c(3,1,4,2)) # pad C.aa to C.gaga
-    for (. in seq(N$g)){ # for each mixing pool (group)
-      P. = P.ga * ((1 - h.y[y]) * B.gg[,.] + (h.y[y] * B.hh[,.])) * RC.g.y[[y]] # pop of each "g" mixing here
-      PR = sweep(P.,2,a.size,'/') / sum(P.) # normalize by expected age distrib & overall pop
-      X = outer(P.,PR) * C.gaga # proportionate mixing * age mixing
+    # B.gg. = (1-h.y[y]) * B.gg + h.y[y] * B.hh # DEBUG: old method - similar to Arenas 2020
+    for (g in seq(N$g)){ # for each group
+      # traveller pool
+      # Pt = P.ga * B.gg.[,g] * RC.g.y[[y]] # DEBUG: old method - similar to Arenas 2020
+      Pt  = P.ga * (1-h.y[y]) * B.gg[,g] * RC.g.y[[y]] # pop of each "g" mixing in this pool
+      PRt = sweep(Pt,2,a.size,'/')/sum(Pt) # normalize overall & age as C.gaga already weighted by age
+      PRt[is.na(PRt)] = 0
+      X = outer(Pt,PRt) * C.gaga # proportionate mixing * age mixing
       X.gaga = X.gaga + X # add contribution of this pool to the total mixing
+      # home pool
+      Ph  = P.ga[g,] * h.y[y] * RC.g.y[[y]] # pop (age groups) of this "g" at home
+      PRh = Ph/a.size/sum(Ph) # normalize overall & age as C.aa.y already weighted by age
+      PRh[is.na(PRh)] = 0
+      X = outer(Ph,PRh) * C.aa.y[[y]] # proportionate mixing * age mixing
+      X.gaga[g,,g,] = X.gaga[g,,g,] + X # add contribution of this pool to the total mixing
     }
     X.gaga = symmetric(X.gaga) # ensure contacts balance
     # print(X.gaga / aperm(X.gaga,c(3,4,1,2))) # DEBUG == 1 (exact) or NaN from 0/0
@@ -123,28 +138,100 @@ aggr.mix = function(C.gaga,what,vs,P.ga=NULL,aggr=TRUE){
   if (what=='Cp'){ stop('aggr.mix for Cp not yet implemented') }
 }
 
-main.mixing = function(t='REF',do.plot=TRUE){
-  pop    = load.fsa.pop()
-  C.AA.y = load.contacts()
-  names(C.AA.y) = names(config$c.type)
-  B.gg.t = load.group.mob(pop)
+main.mixing = function(figdir='mx'){
+  clim=c(0,12.3)
+  # load stuff
+  config   = set.config(mode='10x10',n.y='4')
+  load(root.path('data','fsa','.rdata','Prem2017.rdata')) # -> Prem2017
+  pop      = load.fsa.pop()
+  P.ga     = pop.to.Pga(pop)
+  P.a      = colSums(P.ga)
+  C.AA.y   = load.contacts()
+  C.AA.y.0 = load.contacts(P.norm=FALSE,sym=FALSE)
+  C.AA.y.1 = load.contacts(P.norm=TRUE, sym=FALSE)
+  # do restratify
+  age.1  = seq(100); names(age.1) = age.1;
+  C.11.y = CAAy.to.Caay(C.AA.y,age.1)
   C.aa.y = CAAy.to.Caay(C.AA.y)
-  P.ga   = pop.to.Pga(pop)
+  C.aa.y.p = lapply(C.aa.y,function(C){ sweep(C,2,P.a,'*') / weighted.mean(P.a,bin.size(config$age)) })
+  # plot age distribution
+  P.A = data.frame(y=Prem2017$P.a,x=midpoint(config$age.contact))
+  P.a = data.frame(y=colMeans(P.ga),x=midpoint(config$age))
+  plot.pop.density() +
+    geom_line(data=P.A,aes(x=x,y=y/mean(y)),linetype='dashed')
+  ggsave(figname('Pga',figdir),w=8,h=4)
+  # compare margins
+  C.list   = list(C.AA.y.0, C.AA.y.1, C.AA.y, C.aa.y, C.aa.y.p)
+  age.list = list(config$age.contact,config$age.contact,config$age.contact,config$age,config$age)
+  names(C.list) = c('Original','Unweighted','Unweighted\n+Balanced','Unweighted\nTarget','Target')
+  names(age.list) = names(C.list)
+  plot.contact.margins(C.list,age.list,style='dots') +
+    guides(color=guide_legend(title='',keyheight=2)) +
+    scale_x_continuous(minor_breaks=NULL,
+      breaks=unname(bin.extrap(config$age.contact),minor),
+      sec.axis=sec_axis(~.,breaks=unname(bin.extrap(config$age))))
+    ggsave(figname('C4ay',figdir),w=14,h=4)
+  # compare the various versions of C.AA.y
+  b.1 = seq(0,length(age.1),5)
+  plot.mix(C.AA.y.0,'Ci','a',trans='sqrt',clim=clim); ggsave(figname('C4AAy0',figdir),w=14,h=4)
+  plot.mix(C.AA.y.1,'Ci','a',trans='sqrt',clim=clim); ggsave(figname('C4AAy1',figdir),w=14,h=4)
+  plot.mix(C.AA.y,  'Ci','a',trans='sqrt',clim=clim); ggsave(figname('C4AAy', figdir),w=14,h=4)
+  plot.mix(C.aa.y,  'Ci','a',trans='sqrt'); ggsave(figname('C4aay', figdir),w=14,h=4)
+  plot.mix(C.11.y,  'Ci','a',trans='sqrt') +
+    scale_x_discrete(breaks=b.1) +
+    scale_y_discrete(breaks=b.1); ggsave(figname('C411y',figdir),w=14,h=4)
+  # difference plots
+  C.AA.y.d01 = mapply('-', C.AA.y.1, C.AA.y.0, SIMPLIFY=FALSE)
+  C.AA.y.d12 = mapply('-', C.AA.y,   C.AA.y.1, SIMPLIFY=FALSE)
+  C.AA.y.d02 = mapply('-', C.AA.y,   C.AA.y.0, SIMPLIFY=FALSE)
+  plot.mix(C.AA.y.d01,'Ci','a',trans='nsqrt',clim=c(-2,+2),cmap='RdBu',gez=FALSE)
+    ggsave(figname('C4AAy-d01',figdir),w=14,h=4)
+  plot.mix(C.AA.y.d12,'Ci','a',trans='nsqrt',clim=c(-2,+2),cmap='RdBu',gez=FALSE)
+    ggsave(figname('C4AAy-d12',figdir),w=14,h=4)
+  plot.mix(C.AA.y.d02,'Ci','a',trans='nsqrt',clim=c(-2,+2),cmap='RdBu',gez=FALSE)
+    ggsave(figname('C4AAy-d02',figdir),w=14,h=4)
+  # mobility plots
+  B.gg.t = load.group.mob(pop)
+  B.g.0 = rowSums(B.gg.t[['REF']])
+  B.ggd.t = lapply(B.gg.t,function(B.gg){
+    B.gg + pmin(1, rowSums(B.gg) / B.g.0) * diag(1-B.g.0)
+  })
+  plot.mix(B.gg.t[['REF']],'B','g',trans='sqrt');  ggsave(figname('Bgg',  'mx'),w= 5,h=4)
+  plot.mix(B.ggd.t[['REF']],'B','g',trans='sqrt'); ggsave(figname('Bggd', 'mx'),w= 5,h=4)
+  plot.mix(B.gg.t,'B','g',trans='sqrt');           ggsave(figname('Bggt', 'mx'),w=11,h=4)
+  plot.mix(B.ggd.t,'B','g',trans='sqrt');          ggsave(figname('Bggdt','mx'),w=11,h=4)
+  # compute 4D
   RC.g.y = gen.RC.g.y()
-  CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,t)
+  CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,'REF')
   Ci.gaga.y = CX.norm(CX.gaga.y,P.ga)
-  Cp.gaga.y = CX.norm(CX.gaga.y,P.ga,lapply(C.aa.y,rowSums)) # unused for now
-  if (do.plot){
-    plot.contact.margins(C.AA.y,C.aa.y); ggsave(figname('C-restrat','contacts'),w=8,h=4)
-    C.aa.y.diff = mapply(function(C.,C){ aggr.mix(C.,'Ci','a',P.ga) - C }, Ci.gaga.y, C.aa.y,SIMPLIFY=FALSE)
-    plot.mix(C.aa.y,'Ci','a',trans='sqrt'); ggsave(figname('Caay','contacts'),w=8,h=4)
-    plot.mix(C.aa.y.diff,'Ci','a',trans='nsqrt',clim=c(-2,+2),cmap='RdBu');      ggsave(figname('Caay-diff','contacts'),w=8,h=4)
-    plot.mix(CX.gaga.y,'CX','a',P.ga=P.ga,trans='sqrt',aggr=TRUE);  ggsave(figname('CXaay','mixing',config$mode,t),w=8,h=4)
-    plot.mix(CX.gaga.y,'CX','g',P.ga=P.ga,trans='sqrt',aggr=TRUE);  ggsave(figname('CXggy','mixing',config$mode,t),w=8,h=4)
-    plot.mix(Ci.gaga.y,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE);  ggsave(figname('Ciaay','mixing',config$mode,t),w=8,h=4)
-    plot.mix(Ci.gaga.y,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE);  ggsave(figname('Ciggy','mixing',config$mode,t),w=8,h=4)
-    # plot.mix(Cp.gaga.y,'Cp','a',P.ga=P.ga,trans='sqrt'); ggsave(figname('Cpaay','mixing',config$mode,t),width=8,height=4)
-    # plot.mix(Cp.gaga.y,'Cp','g',P.ga=P.ga,trans='sqrt'); ggsave(figname('Cpggy','mixing',config$mode,t),width=8,height=4)
-  }
-  return(Ci.gaga.y)
+  Ci.gaga   = Reduce('+',Ci.gaga.y)
+  # plot 4D margins in a/a', g/g'
+  plot.mix(Ci.gaga.y,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE)
+    ggsave(figname('CX4aay',figdir),w=14,h=4)
+  plot.mix(Ci.gaga.y,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE)
+    ggsave(figname('CX4ggy',figdir),w=14,h=4)
+  plot.mix(Ci.gaga,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE)
+    ggsave(figname('CXaay',figdir),w=5,h=4)
+  plot.mix(Ci.gaga,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE)
+    ggsave(figname('CXggy',figdir),w=5,h=4)
+  # compare 2D to 4D: should be exactly the same for REF
+  P.a = replicate(config$N$a,colSums(P.ga)/mean(P.ga))
+  C.aa.y. = lapply(C.aa.y,'*',P.a)
+  C.aa.y.diff = mapply(function(C4,C2){ aggr.mix(C4,'Ci','a',P.ga) - C2 }, Ci.gaga.y, C.aa.y., SIMPLIFY=FALSE)
+  plot.mix(C.aa.y.diff,'Ci','a',trans='nsqrt',clim=c(-1,+1),cmap='RdBu');
+    ggsave(figname('C4aay-diff',figdir),w=14,h=4) # should be white
+  # void plots for tikz figure (grabstract)
+  load(root.path('data','fsa','.rdata','Prem2017.rdata'))
+  C.list = list('0'=C.AA.y.0,'1'=C.AA.y.1,'2'=C.AA.y)
+  P.list = list('0'=Prem2017$P.a/mean(Prem2017$P.a),'1'=rep(1,16),'2'=rep(1,16))
+  lapply(names(C.list),function(n1){
+    lapply(names(C.list[[n1]]),function(n2){
+      C = C.list[[n1]][[n2]]
+      plot.mix(C,'Ci','a',trans='sqrt') + void() + guides(fill='none')
+        ggsave(root.path('code','tikz','mx','grabs','fig',paste0('CAA-',n1,'-',n2,'.pdf')),w=1,h=1)
+    })
+  })
+  plot.mix(B.gg.t[['REF']],'B','g',trans='sqrt') + void() + guides(fill='none')
+    ggsave(root.path('code','tikz','mx','grabs','fig','Bgg.pdf'),w=1,h=1)
+  return(NULL)
 }

@@ -12,9 +12,7 @@ if (args[1] == 'mobility'){
 }
 if (args[1] == 'mixing'){
   source('mixing.r')
-  for (t in c(config$t.covid,'REF')){
-    main.mixing(t=t);
-  }
+  main.mixing()
 }
 if (args[1] == 'runtime'){
   source('runtime.r')
