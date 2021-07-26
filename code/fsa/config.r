@@ -6,11 +6,11 @@ root.path = function(...,create=FALSE){ # find project root above /code/ & build
   if (create){ suppressWarnings({ dir.create(path,recursive=TRUE) }) }
   return(path)
 }
-figname = function(name,...){ # e.g. /out/fig/fsa/.../name.pdf
+figname = function(name,...,ext='.pdf'){ # e.g. /out/fig/fsa/.../name.pdf
   path = root.path('out','fig','fsa',...,create=TRUE)
-  return(file.path(path,paste0(name,'.pdf')))
+  return(file.path(path,paste0(name,ext)))
 }
-set.config = function(mode='10x10'){ # set config stuff in global list variable
+set.config = function(mode='10x10',n.y=2){ # set config stuff in global list variable
   config = list( # see [[mode]] below
     '10x10' = list(
       age = c(
@@ -48,29 +48,39 @@ set.config = function(mode='10x10'){ # set config stuff in global list variable
         '3-10' = 3)
   ))[[mode]]
   config$mode = mode
-  config$c.type = c(
-    'Household Contacts'     = 'home',
-    'Non-Household Contacts' = 'other'
-  )
+  config = c(config,list(
+    '2' = list(
+      c.map = list(hh='home',nhh=c('work','school','others')),
+      c.type = c(
+        'Household Contacts'     = 'hh',
+        'Non-Household Contacts' = 'nhh'
+      ),
+      h.y       = c('hh'=1,'nhh'=0),
+      RC.global = c('hh'=1,'nhh'=0)
+    ),
+    '4' = list(
+      c.map=list(home='home',work='work',school='school',others='others'),
+      c.type = c(
+        'Home'   = 'home',
+        'Work'   = 'work',
+        'School' = 'school',
+        'Other'  = 'others'
+      ),
+      h.y       = c('home'=1,'work'=0,'school'=0,'others'=0),
+      RC.global = c('home'=1,'work'=1,'school'=1,'others'=1)
+    )
+  )[[paste(n.y)]])
     # add config stuff that doesn't depend on mode
   config = c(config,list(
-    RC.global = c( # global scaling factor for contacts
-      'home'  = 1,
-      'other' = 1
-    ),
-    RC.decile = c(
-      7.643163, 5.755709, 4.448017, 3.846107, 3.246633,
-      2.983167, 2.539929, 2.136271, 1.625427, 1.000000
+    RC.decile = c(1
+      # 7.643163, 5.755709, 4.448017, 3.846107, 3.246633,
+      # 2.983167, 2.539929, 2.136271, 1.625427, 1.000000
       # 13.029573, 9.067338, 6.610766, 5.409403, 4.522559,
       #  4.068002, 3.286063, 2.687275, 1.839832, 1.000000
     ),
     phi = c( # odds of mobility vs observed devices
       'unobs.device' = .9,
       'no.device'    = .9
-    ),
-    h.y = c( # proportion of contacts formed at home
-      'home'  = 1,
-      'other' = 0
     ),
     t.ref   = c('2020-01','2020-02'), # REF period
     t.covid = c('2020-03','2020-04','2020-05','2020-06', # covid periods
@@ -101,7 +111,6 @@ set.config = function(mode='10x10'){ # set config stuff in global list variable
       '60-64' = 60 , '65-69' = 65,
       '70-74' = 70 , '75-80' = 75)
   ))
-  config$age.max = max(config$age)+5
   config <<- config # make global
 }
 set.config()
