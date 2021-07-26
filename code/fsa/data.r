@@ -14,8 +14,8 @@ aggr.age = function(pop,age=TRUE){
 aggr.mob.decile = function(B,pop){
   P = aggregate(pop~decile+group,pop,sum)
   p = ave(P$pop,P$group,FUN=function(pop){pop/sum(pop)})
-  M = t(tail(outer(c(0,config$group),seq(10),'<=') * outer(c(config$group,Inf),seq(10),'>'),-1))
-  B = t(p*M) %*% B %*% M
+  A = t(tail(outer(c(0,config$group),seq(10),'<=') * outer(c(config$group,Inf),seq(10),'>'),-1))
+  B = t(p*A) %*% B %*% A
   colnames(B) = config$group
   rownames(B) = config$group
   return(B)
@@ -58,15 +58,13 @@ load.fsa.mob = function(refresh=FALSE){
   if (file.exists(rdata) & !refresh){
     load(rdata)
   } else {
-    FSA = unique(load.fsa.pop(age=FALSE)$FSA)
+    FSA = levels(load.fsa.pop(age=FALSE)$FSA)
     X = read.csv(root.path('data','fsa','mobility_fsa.csv'))
     colnames(X) = c('FSA.visited','FSA','month','devices.visit','visit.prop','province','devices.home')
     X = X[X$FSA %in% FSA & X$FSA.visited %in% FSA,] # remove external travel
     X$visit.prop = NULL
     X$province = NULL
-    FSA   = sort(unique(X$FSA))
-    month = sort(unique(X$month))
-    X = merge(expand.grid(FSA=FSA,FSA.visited=FSA,month=month),X,all=TRUE)
+    X = merge(expand.grid(FSA=FSA,FSA.visited=FSA,month=levels(X$month)),X,all.x=TRUE)
     save(X,file=rdata)
   }
   return(X)
