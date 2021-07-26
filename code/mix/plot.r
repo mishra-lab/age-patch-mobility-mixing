@@ -151,7 +151,7 @@ plot.map = function(shp=NULL){
 }
 plot.map.main = function(ext='.png'){
   shp = load.shape()
-  shp = merge(shp,read.csv(root.path('data','fsa','fsa_region.csv')))
+  shp = merge(shp,read.csv(root.path('data','mix','fsa_region.csv')))
   plot.map(subset(shp,substr(FSA,1,1)=='P')) + theme_void() + guides(fill='none');
     ggsave(figname('ontario-north','map',ext=ext),w=3,h=3,dpi=600)
   plot.map(subset(shp,substr(FSA,1,1)!='P')) + theme_void() + guides(fill='none');

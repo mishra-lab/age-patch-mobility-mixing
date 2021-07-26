@@ -7,7 +7,7 @@ root.path = function(...,create=FALSE){ # find project root above /code/ & build
   return(path)
 }
 figname = function(name,...,ext='.pdf'){ # e.g. /out/fig/fsa/.../name.pdf
-  path = root.path('out','fig','fsa',...,create=TRUE)
+  path = root.path('out','fig','mix',...,create=TRUE)
   return(file.path(path,paste0(name,ext)))
 }
 set.config = function(mode='10x10',n.y=2){ # set config stuff in global list variable

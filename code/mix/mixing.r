@@ -138,11 +138,11 @@ aggr.mix = function(C.gaga,what,vs,P.ga=NULL,aggr=TRUE){
   if (what=='Cp'){ stop('aggr.mix for Cp not yet implemented') }
 }
 
-main.mixing = function(figdir='mx'){
+main.mixing = function(figdir=''){
   clim=c(0,12.3)
   # load stuff
   config   = set.config(mode='10x10',n.y='4')
-  load(root.path('data','fsa','.rdata','Prem2017.rdata')) # -> Prem2017
+  load(root.path('data','mix','.rdata','Prem2017.rdata')) # -> Prem2017
   pop      = load.fsa.pop()
   P.ga     = pop.to.Pga(pop)
   P.a      = colSums(P.ga)
@@ -196,10 +196,10 @@ main.mixing = function(figdir='mx'){
   B.ggd.t = lapply(B.gg.t,function(B.gg){
     B.gg + pmin(1, rowSums(B.gg) / B.g.0) * diag(1-B.g.0)
   })
-  plot.mix(B.gg.t[['REF']],'B','g',trans='sqrt');  ggsave(figname('Bgg',  'mx'),w= 5,h=4)
-  plot.mix(B.ggd.t[['REF']],'B','g',trans='sqrt'); ggsave(figname('Bggd', 'mx'),w= 5,h=4)
-  plot.mix(B.gg.t,'B','g',trans='sqrt');           ggsave(figname('Bggt', 'mx'),w=11,h=4)
-  plot.mix(B.ggd.t,'B','g',trans='sqrt');          ggsave(figname('Bggdt','mx'),w=11,h=4)
+  plot.mix(B.gg.t[['REF']],'B','g',trans='sqrt');  ggsave(figname('Bgg',  figdir),w= 5,h=4)
+  plot.mix(B.ggd.t[['REF']],'B','g',trans='sqrt'); ggsave(figname('Bggd', figdir),w= 5,h=4)
+  plot.mix(B.gg.t,'B','g',trans='sqrt');           ggsave(figname('Bggt', figdir),w=11,h=4)
+  plot.mix(B.ggd.t,'B','g',trans='sqrt');          ggsave(figname('Bggdt',figdir),w=11,h=4)
   # compute 4D
   RC.g.y = gen.RC.g.y()
   CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,'REF')
@@ -221,17 +221,18 @@ main.mixing = function(figdir='mx'){
   plot.mix(C.aa.y.diff,'Ci','a',trans='nsqrt',clim=c(-1,+1),cmap='RdBu');
     ggsave(figname('C4aay-diff',figdir),w=14,h=4) # should be white
   # void plots for tikz figure (grabstract)
-  load(root.path('data','fsa','.rdata','Prem2017.rdata'))
+  tikzpath = function(...){ root.path('code','tikz','methodsx','grabstract','fig',...) }
+  load(root.path('data','mix','.rdata','Prem2017.rdata'))
   C.list = list('0'=C.AA.y.0,'1'=C.AA.y.1,'2'=C.AA.y)
   P.list = list('0'=Prem2017$P.a/mean(Prem2017$P.a),'1'=rep(1,16),'2'=rep(1,16))
   lapply(names(C.list),function(n1){
     lapply(names(C.list[[n1]]),function(n2){
       C = C.list[[n1]][[n2]]
       plot.mix(C,'Ci','a',trans='sqrt') + void() + guides(fill='none')
-        ggsave(root.path('code','tikz','mx','grabs','fig',paste0('CAA-',n1,'-',n2,'.pdf')),w=1,h=1)
+        ggsave(tikzpath(paste0('CAA-',n1,'-',n2,'.pdf')),w=1,h=1)
     })
   })
   plot.mix(B.gg.t[['REF']],'B','g',trans='sqrt') + void() + guides(fill='none')
-    ggsave(root.path('code','tikz','mx','grabs','fig','Bgg.pdf'),w=1,h=1)
+    ggsave(tikzpath('Bgg.pdf'),w=1,h=1)
   return(NULL)
 }

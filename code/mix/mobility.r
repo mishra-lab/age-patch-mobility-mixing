@@ -51,7 +51,7 @@ save.mobility = function(X,S,pop){
   X.gg$visit.prop = X.gg$visit.total / pop.g
   X.gg$visit.total = NULL
   X.gg = X.gg[order(X.gg$month,X.gg$decile,X.gg$decile.visited),]
-  write.csv(X.gg,root.path('data','fsa','mobility_decile.csv'),row.names=FALSE)
+  write.csv(X.gg,root.path('data','mix','mobility_decile.csv'),row.names=FALSE)
 }
 
 main.mobility = function(do.plot=TRUE,do.csv=TRUE){
