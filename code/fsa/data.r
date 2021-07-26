@@ -96,6 +96,13 @@ load.cases = function(){
   return(X)
 }
 
+load.shape = function(){
+  library('sf')
+  load(root.path('data','fsa','.raw','lfsa000b16a_e.rdata'))
+  dec = read.csv(root.path('data','fsa','fsa_decile.csv'))
+  return(merge(shp,dec,all.y=TRUE))
+}
+
 clean.raw.pop = function(){
   fsa = read.csv(root.path('data','fsa','fsa.csv'))$FSA
   pop = read.csv(root.path('data','fsa','.raw','pop_age_fsa.csv'))
@@ -132,4 +139,15 @@ clean.Prem2017 = function(){
   )
   # plot.mix(Prem2017$C.AA.y,'Ci','a',trans='sqrt'); ggsave('Rplots.pdf',w=14,h=4) # DEBUG
   save(Prem2017,file=root.path('data','fsa','.rdata','Prem2017.rdata')) # TODO: save as CSV?
+}
+
+clean.shape = function(which='FSA'){
+  fname = function(ext){ root.path('data','fsa','.raw',paste0('lfsa000b16a_e.',ext)) }
+  shp = sf::st_read(dsn=fname('shp'),quiet=TRUE)
+  shp = subset(shp,PRNAME=='Ontario')
+  shp$FSA = shp$CFSAUID
+  shp$CFSAUID = NULL
+  shp$PRNAME = NULL
+  shp$PRUID = NULL
+  save(shp,file=fname('rdata'))
 }

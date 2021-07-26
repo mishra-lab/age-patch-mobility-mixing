@@ -140,3 +140,22 @@ plot.distr = function(C,y,ylabel,cmap='',...){
     theme_light()
   return(g)
 }
+plot.map = function(shp=NULL){
+  if (is.null(shp)){ shp = load.shape() }
+  g = ggplot(shp) +
+    geom_sf(aes(fill=factor(decile,levels=seq(10))),lwd=.0) +
+    cmap.fun('fill',cmap='Spectral',discrete=TRUE,drop=FALSE) +
+    labs(fill='Decile') +
+    theme_light()
+  return(g)
+}
+plot.map.main = function(ext='.png'){
+  shp = load.shape()
+  shp = merge(shp,read.csv(root.path('data','fsa','fsa_region.csv')))
+  plot.map(subset(shp,substr(FSA,1,1)=='P')) + theme_void() + guides(fill='none');
+    ggsave(figname('ontario-north','map',ext=ext),w=3,h=3,dpi=600)
+  plot.map(subset(shp,substr(FSA,1,1)!='P')) + theme_void() + guides(fill='none');
+    ggsave(figname('ontario-south','map',ext=ext),w=3,h=3,dpi=600)
+  plot.map(subset(shp,GTA==1)) + theme_void();
+    ggsave(figname('ontario-gta','map',ext=ext),w=4,h=3,dpi=600)
+}
