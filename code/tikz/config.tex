@@ -1,10 +1,9 @@
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta}
+\usetikzlibrary{arrows.meta,decorations.pathreplacing}
 \tikzset{
-  gpool/.style = {
+  pool/.style = {
     circle,
-    minimum width = 16mm,
-    minimum height = 16mm,
+    minimum width = 10mm,
     inner sep = 0pt,
     fill = #1!10!white,
     draw = #1,
@@ -13,30 +12,64 @@
   },
   arrow/.style = {
     thick,
+    > = latex,
+  },
+  brace/.style 2 args = {
+    decorate,
+    decoration={brace,amplitude=#1,aspect=#2},
+  },
+  brace/.default = {1mm}{0.5},
+  dot/.style = {
+    circle,
+    inner sep = 0pt,
+    minimum width = #1,
+    minimum height = #1,
+  },
+  n/.style = {
+    text width = #1,
+  },
+  p/.style = {
+    circle,
+    minimum width = 6mm,
+  },
+  img/.style = {
+    minimum width = #1,
+    minimum height = #1,
+    inner sep = 0pt,
   },
   bx/.style = {opacity = 0.3},
   fx/.style = {opacity = 1.0},
 }
-\definecolor{G1}{HTML}{f9766e}
-\definecolor{G2}{HTML}{629dff}
-\definecolor{G3}{HTML}{00b939}
+\def\fade{20}
+\definecolor{G1}{HTML}{F98C0A}\colorlet{B1}{G1!\fade!white}
+\definecolor{G2}{HTML}{BB3754}\colorlet{B2}{G2!\fade!white}
+\definecolor{G3}{HTML}{56106E}\colorlet{B3}{G3!\fade!white}
+\definecolor{HL}{HTML}{44C8AB}
+\colorlet{B0}{black!\fade!white}
 \newlength\htp
 \newcommand{\person}[4]{
+  % 1=x, 2=y, 3=height, 4=style
   \setlength{\htp}{#3}
   \fill[#4,rounded corners=.05\htp]
-    (#1-.22\htp,#2+.24\htp) -- (#1+.22\htp,#2+.24\htp) --
-    (#1+.22\htp,#2-.10\htp) -- (#1+.12\htp,#2-.10\htp) --
-    (#1+.12\htp,#2-.50\htp) -- (#1-.12\htp,#2-.50\htp) --
-    (#1-.12\htp,#2-.10\htp) -- (#1-.22\htp,#2-.10\htp) --
+    (#1-.22\htp,#2+.24\htp) -- (#1+.22\htp,#2+.24\htp) -- % shoulder
+    (#1+.22\htp,#2-.10\htp) -- (#1+.12\htp,#2-.10\htp) -- % right arm
+    (#1+.12\htp,#2-.50\htp) -- (#1-.12\htp,#2-.50\htp) -- % feet
+    (#1-.12\htp,#2-.10\htp) -- (#1-.22\htp,#2-.10\htp) -- % left arm
     cycle;
-  \fill[#4] (#1,#2+.38\htp) circle (.12\htp);}
+  \fill[#4] (#1,#2+.38\htp) circle (.12\htp); % head
+}
 \newcommand{\persono}[4]{
   \person{#1}{#2}{#3}{fill=white,draw=white,line width=.5mm}
-  \person{#1}{#2}{#3}{#4}}
-\newcommand{\community}[5]{
-  \foreach \yi in {#5,...,1}{
+  \person{#1}{#2}{#3}{#4}
+}
+\newcommand{\community}[7]{
+  % 1=x, 2=y, 3=rows, 4=x-sep, 5=y-sep, 6=height, 7=style,
+  \foreach \yi in {#3,...,1}{
     \foreach \xi in {1,...,\yi}{
-      \persono{#1-\yi*3mm+\xi*6mm-3mm}{#2+\yi*1mm-1mm}{#3}{#4}
+      \persono{#1-\yi*#4+\xi*2*#4-#4}{#2+\yi*#5-#5}{#6}{#7}
     }
   }
+}
+\newcommand{\matriximg}[5][]{
+  \node[anchor=center,img=#4,#1] at (#2,#3) {\includegraphics[width=#4]{#5.pdf}};
 }

@@ -1,0 +1,2 @@
+main:
+	pdflatex grabstract.tex

@@ -1,0 +1,89 @@
+\documentclass[10pt,margin=0mm]{standalone}
+\input{../../config}
+\usepackage[osf,sfdefault]{biolinum}
+\usepackage{sfmath}
+\usepackage{graphicx}
+\graphicspath{{fig/}}
+\tikzset{
+  cnx/.style = {
+    gray!50!white,
+    arrow,
+  },
+}
+\newcommand{\matriximgs}[4]{
+  \foreach \i in {1.5,1,0.5,0}{
+    \node[img=#3,draw=white,fill=gray] at (#1-\i mm,#2-\i mm) {};
+  }
+  \matriximg[draw=white]{#1}{#2}{#3}{#4}
+}
+\begin{document}
+  \scriptsize\setlength\baselineskip{2mm}
+  \begin{tikzpicture}[x=1mm,y=1mm]
+    \useasboundingbox (0,0) rectangle (130,50);
+    % AGE MIXING
+    \begin{scope}[xshift=+16mm,yshift=-2mm]
+      \node at (-10,48) {Contacts};
+      \node[cnx,n=10mm,align=center] at (-10,36) {Age\\vs\\Age};
+      \node[cnx,n=10mm,align=center] at (-10,14) {Patch\\vs\\Patch};
+      \matriximg {00mm}{42mm}{8mm}{CAA-0-Home}   \node at (00,48) {Home};
+      \matriximg {10mm}{42mm}{8mm}{CAA-0-Work}   \node at (10,48) {Work};
+      \matriximg {20mm}{42mm}{8mm}{CAA-0-School} \node at (20,48) {School};
+      \matriximg {30mm}{42mm}{8mm}{CAA-0-Other}  \node at (30,48) {Other};
+      \matriximgs{00mm}{30mm}{8mm}{CAA-0-Home}
+      \matriximgs{15mm}{24mm}{8mm}{CAA-1-Home}
+      \matriximgs{30mm}{18mm}{8mm}{CAA-2-Home}
+      \draw[cnx,brace={1mm}{.88}] (35,37) -- (-5,37);
+      \draw[cnx,->] ( 0,24) -- ++(0,-1) -- ++(9,0);
+      \draw[cnx,->] (15,18) -- ++(0,-1) -- ++(9,0);
+      \node[cnx,align=center,n=15mm] at (15,32) {Demographic\\Normalization};
+      \node[cnx,align=center,n=15mm] at (30,26) {Ensure\\Balancing};
+      \matriximg {0mm}{8}{8mm}{Bgg}  \node at (0,14) {Mobility};
+      \node[p](CL)  at (-3,42) {};
+      \node[p](BL)  at (-3, 8) {};
+      \node[p](BR)  at (+3, 8) {};
+      \node[p](CAA) at (33,18) {};
+    \end{scope}
+    % MIXING POOLS
+    \begin{scope}[xshift=+90mm,yshift=-2mm]
+      \community{0mm}{40mm}{3}{3mm}{1mm}{8mm}{B1}
+      \community{0mm}{28mm}{3}{3mm}{1mm}{8mm}{G2}
+      \community{0mm}{16mm}{3}{3mm}{1mm}{8mm}{B3}
+      \node[pool=G1] (T1) at (-25,42) {Travel\\1};
+      \node[pool=G2] (T2) at (-25,30) {Travel\\2};
+      \node[pool=G3] (T3) at (-25,18) {Travel\\3};
+      \node[pool=B1,text=B0] (H1) at (+20,42) {Home\\1};
+      \node[pool=G2]         (H2) at (+20,30) {Home\\2};
+      \node[pool=B3,text=B0] (H3) at (+20,18) {Home\\3};
+      \node[p](L1) at (-6,42){}; \node[p](R1) at (+6,42){};
+      \node[p](L2) at (-6,30){}; \node[p](R2) at (+6,30){};
+      \node[p](L3) at (-6,18){}; \node[p](R3) at (+6,18){};
+      \draw[arrow,B1,<->] (R1) -- (H1);
+      \draw[arrow,G2,<->] (R2) -- (H2);
+      \draw[arrow,B3,<->] (R3) -- (H3);
+      \draw[arrow,B1,<->] (L1) -- (T1);
+      \draw[arrow,B1,<->] (L1) -- (T2);
+      \draw[arrow,B1,<->] (L1) -- (T3);
+      \draw[arrow,G2,<->] (L2) -- (T1);
+      \draw[arrow,G2,<->] (L2) -- (T2);
+      \draw[arrow,G2,<->] (L2) -- (T3);
+      \draw[arrow,B3,<->] (L3) -- (T1);
+      \draw[arrow,B3,<->] (L3) -- (T2);
+      \draw[arrow,B3,<->] (L3) -- (T3);
+      \draw[cnx,brace] (-9,14) -- (-19,14);
+      \node[p] (X) at (-14,15) {};
+    \end{scope}
+    % CONNECTIONS
+    \draw[cnx,<-] (BL) -- ++ (-10,0);
+    \draw[cnx,<-] (CL) -- ++ (-10,0);
+    \draw[cnx,->] (BR) -| node[below,near start]{Patch Mixing} (X);
+    \draw[cnx,->] (CAA) -- ++(6,0) |- (T1);
+    \draw[cnx,->] (CAA) -- ++(6,0) |- (T2);
+    \draw[cnx,->] (CAA) -- ++(6,0) |- (T3);
+    \draw[cnx,->] (CAA) -- ++(6,0) |- ++ (65,32) |- (H1);
+    \draw[cnx,->] (CAA) -- ++(6,0) |- ++ (65,32) |- (H2);
+    \draw[cnx,->] (CAA) -- ++(6,0) |- ++ (65,32) |-
+      node[n=10mm,right,near start]{Age\\Mixing\\} (H3);
+    \node[anchor=east,G2] at (125,5) {Force of Infection:
+      $\lambda_g = \lambda^{\tiny\textsf{Home}}_{g} + \sum_{g'} \lambda^{\tiny\textsf{Travel}}_{gg'}$};
+  \end{tikzpicture}
+\end{document}
