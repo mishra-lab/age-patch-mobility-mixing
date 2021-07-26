@@ -77,18 +77,19 @@ load.fsa.smartphones = function(){
   return(X)
 }
 
-load.contacts = function(map=NULL){
-  if (is.null(map)){ map = list(home='home',other=c('work','school','others')) }
+load.contacts = function(c.map=NULL,P.norm=TRUE,sym=TRUE){
+  if (is.null(c.map)){ c.map = config$c.map }
   load(root.path('data','fsa','.rdata','Prem2017.rdata'))
-  P.mean = mean(Prem2017$P.a)
-  C.aa.y = list()
-  for (y in names(map)){
-    C.aa = Reduce('+',Prem2017$C.aa.y[map[[y]]])
-    C.aa = sweep(sweep(C.aa,1,Prem2017$P.a,'/'),2,Prem2017$P.a,'/') * P.mean^2
-    dimnames(C.aa) = list('a'=names(config$age.contact),'a.'=names(config$age.contact))
-    C.aa.y[[y]] = symmetric(C.aa)
+  C.AA.y = list()
+  for (y in names(c.map)){
+    C.AA = Reduce('+',Prem2017$C.AA.y[c.map[[y]]])
+    if (P.norm){ C.AA = sweep(C.AA,2,Prem2017$P.a,'/') * mean(Prem2017$P.a) }
+    if (sym){    C.AA = symmetric(C.AA) }
+    dimnames(C.AA) = list('a'=names(config$age.contact),'a.'=names(config$age.contact))
+    C.AA.y[[y]] = C.AA
   }
-  return(C.aa.y)
+  names(C.AA.y) = names(config$c.type)
+  return(C.AA.y)
 }
 
 load.cases = function(){
@@ -117,6 +118,7 @@ clean.raw.pop = function(){
 }
 
 clean.Prem2017 = function(){
+  # TODO: why does rdata school =/= Prem2017 appendix for a > 30
   rdata = function(name){
     load(root.path('data','fsa','.raw',paste0(name,'.rdata')))
     return(get(name))
@@ -126,9 +128,10 @@ clean.Prem2017 = function(){
   names(c.types) = c.types
   Prem2017 = list(
     P.a = as.numeric(P.raw[P.raw$countryname=='Canada',paste0('age',seq(0,75,5))]),
-    C.aa.y = lapply(c.types,function(c.type){
+    C.AA.y = lapply(c.types,function(c.type){
       return(rdata(paste0('contact_',c.type))$CAN)
     })
   )
+  # plot.mix(Prem2017$C.AA.y,'Ci','a',trans='sqrt'); ggsave('Rplots.pdf',w=14,h=4) # DEBUG
   save(Prem2017,file=root.path('data','fsa','.rdata','Prem2017.rdata')) # TODO: save as CSV?
 }
