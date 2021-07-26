@@ -1,0 +1,27 @@
+\usepackage[osf,tabular,sfdefault]{biolinum}
+\usepackage[scale=.75]{FiraMono}
+\usepackage[onehalfspacing]{setspace}
+\usepackage{sfmath,amsmath,bm}
+\usepackage[marginal]{footmisc}
+% shorthands
+\usepackage[
+  colorlinks,
+  linkcolor=blue,
+  citecolor=magenta,
+]{hyperref}
+\usepackage{xspace}
+\newcommand{\covid}{\mbox{\textsc{covid-19}}\xspace}
+\newcommand{\polymod}{\mbox{\textsc{polymod}}\xspace}
+\newcommand{\hreftt}[1]{\href{#1}{\texttt{#1}}}
+\renewcommand{\ne}{\mathop{\kern-.2em\not{\kern-.2em=}}} % HACK
+\setlength{\skip\footins}{\bigskipamount}
+\newcommand{\rom}[1]{\textsc{\romannumeral#1})}
+% bib
+\addbibresource{refs}
+% floats
+\usepackage{graphicx}
+\graphicspath{{fig/}}
+\usepackage{booktabs}
+\usepackage{subcaption}
+\newcommand{\floatfoot}[2][1]{%
+  \par\parbox{#1\linewidth}{\footnotesize#2}}

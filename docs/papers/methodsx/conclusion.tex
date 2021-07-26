@@ -1,0 +1,39 @@
+\section{Conclusion}\label{conc}
+\citet{Arenas2020} develop an approach to modelling
+contact patterns associated with recurrent mobility,
+which is relevant to dynamic models of infectious disease transmission, such as \covid.
+The original approach simulates contact patterns between
+age groups and geographic patches connected by recurrently mobile individuals,
+and considers changes to mixing between patches due to reduced mobility among some individuals.
+However, the method could be improved to:
+ensure contact balancing between age groups;
+model changes to age contact patterns in response to reduced mobility; and
+allow complete isolation of non-mobile individuals from mobility-related contacts.
+We propose a modification of the approach that achieves these improvements.
+\par
+The first key change in the proposed approach draws on \cite{Arregui2018} to
+combine preferential patterns of age mixing with the age distribution of the mixing population,
+such that the actual number of contacts formed reflects both elements.
+This change is incorporated into each separate mixing ``pool'' where contacts are formed,
+and ensures that the number of contacts simulated from age group $a$ to age group $a'$
+will equal those from age group $a'$ to age group $a$.
+\par
+The second key change in the proposed approach is to
+maintain separate mixing patterns for each type of contact,
+only aggregating the contribution of different contact types to overall transmission
+within the force of infection equation.
+With this change, the age mixing patterns associated with any contact type
+are not influenced by changes to the numbers or mixing patterns of any other contact type.
+This change also supports differential probability of transmission by contact type.
+\par
+The final key change in the proposed approach is to
+introduce two separate mixing pools where contacts can form:
+within ``home'' pools, contacts can only be formed with other residents of the same patch;
+within ``travel'' pools, contacts cab be formed with other residents of the same patch
+who are mobile within their residence patch, or with any mobile visitors to the patch.
+Home pools therefore allow true isolation of some individuals from mobility-related contacts,
+with implications for overall network connectivity.
+\par
+In developing and applying the proposed approach to an example context,
+we present the methodological details and results of each intermediate step,
+so that they may be reproduced or built upon in future work.
