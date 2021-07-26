@@ -1,0 +1,529 @@
+FSA,GTA,region
+K0A,0,Ottawa
+K0B,0,Rockland
+K0C,0,Cornwall
+K0E,0,Brockville
+K0G,0,Kemptville
+K0H,0,Kingston
+K0J,0,Ottawa
+K0K,0,Belleville
+K0L,0,Peterborough
+K0M,0,Lindsay
+K1A,0,Nepean
+K1B,0,Ottawa
+K1C,0,Gloucester
+K1E,0,Gloucester
+K1G,0,Ottawa
+K1H,0,Ottawa
+K1J,0,Ottawa
+K1K,0,Vanier
+K1L,0,Vanier
+K1M,0,Ottawa
+K1N,0,Ottawa
+K1P,0,Ottawa
+K1R,0,Ottawa
+K1S,0,Ottawa
+K1T,0,Ottawa
+K1V,0,Ottawa
+K1W,0,Gloucester
+K1X,0,Gloucester
+K1Y,0,Ottawa
+K1Z,0,Ottawa
+K2A,0,Ottawa
+K2B,0,Nepean
+K2C,0,Nepean
+K2E,0,Nepean
+K2G,0,Nepean
+K2H,0,Nepean
+K2J,0,Nepean
+K2K,0,Nepean
+K2L,0,Nepean
+K2M,0,Kanata
+K2P,0,Ottawa
+K2R,0,Nepean
+K2S,0,Ottawa
+K2T,0,Kanata
+K2V,0,Kanata
+K2W,0,Kanata
+K4A,0,Gloucester
+K4B,0,Gloucester
+K4C,0,Cumberland
+K4K,0,Clarence-Rockland
+K4M,0,Ottawa
+K4P,0,Ottawa
+K4R,0,Russell
+K6A,0,Hawkesbury
+K6H,0,Cornwall
+K6J,0,Cornwall
+K6K,0,Cornwall
+K6T,0,Brockville
+K6V,0,Brockville
+K7A,0,Smiths Falls
+K7C,0,Carleton Place
+K7G,0,Gananoque
+K7H,0,Perth
+K7K,0,Kingston
+K7L,0,Kingston
+K7M,0,Kingston
+K7N,0,Kingston
+K7P,0,Kingston
+K7R,0,Napanee
+K7S,0,Arnprior
+K7V,0,Renfrew
+K8A,0,Pembroke
+K8B,0,Pembroke
+K8H,0,Petawawa
+K8N,0,Belleville
+K8P,0,Belleville
+K8R,0,Belleville
+K8V,0,Quinte West
+K9A,0,Cobourg
+K9H,0,Peterborough
+K9J,0,Peterborough
+K9K,0,Peterborough
+K9L,0,Peterborough
+K9V,0,Lindsay
+L0A,0,Millbrook
+L0B,1,Whitby
+L0C,1,Whitby
+L0E,1,Keswick
+L0G,1,Tottenham
+L0H,1,Gormley
+L0J,1,Kleinburg
+L0K,0,Orillia
+L0L,0,Barrie
+L0M,0,Barrie
+L0N,0,Brampton
+L0P,0,Mississauga
+L0R,0,Hamilton
+L0S,0,Ridgeville
+L1A,0,Port Hope
+L1B,1,Newcastle
+L1C,1,Bowmanville
+L1E,1,Bowmanville
+L1G,1,Oshawa
+L1H,1,Oshawa
+L1J,1,Oshawa
+L1K,1,Oshawa
+L1L,1,Oshawa
+L1M,1,Whitby
+L1N,1,Whitby
+L1P,1,Whitby
+L1R,1,Whitby
+L1S,1,Ajax
+L1T,1,Ajax
+L1V,1,Pickering
+L1W,1,Pickering
+L1X,1,Pickering
+L1Y,1,Pickering
+L1Z,1,Ajax
+L2A,0,Fort Erie
+L2E,0,Niagara Falls
+L2G,0,Niagara Falls
+L2H,0,Niagara Falls
+L2J,0,Niagara Falls
+L2M,0,St. Catharines
+L2N,0,St. Catharines
+L2P,0,St. Catharines
+L2R,0,St. Catharines
+L2S,0,St. Catharines
+L2T,0,St. Catharines
+L2V,0,Thorold
+L2W,0,St. Catharines
+L3B,0,Welland
+L3C,0,Welland
+L3K,0,Port Colborne
+L3M,0,Grimsby
+L3P,1,Markham
+L3R,1,Markham
+L3S,1,Markham
+L3T,1,Markham
+L3V,0,Rama
+L3X,1,Newmarket
+L3Y,1,Newmarket
+L3Z,0,Bradford
+L4A,1,Whitchurch-Stouffville
+L4B,1,Richmond Hill
+L4C,1,Richmond Hill
+L4E,1,Gormley
+L4G,1,Aurora
+L4H,1,Vaughan
+L4J,1,Vaughan
+L4K,1,Vaughan
+L4L,1,Vaughan
+L4M,0,Barrie
+L4N,0,Barrie
+L4P,0,Georgina
+L4R,0,Midland
+L4S,1,Richmond Hill
+L4T,1,Mississauga
+L4V,1,Mississauga
+L4W,1,Mississauga
+L4X,1,Mississauga
+L4Y,1,Mississauga
+L4Z,1,Mississauga
+L5A,1,Mississauga
+L5B,1,Mississauga
+L5C,1,Mississauga
+L5E,1,Mississauga
+L5G,1,Mississauga
+L5H,1,Mississauga
+L5J,1,Mississauga
+L5K,1,Mississauga
+L5L,1,Mississauga
+L5M,1,Mississauga
+L5N,1,Mississauga
+L5P,1,Mississauga
+L5R,1,Mississauga
+L5S,1,Mississauga
+L5T,1,Mississauga
+L5V,1,Mississauga
+L5W,1,Mississauga
+L6A,1,Vaughan
+L6B,1,Markham
+L6C,1,Markham
+L6E,1,Markham
+L6G,1,Markham
+L6H,0,Oakville
+L6J,0,Oakville
+L6K,0,Oakville
+L6L,0,Oakville
+L6M,0,Oakville
+L6P,1,Brampton
+L6R,1,Brampton
+L6S,1,Brampton
+L6T,1,Brampton
+L6V,1,Brampton
+L6W,1,Brampton
+L6X,1,Brampton
+L6Y,1,Brampton
+L6Z,1,Brampton
+L7A,1,Brampton
+L7B,1,King City
+L7C,1,Caledon
+L7E,1,Palgrave
+L7G,0,Georgetown
+L7J,0,Acton
+L7K,1,Caledon
+L7L,0,Burlington
+L7M,0,Burlington
+L7N,0,Burlington
+L7P,0,Burlington
+L7R,0,Burlington
+L7S,0,Burlington
+L7T,0,Burlington
+L8B,0,Hamilton
+L8E,0,Hamilton
+L8G,0,Hamilton
+L8H,0,Hamilton
+L8J,0,Hamilton
+L8K,0,Hamilton
+L8L,0,Hamilton
+L8M,0,Hamilton
+L8N,0,Hamilton
+L8P,0,Hamilton
+L8R,0,Hamilton
+L8S,0,Hamilton
+L8T,0,Hamilton
+L8V,0,Hamilton
+L8W,0,Hamilton
+L9A,0,Hamilton
+L9B,0,Hamilton
+L9C,0,Hamilton
+L9E,0,Milton
+L9G,0,Hamilton
+L9H,0,Hamilton
+L9J,0,Barrie
+L9K,0,Hamilton
+L9L,1,Port Perry
+L9M,0,Penetanguishene
+L9N,1,East Gwillimbury
+L9P,1,Uxbridge
+L9R,0,New Tecumseth
+L9S,0,Innisfil
+L9T,0,Milton
+L9V,0,Orangeville
+L9W,0,Orangeville
+L9X,0,Minesing
+L9Y,0,The Blue Mountains
+L9Z,0,Wasaga Beach
+M1B,1,Scarborough
+M1C,1,Scarborough
+M1E,1,Scarborough
+M1G,1,Scarborough
+M1H,1,Scarborough
+M1J,1,Scarborough
+M1K,1,Scarborough
+M1L,1,North York
+M1M,1,Scarborough
+M1N,1,Scarborough
+M1P,1,Scarborough
+M1R,1,North York
+M1S,1,Scarborough
+M1T,1,Scarborough
+M1V,1,Scarborough
+M1W,1,Scarborough
+M1X,1,Scarborough
+M2H,1,North York
+M2J,1,North York
+M2K,1,North York
+M2L,1,North York
+M2M,1,North York
+M2N,1,North York
+M2P,1,North York
+M2R,1,North York
+M3A,1,North York
+M3B,1,North York
+M3C,1,North York
+M3H,1,North York
+M3J,1,North York
+M3K,1,North York
+M3L,1,North York
+M3M,1,North York
+M3N,1,North York
+M4A,1,North York
+M4B,1,Toronto
+M4C,1,Toronto
+M4E,1,Toronto
+M4G,1,North York
+M4H,1,Toronto
+M4J,1,Toronto
+M4K,1,Toronto
+M4L,1,Old Toronto
+M4M,1,Toronto
+M4N,1,Toronto
+M4P,1,North York
+M4R,1,North York
+M4S,1,Old Toronto
+M4T,1,Old Toronto
+M4V,1,Old Toronto
+M4W,1,Old Toronto
+M4X,1,Old Toronto
+M4Y,1,Old Toronto
+M5A,1,Old Toronto
+M5B,1,Old Toronto
+M5C,1,Old Toronto
+M5E,1,Old Toronto
+M5G,1,Old Toronto
+M5H,1,Old Toronto
+M5J,1,Toronto
+M5K,1,Old Toronto
+M5L,1,Old Toronto
+M5M,1,Toronto
+M5N,1,Old Toronto
+M5P,1,York
+M5R,1,Old Toronto
+M5S,1,Old Toronto
+M5T,1,Old Toronto
+M5V,1,Toronto
+M5W,1,Old Toronto
+M5X,1,Old Toronto
+M6A,1,North York
+M6B,1,Toronto
+M6C,1,Toronto
+M6E,1,Toronto
+M6G,1,Old Toronto
+M6H,1,Old Toronto
+M6J,1,Old Toronto
+M6K,1,Old Toronto
+M6L,1,North York
+M6M,1,Toronto
+M6N,1,Toronto
+M6P,1,Toronto
+M6R,1,Old Toronto
+M6S,1,Toronto
+M7A,1,North York
+M7R,1,Mississauga
+M7Y,1,Old Toronto
+M8V,1,Etobicoke
+M8W,1,Etobicoke
+M8X,1,Etobicoke
+M8Y,1,Etobicoke
+M8Z,1,Etobicoke
+M9A,1,Etobicoke
+M9B,1,Etobicoke
+M9C,1,Etobicoke
+M9L,1,North York
+M9M,1,North York
+M9N,1,Toronto
+M9P,1,Etobicoke
+M9R,1,Etobicoke
+M9V,1,Etobicoke
+M9W,1,Etobicoke
+N0A,0,Brantford
+N0B,0,Kitchener
+N0C,0,Dundalk
+N0E,0,Brantford
+N0G,0,Mount Forest
+N0H,0,Owen Sound
+N0J,0,Kitchener
+N0K,0,Stratford
+N0L,0,London
+N0M,0,London
+N0N,0,Sarnia
+N0P,0,Windsor
+N0R,0,Windsor
+N1A,0,Dunnville
+N1C,0,Guelph
+N1E,0,Guelph
+N1G,0,Guelph
+N1H,0,Guelph
+N1K,0,Guelph
+N1L,0,Guelph
+N1M,0,Fergus
+N1P,0,Cambridge
+N1R,0,Cambridge
+N1S,0,Cambridge
+N1T,0,Cambridge
+N2A,0,Kitchener
+N2B,0,Kitchener
+N2C,0,Kitchener
+N2E,0,Kitchener
+N2G,0,Kitchener
+N2H,0,Kitchener
+N2J,0,Waterloo
+N2K,0,Kitchener
+N2L,0,Waterloo
+N2M,0,Kitchener
+N2N,0,Kitchener
+N2P,0,Kitchener
+N2R,0,Kitchener
+N2T,0,Waterloo
+N2V,0,Waterloo
+N2Z,0,Kincardine
+N3A,0,New Hamburg
+N3B,0,Elmira
+N3C,0,Cambridge
+N3E,0,Cambridge
+N3H,0,Cambridge
+N3L,0,Brant
+N3P,0,Brantford
+N3R,0,Brantford
+N3S,0,Brantford
+N3T,0,Brantford
+N3V,0,Brantford
+N3W,0,Caledonia
+N3Y,0,Simcoe
+N4B,0,Delhi
+N4G,0,Tillsonburg
+N4K,0,Owen Sound
+N4L,0,Meaford
+N4N,0,Hanover
+N4S,0,Woodstock
+N4T,0,Woodstock
+N4V,0,Woodstock
+N4W,0,Listowel
+N4X,0,Saint Marys
+N4Z,0,Stratford
+N5A,0,Stratford
+N5C,0,Ingersoll
+N5H,0,Aylmer
+N5L,0,Port Stanley
+N5P,0,St. Thomas
+N5R,0,St. Thomas
+N5V,0,London
+N5W,0,London
+N5X,0,London
+N5Y,0,London
+N5Z,0,London
+N6A,0,London
+N6B,0,London
+N6C,0,London
+N6E,0,London
+N6G,0,London
+N6H,0,London
+N6J,0,London
+N6K,0,London
+N6L,0,London
+N6M,0,London
+N6N,0,London
+N6P,0,London
+N7A,0,Goderich
+N7G,0,Strathroy
+N7L,0,Chatham-Kent
+N7M,0,Chatham-Kent
+N7S,0,Sarnia
+N7T,0,Sarnia
+N7V,0,Sarnia
+N7W,0,Sarnia
+N7X,0,Sarnia
+N8A,0,Wallaceburg
+N8H,0,Leamington
+N8M,0,Essex
+N8N,0,Tecumseh
+N8P,0,Tecumseh
+N8R,0,Windsor
+N8S,0,Windsor
+N8T,0,Windsor
+N8V,0,Windsor
+N8W,0,Windsor
+N8X,0,Windsor
+N8Y,0,Windsor
+N9A,0,Windsor
+N9B,0,Windsor
+N9C,0,Windsor
+N9E,0,Windsor
+N9G,0,Windsor
+N9H,0,Windsor
+N9J,0,Windsor
+N9K,0,Tecumseh
+N9V,0,Amherstburg
+N9Y,0,Kingsville
+P0A,0,Sundridge
+P0B,0,Bracebridge
+P0C,0,Bracebridge
+P0E,0,Gravenhurst
+P0G,0,Sudbury
+P0H,0,North Bay
+P0J,0,New Liskeard
+P0K,0,Kirkland Lake
+P0L,0,Timmins
+P0M,0,Sudbury
+P0N,0,Timmins
+P0P,0,Sudbury
+P0R,0,Sudbury
+P0S,0,Sault Ste. Marie
+P0T,0,Thunder Bay
+P0V,0,Weagamow Lake
+P0W,0,Kenora
+P0X,0,Kenora
+P0Y,0,Ingolf
+P1A,0,North Bay
+P1B,0,North Bay
+P1C,0,North Bay
+P1H,0,Huntsville
+P1L,0,Bracebridge
+P1P,0,Gravenhurst
+P2A,0,Parry Sound
+P2B,0,Garden Village
+P2N,0,Kirkland Lake
+P3A,0,Sudbury
+P3B,0,Sudbury
+P3C,0,Sudbury
+P3E,0,Sudbury
+P3G,0,Sudbury
+P3L,0,Garson
+P3N,0,Greater Sudbury
+P3P,0,Hanmer
+P3Y,0,Greater Sudbury
+P4N,0,Timmins
+P4P,0,Timmins
+P4R,0,Timmins
+P5A,0,Elliot Lake
+P5E,0,Espanola
+P5N,0,Kapuskasing
+P6A,0,Sault Ste. Marie
+P6B,0,Sault Ste. Marie
+P6C,0,Sault Ste. Marie
+P7A,0,Thunder Bay
+P7B,0,Thunder Bay
+P7C,0,Thunder Bay
+P7E,0,Thunder Bay
+P7G,0,Thunder Bay
+P7J,0,Thunder Bay
+P7K,0,Thunder Bay
+P7L,0,Neebing
+P8N,0,Dryden
+P8T,0,Sioux Lookout
+P9A,0,Fort Frances
+P9N,0,Kenora
