@@ -39,12 +39,12 @@ load.fsa.pop = function(age=TRUE,aggr=TRUE){
   }
 }
 
-load.group.mob = function(pop){
-  mob = read.csv(root.path('data','mix','mobility_decile.csv'))
+load.group.mob = function(pop,key='all'){
+  mob = read.csv(root.path('data','mix',paste0('mobility_decile_',key,'.csv')))
   mob = map.decile(mob)
   months = levels(mob$month)
-  B.gg.t = lapply(months,function(mo){
-    B.m = matrix(mob[mob$month == mo,]$visit.prop,nrow=10,ncol=10)
+  B.gg.t = lapply(months,function(t){
+    B.m = matrix(mob[mob$month == t,]$visit.prop,nrow=10,ncol=10)
     return(aggr.mob.decile(B.m,pop))
   })
   names(B.gg.t) = months
@@ -67,6 +67,14 @@ load.fsa.mob = function(refresh=FALSE){
     X = merge(expand.grid(FSA=FSA,FSA.visited=FSA,month=levels(X$month)),X,all.x=TRUE)
     save(X,file=rdata)
   }
+  return(X)
+}
+
+load.fsa.t.away = function(){
+  X = read.csv(root.path('data','mix','fsa_t_away.csv'))
+  X$away.time = X$time.away.mean
+  X$time.away.mean = NULL
+  X$time.away.median = NULL
   return(X)
 }
 
