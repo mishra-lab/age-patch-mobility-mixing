@@ -1,0 +1,35 @@
+\section{Introduction}
+Contact patterns by age and geography are often key determinants of infectious disease dynamics in humans.
+Arenas et al.\ (2020) develop a method to simulate contact patterns associated with
+age and recurrent mobility between geographic patches, such as for work and school.
+However, their approach makes several assumptions which may not always be suitable.
+We sought to improve the approach to make those assumptions optional,
+and examine the potential influence of each assumption on simulated contact patterns.
+\section{Methods}
+In our proposed approach:
+age mixing patterns from the \textsc{polymod} study are maintained separate by contact type
+(household, work, school, other),
+versus aggregated overall (assumption~1),
+so that changes to the numbers of different types of contacts are reflected in overall age mixing patterns;
+age mixing patterns are demographically adjusted to each mixing pool,
+versus fixed for the whole population (assumption~2),
+so that contacts in the model are balanced; and
+non-mobile individuals can be fully isolated from mobile travellers to their patch,
+versus isolation from travellers being impossible (assumption~3),
+so that various intervention options can be explored.
+We compared contact matrices for Ontario, Canada under reduced mobility
+before versus after relaxing each assumption.
+\section{Results}
+Relaxing assumption~1 led to
+household contact patterns being more dominant overall in the context of reduced mobility.
+Relaxing assumption~2 led to
+more contacts with more populous age strata, and fewer contacts with less populous age strata,
+for all contact types.
+Relaxing assumption~3 led to
+a greater proportion of contacts with residents of the same patch for non-household contact types,
+and no change to household contacts.
+\section{Significance}
+Precise assumptions about contact patterns
+are important for parameterizing transmission models stratified by age and geography,
+and essential for using those models to answer research questions
+related to differential interventions and/or outcomes by age and/or geography.
