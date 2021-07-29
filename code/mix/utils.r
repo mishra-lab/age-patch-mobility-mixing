@@ -4,6 +4,10 @@ col.rename = function(x,old.name,new.name){ # rename a column
   colnames(x)[grepl(old.name,colnames(x))] = new.name
   return(x)
 }
+is.list. = function(x){
+  return(class(x)=='list')
+  # return(inherits(x,'list'))
+}
 a.sum = function(A,d){ # sum across dimensions "d" of N-D array "A"
   if (length(d)==0){ return(A) }
   ds = seq(length(dim(A)))

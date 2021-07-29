@@ -5,15 +5,21 @@ library(ggplot2)
 library(ggridges)
 library(scales)
 })
+source('utils.r')
 
 # supporting functions for plotting stuff
 
 offd  = function(x){ x-diag(rep(NA,nrow(x))) }
-list.bind = function(X,gname='group',fun=identity,...){
+list.bind = function(X,gname='group',fun=identity,arg.name=FALSE,...){
   # if X is a list, rbind its elements & add a new column bearing the list name
-  if (is.list(X)){
+  # can run fun on each list element if needed, and possibly pass column name too
+  if (is.list.(X)){
     return(do.call(rbind,lapply(names(X),function(name){
-      Xi = fun(X[[name]],name,...)
+      if (arg.name){
+        Xi = fun(X[[name]],name,...)
+      } else {
+        Xi = fun(X[[name]])
+      }
       Xi[[gname]] = factor(name,levels=names(X))
       return(Xi)
     })))
@@ -24,7 +30,7 @@ list.bind = function(X,gname='group',fun=identity,...){
 mix.melt = function(C,what,vs,aggr=TRUE,xfun=NULL,...){
   # list.bind + need to aggregate & melt each individual matrix
   if (is.null(xfun)){ xfun = identity }
-  return(list.bind(C,gname='group',fun=function(Ci,name){
+  return(list.bind(C,gname='group',fun=function(Ci){
     return(melt(xfun(aggr.mix(Ci,what,vs,aggr=aggr,...)),
       value.name='X',varnames=c('i','i.')))
   }))
@@ -66,7 +72,7 @@ plot.mix = function(C,what,vs,aggr=FALSE,xfun=NULL,
       a = theme(axis.text.x=element_text(angle=90,hjust=1)),
       n = theme(axis.text.x=element_blank(),axis.text.y=element_blank())
     )
-  if (is.list(C)){
+  if (is.list.(C)){
     if (length(C) <= 6) { g = g + facet_grid(cols=vars(group)) }
     else { g = g + facet_wrap(vars(group),ncol=6) }
   }
@@ -76,8 +82,8 @@ void = function(){
   return(theme_void() +
     theme(strip.text.x=element_blank(),strip.text.y=element_blank()))
 }
-plot.device.density = function(X,x,y='month',bw=NULL,q=4,xmax=NULL,legend=FALSE){
-  if (is.null(xmax)){ xmax=max(X[[x]]) }
+plot.ridge.density = function(X,x,y='month',bw=NULL,q=4,xmax=NULL,legend=FALSE){
+  if (is.null(xmax)){ xmax=max(X[[x]],na.rm=TRUE) }
   if (y=='month'){ y.lab='Month' } else { y.lab = y }
   X. = list.bind(X)
   g = ggplot(X.,aes_string(y=y,fill='factor(stat(quantile))',x=x)) +
@@ -93,7 +99,7 @@ plot.device.density = function(X,x,y='month',bw=NULL,q=4,xmax=NULL,legend=FALSE)
   if (!legend){
     g = g + guides(fill='none')
   }
-  if (is.list(X)) { g = g + facet_grid(cols=vars(group)) }
+  if (is.list.(X)) { g = g + facet_grid(cols=vars(group)) }
   return(g)
 }
 plot.pop.density = function(){
@@ -107,8 +113,8 @@ plot.pop.density = function(){
   return(g)
 }
 plot.contact.margins = function(C.aa.y.list,age.list,style='line'){
-  C.a.y. = list.bind(C.aa.y.list,gname='vs',function(C.aa.y,C.name){
-    list.bind(C.aa.y,gname='Type',function(C.aa,...){
+  C.a.y. = list.bind(C.aa.y.list,gname='vs',arg.name=TRUE,function(C.aa.y,C.name){
+    list.bind(C.aa.y,gname='Type',function(C.aa){
       return(data.frame(Contacts=rowSums(C.aa),Age=midpoint(age.list[[C.name]])))
     })
   })
