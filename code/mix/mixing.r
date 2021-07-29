@@ -75,25 +75,45 @@ gen.mix.main = function(P.ga,C.aa.y,RC.g.y,B.gg.t,t){
   B.gg = B.gg.t[[t]] + (B.g.t / B.g.0) * diag(1-B.g.0) # add mobility in same "g"
   B.hh = diag(N$g) # dummy "mobillity" for household contacts
   a.size = bin.size(config$age,norm=TRUE) # expected age distribution
+  if (config$method$age.adapt){
+    P.ga. = P.ga
+  } else {
+    P.ga. = replicate(N$a,rowMeans(P.ga))
+    dimnames(P.ga.) = dimnames(P.ga)
+  }
+  if (! config$method$age.by.type){
+    C.aa.u = Reduce('+',C.aa.y)
+    C.aa.y = lapply(C.aa.y,function(C){
+      C.aa.u * rowSums(C)/rowSums(C.aa.u)
+    })
+  }
+  # PR = replicate(N$a,rowMeans(sweep(P.ga,2,a.size,'/')/sum(P.ga)))
   X.gaga.y = list() # initialize output
   for (y in seq(N$y)){ # for each contact type
     X.gaga = array(0,c(N$g,N$a,N$g,N$a),dimnames=config$X.names) # initialize X for this y
     C.gaga = aperm(replicate(N$g,replicate(N$g,C.aa.y[[y]])),c(3,1,4,2)) # pad C.aa to C.gaga
-    # B.gg. = (1-h.y[y]) * B.gg + h.y[y] * B.hh # DEBUG: old method - similar to Arenas 2020
     for (g in seq(N$g)){ # for each group
       # traveller pool
-      # Pt = P.ga * B.gg.[,g] * RC.g.y[[y]] # DEBUG: old method - similar to Arenas 2020
-      Pt  = P.ga * (1-h.y[y]) * B.gg[,g] * RC.g.y[[y]] # pop of each "g" mixing in this pool
-      PRt = sweep(Pt,2,a.size,'/')/sum(Pt) # normalize overall & age as C.gaga already weighted by age
-      PRt[is.na(PRt)] = 0
-      X = outer(Pt,PRt) * C.gaga # proportionate mixing * age mixing
+      if (config$method$home.pool){ # pop of each "g" mixing in this pool ...
+        Pt  = RC.g.y[[y]] * P.ga  * (1-h.y[y]) * B.gg[,g]
+        Pt. = RC.g.y[[y]] * P.ga. * (1-h.y[y]) * B.gg[,g]
+      } else {
+        Pt  = RC.g.y[[y]] * P.ga  * ((1-h.y[y]) * B.gg[,g] + (h.y[y]) * B.hh[,g])
+        Pt. = RC.g.y[[y]] * P.ga. * ((1-h.y[y]) * B.gg[,g] + (h.y[y]) * B.hh[,g])
+      }
+      pt. = sweep(Pt.,2,a.size,'/')/sum(Pt.) # normalize overall & age as C.gaga already weighted by age
+      pt.[is.nan(pt.)] = 0
+      X = outer(Pt,pt.) * C.gaga # proportionate mixing * age mixing
       X.gaga = X.gaga + X # add contribution of this pool to the total mixing
       # home pool
-      Ph  = P.ga[g,] * h.y[y] * RC.g.y[[y]] # pop (age groups) of this "g" at home
-      PRh = Ph/a.size/sum(Ph) # normalize overall & age as C.aa.y already weighted by age
-      PRh[is.na(PRh)] = 0
-      X = outer(Ph,PRh) * C.aa.y[[y]] # proportionate mixing * age mixing
-      X.gaga[g,,g,] = X.gaga[g,,g,] + X # add contribution of this pool to the total mixing
+      if (config$method$home.pool){
+        Ph  = RC.g.y[[y]] * P.ga[g,]  * h.y[y] # pop (age groups) of this "g" at home
+        Ph. = RC.g.y[[y]] * P.ga.[g,] * h.y[y]
+        ph. = Ph./a.size/sum(Ph)# normalize overall & age as C.aa.y already weighted by age
+        ph.[is.nan(ph.)] = 0
+        X = outer(Ph,ph.) * C.aa.y[[y]] # proportionate mixing * age mixing
+        X.gaga[g,,g,] = X.gaga[g,,g,] + X # add contribution of this pool to the total mixing
+      }
     }
     X.gaga = symmetric(X.gaga) # ensure contacts balance
     # print(X.gaga / aperm(X.gaga,c(3,4,1,2))) # DEBUG == 1 (exact) or NaN from 0/0
@@ -136,6 +156,54 @@ aggr.mix = function(C.gaga,what,vs,P.ga=NULL,aggr=TRUE){
     return( a.mean( a.sum(C.gaga,d[d>=3]), d[d<=2], a.sum(P.gaga,d[d>=3])) )
   }
   if (what=='Cp'){ stop('aggr.mix for Cp not yet implemented') }
+}
+
+compare.mixing = function(figdir='compare'){
+  set.config(n.y = '4',
+             age = config$age.contact,
+             h.y = c('home'=1,'work'=0.1,'school'=0.5,'others'=0.3))
+  pop    = load.fsa.pop()
+  P.ga   = pop.to.Pga(pop)
+  C.AA.y = load.contacts()
+  C.aa.y = CAAy.to.Caay(C.AA.y)
+  RC.g.y = gen.RC.g.y()
+  B.gg.t = load.group.mob(pop)
+  mix.fun = function(key,t='REF',...){
+    args = list(...)
+    for (name in names(args))
+    config$method[[name]] <<- args[[name]]
+    CX = CX.norm(gen.mix.main(P.ga, C.aa.y, RC.g.y, B.gg.t, t),P.ga)
+    CX. = Reduce('+',CX)
+    plot.mix(CX,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE); ggsave(figname(paste0('C4iaa',key),figdir),w=14,h=4)
+    plot.mix(CX,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE); ggsave(figname(paste0('C4igg',key),figdir),w=14,h=4)
+    plot.mix(CX.,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE); ggsave(figname(paste0('Ciaa',key),figdir),w=5,h=4)
+    plot.mix(CX.,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE); ggsave(figname(paste0('Cigg',key),figdir),w=5,h=4)
+    return(CX)
+  }
+  Ci.gaga.y.m = list( # steps: home pool, age adapt, age by type
+    '3' = mix.fun('3',home.pool=TRUE, age.adapt=TRUE, age.by.type=TRUE),
+    '2' = mix.fun('2',home.pool=FALSE,age.adapt=TRUE, age.by.type=TRUE),
+    '1' = mix.fun('1',home.pool=FALSE,age.adapt=FALSE,age.by.type=TRUE),
+    '0' = mix.fun('0',home.pool=FALSE,age.adapt=FALSE,age.by.type=FALSE))
+  comb = combn(names(Ci.gaga.y.m),2)
+  max.abs = function(x){ max(abs(x)) }
+  cmfun = function(cm){ cm = max(cm,.2); return(c(-cm,+cm)) }
+  for (m in c('a','g')){
+    for (i in seq(ncol(comb))){
+      Ci.y.diff = lapply(names(config$c.type),function(y){
+        aggr.mix(Ci.gaga.y.m[[comb[1,i]]][[y]],'Ci',m,P.ga) -
+        aggr.mix(Ci.gaga.y.m[[comb[2,i]]][[y]],'Ci',m,P.ga)
+      })
+      names(Ci.y.diff) = names(config$c.type)
+      cm = max(sapply(Ci.y.diff,max.abs))
+      plot.mix(Ci.y.diff,'Ci',m,P.ga=P.ga,cmap='RdBu',trans='nsqrt',gez=FALSE,clim=cmfun(cm))
+        ggsave(figname(paste0('D4',m,m,comb[1,i],'v',comb[2,i]),figdir),w=14,h=4)
+      Ci.diff = Reduce('+',Ci.y.diff)
+      cm = max.abs(Ci.diff)
+      plot.mix(Ci.diff,'Ci',m,P.ga=P.ga,cmap='RdBu',trans='nsqrt',gez=FALSE,clim=cmfun(cm))
+        ggsave(figname(paste0('D',m,m,comb[1,i],'v',comb[2,i]),figdir),w=5,h=4)
+    }
+  }
 }
 
 main.mixing = function(figdir=''){
