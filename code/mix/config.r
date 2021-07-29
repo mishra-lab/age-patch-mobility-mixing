@@ -10,8 +10,9 @@ figname = function(name,...,ext='.pdf'){ # e.g. /out/fig/fsa/.../name.pdf
   path = root.path('out','fig','mix',...,create=TRUE)
   return(file.path(path,paste0(name,ext)))
 }
-set.config = function(mode='10x10',n.y=2){ # set config stuff in global list variable
+set.config = function(mode='10x10',n.y=2,...){ # set config stuff in global list variable
   config = list( # see [[mode]] below
+    # TODO: remove support for 2x2 ?
     '10x10' = list(
       age = c(
         '<12'   = 0,
@@ -70,8 +71,13 @@ set.config = function(mode='10x10',n.y=2){ # set config stuff in global list var
       RC.global = c('home'=1,'work'=1,'school'=1,'others'=1)
     )
   )[[paste(n.y)]])
-    # add config stuff that doesn't depend on mode
+  # add config stuff that doesn't depend on mode
   config = c(config,list(
+    method = list(
+      'home.pool'   = TRUE,
+      'age.adapt'   = TRUE,
+      'age.by.type' = TRUE
+    ),
     RC.decile = c(1
       # 7.643163, 5.755709, 4.448017, 3.846107, 3.246633,
       # 2.983167, 2.539929, 2.136271, 1.625427, 1.000000
@@ -85,17 +91,6 @@ set.config = function(mode='10x10',n.y=2){ # set config stuff in global list var
     t.ref   = c('2020-01','2020-02'), # REF period
     t.covid = c('2020-03','2020-04','2020-05','2020-06', # covid periods
                 '2020-07','2020-08','2020-09','2020-10','2020-11','2020-12','2021-01'),
-    X.names = list( # convenience list for naming matrix dims
-      'g'  = names(config$group),
-      'a'  = names(config$age),
-      'g.' = names(config$group),
-      'a.' = names(config$age)
-    ),
-    N = list( # convenience
-      a = length(config$age),
-      y = length(config$c.type),
-      g = length(config$group)
-    ),
     labels = list( # convenience for plotting labels
       g = list(x='Home Decile (g)',y='Other Decile (g\')'),
       n = list(x='Home FSA (n)',   y='Other FSA (n\')'),
@@ -110,6 +105,23 @@ set.config = function(mode='10x10',n.y=2){ # set config stuff in global list var
       '50-54' = 50 , '55-59' = 55,
       '60-64' = 60 , '65-69' = 65,
       '70-74' = 70 , '75-80' = 75)
+  ))
+  args = list(...)
+  for (name in names(args)){
+    config[[name]] = args[[name]]
+  }
+  config = c(config,list(
+    X.names = list( # convenience list for naming matrix dims
+      'g'  = names(config$group),
+      'a'  = names(config$age),
+      'g.' = names(config$group),
+      'a.' = names(config$age)
+    ),
+    N = list( # convenience
+      a = length(config$age),
+      y = length(config$c.type),
+      g = length(config$group)
+    )
   ))
   config <<- config # make global
 }
