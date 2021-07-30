@@ -112,48 +112,56 @@ as defined by at least 2 consecutive pings spanning at least 2 hours within the 
 By this definition, it was possible for a device to visit multiple FSA, or no FSA during a given day.
 Repeated visits to the same FSA by the same device on the same calendar date are treated as a single visit.
 \par
-These definitions were applied to each calendar month $t$ from Jan 2020--Jan 2021 (13 months) to compute:
-the mean number of devices with home FSA $n$ per day, denoted $H_{nt}$ or ``observed devices''; and
-the mean number of devices with home FSA $n$ that visited FSA $n'$ per day, denoted $V_{nn't}$, or ``device visits''.
+The ``time away from home'' represents the proportion of time each device
+was estimated to be away from the home dwelling (not just FSA),
+as defined by the Geohash 6 tile with the greatest daily-average time between 8:00\,pm--5:00\,am each month.
+\par
+These definitions were applied to each calendar month $t$ from Jan 2020--Dec 2020 (12 months) to compute:
+the mean number of devices with home FSA $n$ per day, denoted $H_{nt}$ or ``observed devices'';
+the mean number of devices with home FSA $n$ that visited FSA $n'$ per day, denoted $V_{nn't}$, or ``device visits''; and
+the mean proportion of time each device spent outside the home per day for each FSA, denoted $W_{nt}$.
 % --------------------------------------------------------------------------------------------------
-\subsubsection{Bias Correction}\label{app.mob.bias}
-Elements of the mobility matrix $B_{gg't}$ could be defined as
-the proportion of observed devices that travelled to each FSA ($V_{nn'} / H_{nt}$).
+\subsubsection{Inter-FSA Mobility}\label{app.mob.inter}
+The inter-FSA mobility matrix $B_{nn't}$ ($n \ne n'$) could be defined as
+the proportion of observed devices that travelled to each FSA ($V_{nn't} / H_{nt}$).
 However, the following analysis of the data suggested that such an approach may bias estimates of mobility.
 A reference period $t_0$ was defined as Jan--Feb 2020, to reflect pre-pandemic conditions.
 The expected values of $H_{nt}$ and $V_{nt} = \sum_{n' V_{nn't}}$ for each FSA during this period were then
 computed and compared to the expected values during each subsequent month.
 Figure~\ref{fig:RHVt} plots the distribution of ratios
-$H_{nt} / H_{nt_0}$ (\subref{fig:RHt}) and $V_{nt} / V_{nt_0}$ ((\subref{fig:RVt})
+$H_{nt} / H_{nt_0}$ (\subref{fig:RHt}) and $V_{nt} / V_{nt_0}$ (\subref{fig:RVt})
 across all 513 FSAs, for each month.
-These ratios illustrate that both $V_{nt}$ and $H_{nt}$ were influenced by pandemic restrictions,
+These ratios illustrate that both $V_{nt}$ and $H_{nt}$ were influenced (reduced) by pandemic restrictions,
 and thus $V_{nn't} / H_{nt}$ would overestimate mobility.
 The trend in $H_{nt}$ might be because apps accessing geolocation services are only opened
 after the user intends to travel, such as map-related apps.
-\begin{figure}[ht]
+\begin{figure}
   \centering
   \begin{subfigure}{0pt}\refstepcounter{subfigure}\label{fig:RHt}\end{subfigure}%
   \begin{subfigure}{0pt}\refstepcounter{subfigure}\label{fig:RVt}\end{subfigure}%
   \begin{subfigure}{0pt}\refstepcounter{subfigure}\label{fig:RH0Vt}\end{subfigure}%
   \includegraphics[width=\linewidth]{devices-ratios}
-  \caption{Ratio of observed devices at home (\subref{fig:RHt}) and device visits (\subref{fig:RVt})
+  \caption{Ratios of (\subref{fig:RHt}) observed devices at home
+    and (\subref{fig:RVt}) total device visits
     during each month versus during the reference period (Jan--Feb 2020),
     suggesting that the proportion of observed devices travelling each month
-    alone is not reflective of true mobility;
-    (\subref{fig:RH0Vt}) adjusted mobility measure: ratio of device visits each month versus
+    alone is not reflective of true mobility or (\subref{fig:RHt}) would be 1;
+    (\subref{fig:RH0Vt}) adjusted mobility measure: ratio of
+    device visits each month from versus
     the number of observed devices at home during the reference period}
   \label{fig:RHVt}
   \floatfoot{Distributions show the density of ratio values across all 513 FSAs;
     coloured segments indicate the 4 quantiles of each distributions.}
 \end{figure}
 \par
-To address this bias, we modelled mobility with the denominator as
-the observed devices during the reference period: $V_{nn't} / H_{nt_0}$ (Figure~\ref{fig:RH0Vt}).%
+To address this bias, we chose $H_{nt_0}$ from the reference period as a more reliable denominator,
+and thus modelled mobility using: $V_{nn't} / H_{nt_0}$ (Figure~\ref{fig:RH0Vt}).%
 \footnote{One limitation of this approach is that the reference period only includes winter months,
   which may not be representative of mobility year-round.
   Indeed, all three ratios in Figure~\ref{fig:RHVt} have substantial tails above 1 during Aug--Sept 2020,
   suggesting that mobility was higher during that period versus the pre-pandemic reference period.}
-However, the results of Figure~\ref{fig:RHVt} suggest that unobserved devices are less mobile than observed devices;
+However, the results of Figure~\ref{fig:RHVt} also suggest that
+unobserved devices are less mobile than observed devices;
 thus the unobserved devices would not have the same expected mobility as the observed devices.
 To account for this observation, we first estimated the total number of devices per FSA, denoted $D_n$,
 using Statistics Canada data on smart-phone ownership by age group.%
@@ -172,30 +180,71 @@ at a rate $\phi_1 < 1$ (default 0.9) relative to the observed devices.
 Similarly, for individuals who do not own devices ($P_n - D_n$) we assume that they are mobile
 at a rate $\phi_2 < 1$ (default 0.9) relative to the observed devices.
 Thus, the total proportion of individuals in FSA $n$ who travel to FSA $n'$ during month $t$ is modelled~as:
-\begin{equation}\label{eq:Bnnt}
-  B_{nn't} = \frac{V_{nn't}}{H_{n0}} \big[
+\begin{equation}\label{eq:Bnnt.inter}
+  B_{nn't \,(n\ne n')} = \frac{V_{nn't}}{H_{n0}} \big[
   \underbrace{1\vphantom{\phi}}_{\textrm{(a)}}
   + \underbrace{\phi_1 \left(D_n - H_{n0}\right)}_{\textrm{(b)}}
-  + \underbrace{\phi_2 \left(P_n - D_n\right)}_{\textrm{(c)}} \big]
+  + \underbrace{\phi_2 \left(P_n - D_n\right)}_{\textrm{(c)}} \big] P_n^{-1}
 \end{equation}
 where (a) represents the observed devices,
 (b) represents unobserved devices, and
 (c) represents individuals without devices.
-\par
-The current data do not provide information on mobility within the home FSA,
-although the aggregated $B_{gg't}$ includes values along the diagonal
-due to travel to other FSA within the same decile.
-We assume that, during the pre-pandemic period,
-all individuals who do not travel to other FSA are still mobile within their home FSA.
-During the pandemic months, we assume that
-individuals who are mobile within their home FSA have reduced mobility
-proportional to the reduced mobility of individuals who are mobile outside their FSA,
-as measured by $B_{nt} = \sum_{n'} B_{nn't}$.
-Thus $B^h_{nn't}$ that considers mobility within the home decile is defined as:
-\begin{equation}\label{eq:Bhggt}
-  B^h_{gg't} = B_{gg't} + \frac{B_{gt}}{B_{gt_0}} \,\textsf{diag}\left( 1 - B_{gt_0} \right)
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Intra-FSA Mobility}\label{app.mob.intra}
+Since device visits to other FSA $V_{nn't}$ do not include ``visits'' within the home FSA,
+the proportion of individuals who are mobile (making contacts) within their home FSA is not yet determined.
+During the reference period, we assume that
+all individuals who do not travel to other FSAs are still mobile within their home FSA:
+\begin{equation}\label{eq:Bnnt.intra.t0}
+  B_{nn't_0\,(n = n')} = 1 - \sum_{n'} B_{nn't_0\,(n \ne n')}
 \end{equation}
-with the constraint that $B_{gt} / B_{gt_0} \le 1$.
+During pandemic months, we assume that
+a proportion of such individuals remain mobile within their home FSA;
+this proportion is derived from the time away from home $W_{nt}$ as follows.
+We assume that individuals who are mobile within their home FSA
+spend $\psi \le 1$ (default 1) as much time away from home as
+those who are mobile within other FSAs.
+Thus, the model for $W_{nt}$ is:
+\begin{equation}\label{eq:Wnt}
+  W_{nt} = W^*_n \left(\psi B_{nn't\,(n = n')} + \sum_{n'} B_{nn't\,(n \ne n')} \right)
+\end{equation}
+where $W^*_n$ is the expected proportion of time away from home
+among travellers from FSA $n$ to other FSAs.
+During the reference period, all individuals are mobile so $B_{nn't_0\,(n = n')}$ is known, and
+$W^*_n$ can be calculated by rearranging Eq.~(\ref{eq:Wnt}).
+Then, during the pandemic months, the observed $W_{nt}$ can be used to infer $B_{nn't\,(n = n')}$ as:
+\begin{equation}\label{eq:Bnnt.intra.t}
+  B_{nn't\,(n = n')} = \left(\frac{W_{nt}}{W^*_n} - \sum_{n'} B_{nn't\,(n \ne n')}\right) \psi^{-1}
+\end{equation}
+Figure~\ref{fig:W} plots the distribution of expected times away from home $W_{nt}$
+in hours (\subref{fig:W-hours}) and relative to the reference period $W_{nt_0}$ (\subref{fig:W-relative}).
+\par
+During the pandemic months, $B_{nn't}$ will sum to less than 1 for many FSA;
+this is desirable, since we interpret $1 - \sum_{n'} B_{nn't}$ to mean
+the expected proportion of individuals in FSA $n$
+who did not leave the home each day during month~$t$,
+and thus would not form any mobility-related contacts.
+Similarly, if $B_{nn't}$ sums to greater than 1, the net result in the force of infection is that
+individuals may form more contacts than expected from the reference period,
+which is also usually acceptable (such as during Aug--Sept 2020).
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.4\linewidth}
+    \includegraphics[width=\linewidth]{t-away-hours}
+    \caption{Hours away from home}
+    \label{fig:W-hours}
+  \end{subfigure}
+  \begin{subfigure}{0.4\linewidth}
+    \includegraphics[width=\linewidth]{t-away-relative}
+    \caption{Relative time away versus reference period}
+    \label{fig:W-relative}
+  \end{subfigure}
+  \caption{Expected time away from home in hours and versus the reference period (Jan--Feb 2020)}
+  \label{fig:W}
+  \floatfoot{Distributions show the density of ratio values across all 513 FSAs;
+    coloured segments indicate the 4 quantiles of each distributions.}
+\end{figure}
+\par
 Finally, as noted in \S~\ref{ex:data}, Eq.~(\ref{eq:Bgg})\,/\,(\ref{eq:Bgg.app})
 can be used to aggregate $B_{nn'}$ to obtain $B_{gg'}$ (repeated here for reference):
 \begin{equation}\label{eq:Bgg.app}
@@ -204,26 +253,20 @@ can be used to aggregate $B_{nn'}$ to obtain $B_{gg'}$ (repeated here for refere
 where $S_{g}$ is the set of FSA $n$ corresponding to patch $g$.
 Figure~\ref{fig:Bggt} illustrates the matrices $B_{gg't}$
 for the reference period, and each subsequent month,
-with and without the assumed mobility within the home FSA / decile.
-Mobility patterns are overall consistent across months,
+with and without the inferred mobility within the home FSA / decile.
+Mobility patterns are generally consistent across months,
 with the overall proportions of travelling individuals
 proportional to the ratio depicted in Figure~\ref{fig:RH0Vt}.
-Due to Eq.~(\ref{eq:Bhggt}), $B_{gg't}$ during the reference period will have
-exactly $\sum_{g'} B_{gg't_0} = 1$.
-However, for pandemic months, $\sum_{g'} B_{gg't} \le 1$.
-Thus, when incorporating this mobility matrix into Eq.~(\ref{eq:P*}),
-the total number of contacts formed by population $P_{ga}$ will be implicitly reduced
-by the proportional reduction in mobility.
 \begin{figure}[ht]
   \centering
   \begin{subfigure}{\linewidth}
-    \includegraphics[width=\linewidth]{Bggt}
+    \includegraphics[width=\linewidth]{Bggit}
     \caption{Directly observed mobility: no data for mobility within the residence decile}
     \label{fig:Bggot}
   \end{subfigure}
   \begin{subfigure}{\linewidth}
-    \includegraphics[width=\linewidth]{Bggdt}
-    \caption{Complete modelled mobility: including assumed mobility within the residence decile}
+    \includegraphics[width=\linewidth]{Bggt}
+    \caption{Complete modelled mobility: including inferred mobility within the residence decile}
     \label{fig:Bggdt}
   \end{subfigure}
   \caption{Mobility matrices $B_{gg't}$, representing the expected proportions of individuals
