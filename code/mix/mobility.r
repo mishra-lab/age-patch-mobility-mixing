@@ -31,7 +31,9 @@ add.within.fsa.mobility = function(X,S,SR){
   idx.self = X$FSA == X$FSA.visited
   X[idx.self,]$devices.home = S$devices.home # was NA
   X[idx.self,]$devices.visit =
-    pmin(S$away.ratio, 1.5) * pmax(0, SR$devices.home - S$devices.visit)
+    # TODO: implement ratio psi (assumes 1 for now)
+    S$away.ratio * SR$devices.home - S$devices.visit
+    # pmin(S$away.ratio, 1.5) * pmax(0, SR$devices.home - S$devices.visit)
   return(X)
 }
 
@@ -59,11 +61,11 @@ plot.mobility.margins = function(S,SR){
     'Home Reduction'         = data.frame(month=S$month,Ratio=S$devices.ht.h0),
     'Visit Reduction'        = data.frame(month=S$month,Ratio=S$devices.vt.v0),
     'Visit / Reference Home' = data.frame(month=S$month,Ratio=S$devices.vt.h0)
-  ),'Ratio',xmax=2); ggsave(figname('devices-panel','mx'),w=15,h=5)
+  ),'Ratio',xmax=2); ggsave(figname('devices-panel'),w=15,h=5)
   g = plot.ridge.density(S,x='away.hrs') + labs(x='Hours away from home');
-    ggsave(figname('t-away-hours','mx'),w=5,h=5)
+    ggsave(figname('t-away-hours'),w=5,h=5)
   g = plot.ridge.density(S,x='away.ratio') + labs(x='Relative time away from home');
-    ggsave(figname('t-away-relative','mx'),w=5,h=5)
+    ggsave(figname('t-away-relative'),w=5,h=5)
 }
 
 save.mobility = function(X,S,key='all'){
@@ -80,7 +82,7 @@ save.mobility = function(X,S,key='all'){
   write.csv(X.gg.,root.path('data','mix',paste0('mobility_decile_',key,'.csv')),row.names=FALSE)
 }
 
-main.mobility = function(do.plot=FALSE,do.csv=TRUE){
+main.mobility = function(do.plot=TRUE,do.csv=TRUE){
   H  = load.fsa.t.away()
   X  = load.fsa.mob()
   S  = merge.mobility.margin(X,H)

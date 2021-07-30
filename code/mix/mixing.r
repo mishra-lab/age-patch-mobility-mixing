@@ -70,9 +70,7 @@ gen.mix.main = function(P.ga,C.aa.y,RC.g.y,B.gg.t,t){
   # X.gaga.y: [value] list by type of arrays: total number of contacts
   #           by age, group, other age, other group (not per person)
   N = config$N; h.y = config$h.y; # convenience
-  B.g.0 = rowSums(B.gg.t[['REF']]) # total mobility during REF
-  B.g.t = rowSums(B.gg.t[[t]])     # total mobility during t
-  B.gg = B.gg.t[[t]] + (B.g.t / B.g.0) * diag(1-B.g.0) # add mobility in same "g"
+  B.gg = B.gg.t[[t]] # mobility during t
   B.hh = diag(N$g) # dummy "mobillity" for household contacts
   a.size = bin.size(config$age,norm=TRUE) # expected age distribution
   if (config$method$age.adapt){
@@ -259,15 +257,12 @@ main.mixing = function(figdir=''){
   plot.mix(C.AA.y.d02,'Ci','a',trans='nsqrt',clim=c(-2,+2),cmap='RdBu',gez=FALSE)
     ggsave(figname('C4AAy-d02',figdir),w=14,h=4)
   # mobility plots
+  B.ggi.t = load.group.mob(pop,key='inter')
   B.gg.t = load.group.mob(pop)
-  B.g.0 = rowSums(B.gg.t[['REF']])
-  B.ggd.t = lapply(B.gg.t,function(B.gg){
-    B.gg + pmin(1, rowSums(B.gg) / B.g.0) * diag(1-B.g.0)
-  })
+  plot.mix(B.ggi.t[['REF']],'B','g',trans='sqrt'); ggsave(figname('Bggi', figdir),w= 5,h=4)
   plot.mix(B.gg.t[['REF']],'B','g',trans='sqrt');  ggsave(figname('Bgg',  figdir),w= 5,h=4)
-  plot.mix(B.ggd.t[['REF']],'B','g',trans='sqrt'); ggsave(figname('Bggd', figdir),w= 5,h=4)
-  plot.mix(B.gg.t,'B','g',trans='sqrt');           ggsave(figname('Bggt', figdir),w=11,h=4)
-  plot.mix(B.ggd.t,'B','g',trans='sqrt');          ggsave(figname('Bggdt',figdir),w=11,h=4)
+  plot.mix(B.ggi.t,'B','g',trans='sqrt');          ggsave(figname('Bggit',figdir),w=10,h=4)
+  plot.mix(B.gg.t,'B','g',trans='sqrt');           ggsave(figname('Bggt', figdir),w=10,h=4)
   # compute 4D
   RC.g.y = gen.RC.g.y()
   CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,'REF')
@@ -300,7 +295,7 @@ main.mixing = function(figdir=''){
         ggsave(tikzpath(paste0('CAA-',n1,'-',n2,'.pdf')),w=1,h=1)
     })
   })
-  plot.mix(B.gg.t[['REF']],'B','g',trans='sqrt') + void() + guides(fill='none')
-    ggsave(tikzpath('Bgg.pdf'),w=1,h=1)
+  plot.mix(B.ggi.t[['REF']],'B','g',trans='sqrt') + void() + guides(fill='none')
+    ggsave(tikzpath('Bggi.pdf'),w=1,h=1)
   return(NULL)
 }
