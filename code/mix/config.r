@@ -90,7 +90,7 @@ set.config = function(mode='10x10',n.y=2,...){ # set config stuff in global list
     ),
     t.ref   = c('2020-01','2020-02'), # REF period
     t.covid = c('2020-03','2020-04','2020-05','2020-06', # covid periods
-                '2020-07','2020-08','2020-09','2020-10','2020-11','2020-12','2021-01'),
+                '2020-07','2020-08','2020-09','2020-10','2020-11','2020-12'),
     labels = list( # convenience for plotting labels
       g = list(x='Home Decile (g)',y='Other Decile (g\')'),
       n = list(x='Home FSA (n)',   y='Other FSA (n\')'),

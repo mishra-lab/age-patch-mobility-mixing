@@ -54,10 +54,10 @@ plot.mix = function(C,what,vs,aggr=FALSE,xfun=NULL,
   C. = mix.melt(C,what,vs,aggr=aggr,xfun=xfun,...)
   if (gez){ C.$X[C.$X<0] = 0 }
   v.name = switch(what,
-    CX = 'Total Contacts\n(Millions)',
-    Ci = 'Contacts\nPer Person',
-    Cp = 'Contact\nFormation\nProbability',
-    B  = '% Decile Pop\nwho Travelled\nto Other Decile')
+    CX = 'Total contacts\n(Millions)',
+    Ci = 'Contacts\nper person',
+    Cp = 'Contact\nformation\nprobability',
+    B  = '% home decile\nmobile in\nother decile')
   g = ggplot(C.,aes(x=factor(i),y=factor(i.),fill=X,color=X)) +
     geom_tile() +
     coord_fixed(ratio=1) +
@@ -73,8 +73,12 @@ plot.mix = function(C,what,vs,aggr=FALSE,xfun=NULL,
       n = theme(axis.text.x=element_blank(),axis.text.y=element_blank())
     )
   if (is.list.(C)){
-    if (length(C) <= 6) { g = g + facet_grid(cols=vars(group)) }
-    else { g = g + facet_wrap(vars(group),ncol=6) }
+    if (length(C) <= 6) { # HACK
+      g = g + facet_grid(cols=vars(group))
+    } else {
+      g = g + facet_wrap(vars(group),ncol=6) +
+        theme(legend.position=c(1,-.05),legend.justification=c(1,0))
+    }
   }
   return(g)
 }
