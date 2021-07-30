@@ -25,6 +25,8 @@
 \setlength{\parindent}{0ex}
 \setlength{\abovecaptionskip}{\medskipamount}
 \setlength{\belowcaptionskip}{\medskipamount}
+\renewcommand\textfraction{.2}
+\renewcommand{\floatpagefraction}{.8}
 \widowpenalty10000
 \clubpenalty10000
 % meta-data
