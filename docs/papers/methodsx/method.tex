@@ -47,7 +47,9 @@ that are relevant to epidemic modelling on relatively small spatial and time sca
 However, the model could be improved by
 separating different contact types throughout the force of infection equation,
 and by not fixing the age distribution of contacts.
-Three specific issues with the original approach are as follows.
+% MH: Kind of awkward - would suggest consistency in affirmative vs negative verb tenses
+% (here you begin affirmative and switch to negative)
+Three specific issues with the original approach are as follows:
 \begin{enumerate}
   \item \textbf{Contact balancing:}\label{issue:balance}
   The contact balancing principle states that
@@ -56,7 +58,7 @@ Three specific issues with the original approach are as follows.
   \begin{equation}\label{eq:balance}
     P_{a} C_{a} \theta_{aa'} = P_{a'} C_{a'} \theta_{a'a}
   \end{equation}
-  For a model with non-random age mixing but random mixing by patches,
+  For a model with non-random age mixing and random mixing by patches,
   Eq.~(\ref{eq:balance}) could be satisfied by a single fixed age mixing matrix $\theta_{aa'}$,
   i.e. for the population overall.
   However, in the context of patch-based mixing reflecting recurrent mobility,
@@ -70,18 +72,23 @@ Three specific issues with the original approach are as follows.
   then the modelled incidence would be higher than it should be, etc.
   \item \textbf{Age mixing by contact type:}\label{issue:age-mix}
   A related issue is that the expected contact rates by age group $C_a$ reflect
-  the summation of different types in \cite{Arenas2020},
+  the summation of different types, % MH: Already clear you are talking about 1.
   and so the fixed age mixing matrix $\theta_{aa'}$ is applied to all contact types.
   Then, when restrictions are simulated, overall average contact rates $C_a$ are reduced
   by an amount reflecting the proportion of work versus home contacts
   (and various related assumptions), but $\theta_{aa'}$ is not updated.
+  % MH: A little bit awkward and unclear. I would suggest something like this:
+  % "Therefore, when public health restrictions are simulated
+  % (e.g. mandated masking, work from home policies etc.)
+  % - and overall average contact rates are reduced to reflect reductions in external
+  % versus home contacts - theta aa is not updated.
   As illustrated by the \polymod study \cite{Mossong2008}, age mixing patterns vary by contact type.
   Thus, differential reductions in each contact type would affect age mixing patterns.
   For example, if reduced contacts between working-aged adults were not reflected in $\theta_{aa'}$,
   then the relative contribution of this age group to transmission could be overestimated.
   \item \textbf{Modelling contact \& mobility reductions:}\label{issue:mobility}
   The term $(1-\rho_a)\,\Phi_{ga}(t)$ in Eq.~(\ref{eq:Arenas.lambda})
-  represents transmission to non-mobile individuals in patch $g$.  
+  represents transmission to non-mobile individuals in patch $g$.
   The associated definitions in Eqs.~(\ref{eq:Arenas.Phi}--\ref{eq:Arenas.M})
   consider transmission to these individuals from visitors to patch $g$.
   Such definitions therefore imply that
@@ -91,11 +98,15 @@ Three specific issues with the original approach are as follows.
   suggesting that non-mobile individuals form only home contacts.
   It seems incongruous to model the formation of
   home contacts among non-mobile residents of patch $g$ with mobile visitors to patch $g$.
+  % MH: This section is quite unclear.
+  % Not sure I follow logic on why proportional reductions in mobility and non-home contacts
+  % would suggest non-mobile individuals are forming home contacts with mobile visitors?
   As illustrated in Figure~\ref{fig:nm}, this approach potentially
   overestimates the contact network connectivity during reduced mobility
-  versus an approach in which non-mobile populations do not contact visitors,
-  and thus could underestimate the impact of confinement strategies.
-  While it may be sometimes desirable to allow mixing of ``non-mobile'' individuals
+  versus an approach in which non-mobile populations do not contact visitors
+  Thus \cite{Arenas2020} could underestimate the impact of confinement strategies.
+  % MH: Here I think it's important to specify what methodology underestimates impact of confinement strategies
+  While it may be desirable to allow mixing of ``non-mobile'' individuals
   with visitors to their residence patch,
   the original approach does not provide parameterization to prevent this from happening.
   % The differences in connectivity between the approaches are larger when
@@ -125,6 +136,7 @@ as described in the following subsections.
 To support these descriptions, we will refer to Figures from an example application,
 although the details of the application and the Figures are given in \S~\ref{ex}.
 Collecting the full network of contacts in the matrix $C_{gag'a'y}$ is parsimonious,
+% MH: unsure about use of parsimonious here??   collecting full network of contacts is frugal?
 and allows us to easily compute various properties, like the margins in $a,a'$ or $g,g'$,
 and whether contact balancing is satisfied per Eq.~(\ref{eq:balance}).
 Additionally, separating contact types allows the incorporation of
@@ -147,7 +159,7 @@ We aim to incorporate these contact numbers and patterns into $C_{gag'a'y}$.
 The first challenge is that these contact matrices $C_{aa'y}$ are
 inherently weighted by the underlying population age distribution---%
 the proportion of expected contacts with age group~$a'$ is proportional to the size of age group~$a'$.
-To overcome this challenge and apply these patterns to new population age structures, 
+To overcome this challenge and apply these patterns to new population age structures,
 \citet{Arregui2018} suggest to divide by the population age distribution
 to obtain an ``unweighted'' matrix $C^u_{aa'y}$ (Figure~\ref{fig:C4AAy1}):%
 \footnote{The matrix $C^u_{aa'y}$ could also be interpreted as
@@ -217,20 +229,28 @@ representing the expected proportions of individuals in patch $g$ who travel to 
 We do not assume that rows of $B_{gg'}$ sum to~1;
 however, we do assume that the diagonal ($g=g'$) represents
 the proportion of individuals who are mobile within their own patch.
+% MH: Found the concept of home vs. traveling pools and mobile vs. not mobile individuals confusing upon first read.
+% Have made some suggestions to improve clarity.
 Thus $1 - \sum_{g'} B_{gg'}$ represents
 the proportion of individuals in patch $g'$ who are not mobile.
+% MH: Unclear if this is not mobile (as described below), or not mobile outside of home residence patch.
 In \S~\ref{app.mob} we discuss some details about generating such a matrix $B_{gg'}$.
+% MH: Would save this comment until the end of the section on mobility-related mixing
 \par
 The distinction between ``not mobile'' and ``mobile within the residence patch''
 is new versus the original approach \cite{Arenas2020}.
-As described in \S~\ref{meth.orig}, in the original approach,
-individuals with reduced mobility were assumed to form fewer contacts,
+% MH: Awkward .... Would recommend as follows:
+% "In contrast to [1], we distinguish individuals who are "not mobile" from
+% individuals who are mobile within their home residence patch"
+As described in \S~\ref{meth.orig}, in \cite{Arenas2020} assume
+individuals with reduced mobility form fewer contacts,
 but continue mixing with visitors to their residence patch.
-Our proposed distinction allows us to separate two ``mixing pools'' where contacts might be formed:
+In contrast, we categorize mixing into two pools:
 ``home pools'', where contacts are formed exclusively with
 other residents of the same patch $g$ (e.g. household contacts); and
-``travel pools'', where contacts are formed with any mobile individuals visiting patch $g$,
-which may include individuals who are mobile within their residence patch
+``travel pools'', where contacts are formed with
+% MH: redundant
+individuals who are mobile within their residence patch
 and travellers from other patches (e.g. work contacts).
 An illustration of these pools is given in Figure~\ref{fig:pools}.
 \begin{figure}
@@ -244,15 +264,16 @@ An illustration of these pools is given in Figure~\ref{fig:pools}.
   \floatfoot{Non-mobile populations are indicated with faded colour and green outline}
 \end{figure}
 \par
-We assume that individuals who are not mobile will only form contacts within the home pool,
-but that the number of contacts formed per person within the home pool is fixed and not affected by
-the proportion of individuals who are not mobile.
+We assume that individuals who are ``not mobile'' will only form contacts within the home pool.
+Moreover, we assme that the number of contacts formed per person within the home pool is fixed and unaffected by
+the proportion of individuals who are ``not mobile''.
 It is not necessary to assume that
 all contacts of any particular type are formed with only one type of pool;
 rather we introduce a parameter $h_y \in [0,1]$ representing
 the proportion of type $y$ contacts that are formed with the home pool.
 For example, we could have
 $h_y = 1$ for household contacts, $h_y = 0$ for work contacts, and perhaps $h_y = 0.5$ for school contacts.
+% MH: I would add statement on appendix A.3 here.
 \par
 To calculate $C_{gag'a'y}$ using these assumptions, we begin by considering the travel pool in patch $g^*$.
 The effective number of individuals from population $P_{ga}$

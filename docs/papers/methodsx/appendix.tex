@@ -83,14 +83,19 @@ The difference is largest in the context of differential mobility by patch
     equal population sizes and contact rates by patch;
     random mobility (equal probability of visiting any patch if mobile).}
   \label{fig:nm}
+  % MH: Very cool - critical appendix figure!
 \end{figure}
 \clearpage
 % ==================================================================================================
 \subsection{Deriving the Mobility Matrix}\label{app.mob}
 Here we describe the methods used to obtain the mobility matrix $B_{gg'}$,
 representing the expected proportions of individuals residing in decile/patch $g$,
+% MH: instead of "/" would recommend putting patch in brackets: decile (i.e. geographic patch)
 who travel to decile/patch $g'$ each day,
 based on mobile device data.
+% MH: Would recommend adding terminology to indicate this is an applied example
+% so individuals from outside of Ontario/Canada don't get confused with decile and FSA terminology.
+% Could also highlight "for applied example" in A.3 title.
 We will begin by producing the FSA-level mobility matrix $B_{nn'}$.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Data}\label{app.mob.data}
@@ -109,12 +114,15 @@ Devices for which it was not possible to determine the home FSA were excluded fr
 \par
 The ``visited FSAs'' represent FSAs a device travelled to within a 24-hour period,
 as defined by at least 2 consecutive pings spanning at least 2 hours within the FSA.
-By this definition, it was possible for a device to visit multiple FSA, or no FSA during a given day.
+By this definition, it was possible for a device to visit multiple FSAs, or no FSA during a given day.
 Repeated visits to the same FSA by the same device on the same calendar date are treated as a single visit.
 \par
 The ``time away from home'' represents the proportion of time each device
 was estimated to be away from the home dwelling (not just FSA),
-as defined by the Geohash 6 tile with the greatest daily-average time between 8:00\,pm--5:00\,am each month.
+as defined by the Geohash 6 tile with the greatest daily-average time between 8:00\,pm and 5:00\,am each month.
+% MH: Given you have already defined home FSA above think this is unneccessary.
+% Also reads as if the "time away from home" is defined by
+% the greatest daily average time between 8:00pm  to 5:00am each month.
 \par
 These definitions were applied to each calendar month $t$ from Jan 2020--Dec 2020 (12 months) to compute:
 the mean number of devices with home FSA $n$ per day, denoted $H_{nt}$ or ``observed devices'';
@@ -154,7 +162,8 @@ after the user intends to travel, such as map-related apps.
     coloured segments indicate the 4 quantiles of each distributions.}
 \end{figure}
 \par
-To address this bias, we chose $H_{nt_0}$ from the reference period as a more reliable denominator,
+To address this bias, we chose $H_{nt_0}$ as a more reliable denominator,
+% Inherent in the definition of Hnto
 and thus modelled mobility using: $V_{nn't} / H_{nt_0}$ (Figure~\ref{fig:RH0Vt}).%
 \footnote{One limitation of this approach is that the reference period only includes winter months,
   which may not be representative of mobility year-round.
@@ -179,6 +188,9 @@ Since we have no data on these individuals, we assume that they are mobile
 at a rate $\phi_1 < 1$ (default 0.9) relative to the observed devices.
 Similarly, for individuals who do not own devices ($P_n - D_n$) we assume that they are mobile
 at a rate $\phi_2 < 1$ (default 0.9) relative to the observed devices.
+% Think it might be worth providing a rationale for why
+% we assume observed devices are more mobile than those who are unobserved and those without devices
+% (potentially greater intent to travel if we are observing)
 Thus, the total proportion of individuals in FSA $n$ who travel to FSA $n'$ during month $t$ is modelled~as:
 \begin{equation}\label{eq:Bnnt.inter}
   B_{nn't \,(n\ne n')} = \frac{V_{nn't}}{H_{n0}} \big[
@@ -219,8 +231,8 @@ Then, during the pandemic months, the observed $W_{nt}$ can be used to infer $B_
 Figure~\ref{fig:W} plots the distribution of expected times away from home $W_{nt}$
 in hours (\subref{fig:W-hours}) and relative to the reference period $W_{nt_0}$ (\subref{fig:W-relative}).
 \par
-During the pandemic months, $B_{nn't}$ will sum to less than 1 for many FSA;
-this is desirable, since we interpret $1 - \sum_{n'} B_{nn't}$ to mean
+During the pandemic months, $B_{nn't}$ will sum to less than 1 for many FSAs;
+this is desirable, since we interpret $1 - \sum_{n'} B_{nn't}$ as
 the expected proportion of individuals in FSA $n$
 who did not leave the home each day during month~$t$,
 and thus would not form any mobility-related contacts.
@@ -251,12 +263,21 @@ can be used to aggregate $B_{nn'}$ to obtain $B_{gg'}$ (repeated here for refere
   B_{gg'} = \sum_{n \in S_g}\sum_{n' \in S_g'} B^h_{nn'}
 \end{equation}
 where $S_{g}$ is the set of FSA $n$ corresponding to patch $g$.
+% MH: A little bit awkward.
+% Do you mean n denotes a set of FSAs?  If so, would recommend putting n in brackets as such:
+% "where Sg denotes the set of FSAs (n) corresponding to patch g?"
 Figure~\ref{fig:Bggt} illustrates the matrices $B_{gg't}$
 for the reference period, and each subsequent month,
-with and without the inferred mobility within the home FSA / decile.
-Mobility patterns are generally consistent across months,
+% MH: Again a little awkward - would it be fair to say
+% "Figure A.4 illustrates monthly matrices ... for the study period,
+% with and without inferred mobility within the home decile.
+with and without the inferred mobility within the home decile.
+% MH: Not showing plots by FSA so would remove this text.
+Mobility patterns outlined in Figure~\ref{fig:Bggt} are generally consistent across months,
 with the overall proportions of travelling individuals
 proportional to the ratio depicted in Figure~\ref{fig:RH0Vt}.
+% MH: Would be easier if you could summarize what this ratio is
+% rather than forcing individuals to jump back to Figure A.2C to see what this ratio was.
 \begin{figure}[ht]
   \centering
   \begin{subfigure}{\linewidth}
@@ -271,9 +292,17 @@ proportional to the ratio depicted in Figure~\ref{fig:RH0Vt}.
   \end{subfigure}
   \caption{Mobility matrices $B_{gg't}$, representing the expected proportions of individuals
     in patch/decile $g$ who travelled to patch/decile $g'$ each day,
+    % MH: Would recommend selecting one or the other rather than stating both patch/decile.
+    % Given you have used Decile in your figures, would recommend adding
+    % a description of what a decile is so that the figure stands alone from the text.
     stratified by calendar month plus the reference period (Jan--Feb 2020)}
+    % MH: Is this additional information neccessary in the title.  Would recommend removing.
+    % Instead could add a comment below stating Reference period = January to February 2020
   \label{fig:Bggt}
   \floatfoot{Colour scale is square-root transformed to improve perception of smaller values.}
+  % MH: General comment for figures - ensure enough information is present in each figure
+  % so that a reader could understand it without reading the manuscript.
+  % E.g. provide more information on what a decile is
 \end{figure}
 \clearpage
 % ==================================================================================================
