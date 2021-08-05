@@ -3,6 +3,7 @@
 .debug/
 .tmp/
 .sub/
+.coa/
 
 # code
 Rplots.pdf
@@ -23,6 +24,7 @@ Rplots.pdf
 *.bbl
 *.blg
 *-blx.bib
+*.bcf
 *.run.xml
 *.synctex
 *.synctex.gz
