@@ -1,5 +1,8 @@
 \section{Method}\label{meth}
 % HM: do we need to briefly describe Arenas's model structure in additional to force of infection?
+% JK: I'm not sure if it is necessary -- it may also distract from the main focus by
+% introducing other parameters and ideas that won't get used again.
+% Already running out of Greek letters :p
 Consider a population stratified by $N_g$ patches and $N_a$ age groups.%
 \footnote{We use different notation than \citet{Arenas2020};
   a comparison is given in Table~\ref{tab:notation}.}
@@ -29,7 +32,7 @@ the chained binomial for multiple exposures \cite{Kaplan1990}:
 \end{equation}
 where:
 $\beta_i$ is the per-contact transmission probability associated with infectious state $i$;
-$f_{g^*}$ is a density factor associated with patch $g^*$; % (that we won't consider further here);
+$f_{g^*}$ is a density factor associated with patch $g^*$;
 $C_a$ is the expected number of contacts made per person per day in age group $a$;
 $\theta_{aa'}$ is the age distribution of those contacts, derived from \cite{Prem2017} for Spain,
 such that $\sum_{a'} \theta_{aa'} = 1$;
@@ -157,6 +160,7 @@ Four types of contact are considered: ``home'', ``work'', ``school'', and ``othe
 (Figure~\ref{fig:C4AAy0}).
 We aim to incorporate these contact numbers and patterns into $C_{gag'a'y}$.
 % HM: do we need describe polymod data in Data section as it s Canada specific?
+% JK: good point -- I think we have not mentioned that it is Canada specific there, but I've added now.
 \par
 The first challenge is that these contact matrices $C_{aa'y}$ are
 inherently weighted by the underlying population age distribution---%

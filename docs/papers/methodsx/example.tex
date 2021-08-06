@@ -1,6 +1,9 @@
 \section{Example}\label{ex}
 % HM: We describe all ON specific data here? For others want to implement the method,
 % they will need to change data section to their context? so polymond Canada data will be here too?
+% JK: Yes, that's right -- basically they can plop in their own methods / data to obtain
+% the four parameters required for our mixing approach,
+% those 4 parameters that are listed at the end of section 3.1: Pga, Caa'y, Bgg', hy.
 We applied the proposed methodology for generating a mixing matrix $C_{gag'a'y}$,
 which reflects patterns of age mixing, recurrent mobility between patches, and different contact types,
 to the population of Ontario, Canada, in the context of \covid transmission modelling.
@@ -40,7 +43,7 @@ Ontario population sizes by age and FSA $P_{ga}$ were obtained from
 the 2016 Canadian Census via Statistics Canada%
 \footnote{\hreftt{https://www150.statcan.gc.ca/n1/en/catalogue/98-400-X2016008}}
 and aggregated from 1-year age groups ($a_1$) into 5-year ($a_5$) and target ($a_*$) age groups as needed.
-We obtained the final output contact matrices $C_{aa'y}$ from \cite{Prem2017},
+We obtained the final output contact matrices $C_{aa'y}$ for Canada from \cite{Prem2017},
 for each of the ``home'', ``work'', ``school'', and ``others'' contact types,
 as well as the population size of each 5-year age group used in \cite{Prem2017}.%
 \footnote{\raggedright

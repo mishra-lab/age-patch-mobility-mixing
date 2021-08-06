@@ -1,16 +1,24 @@
 \section{Introduction}\label{intro}
-Contact patterns are key determinants of epidemic dynamics.
+Contact patterns are key determinants of epidemic dynamics
+because they define who can be infected, by whom, and how quickly \cite{Mossong2008}.
 % HM: why it is the key determinant? I think this paper set the rational well:
 % https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0173411
+% JK: I've added a bit -- but would prefer to cite a "bigger picture" paper here
+% e.g. the original POLYMOD study Mossong2008, versus one applied study
 \citet{Arenas2020} develop a patch-based model of \covid transmission applied to Spain,
 in which the modelled population is stratified by geographic patches and three age groups.
 Following foundational work by \citet{Balcan2011,Sattenspiel1995},
 the model incorporates data on short, recurrent mobility patterns
 to determine contact rates between individuals in different patches and age groups.
-We build upon this contact model to incorporate age mixing patterns
-for different contact types which are responsive to
+We build upon this contact model to incorporate improved age mixing patterns,
+which are stratified by different contact types and are responsive to
 the age distributions of mixing populations, as proposed by \citet{Arregui2018}.
 % HM: why we want to include age mixing? maybe include more rational for build on top Arenas et al. model
+% Arenas2020 already do include limited age mixing,
+% whereas we are allowing it to be responsive to the mixing populations,
+% but I've rephrased to make the rationale more obvious.
+% It's hard to get into the specific without adding a lot of detail,
+% which we do in in 2.1 anyways
 % MH: Again - believe this should be at the beginning of the sentence.
 % JK: But Arregui2018 didn't propose to "build upon this model" since it was published prior.
 % hopefully it still reads okay like this?
