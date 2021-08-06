@@ -57,7 +57,7 @@ plot.mix = function(C,what,vs,aggr=FALSE,xfun=NULL,
     CX = 'Total contacts\n(Millions)',
     Ci = 'Contacts\nper person',
     Cp = 'Contact\nformation\nprobability',
-    B  = '% home decile\nmobile in\nother decile')
+    B  = '% Decile g pop.\nwho are mobile\nin decile g\' per day')
   g = ggplot(C.,aes(x=factor(i),y=factor(i.),fill=X,color=X)) +
     geom_tile() +
     coord_fixed(ratio=1) +
@@ -77,7 +77,7 @@ plot.mix = function(C,what,vs,aggr=FALSE,xfun=NULL,
       g = g + facet_grid(cols=vars(group))
     } else {
       g = g + facet_wrap(vars(group),ncol=6) +
-        theme(legend.position=c(1,-.05),legend.justification=c(1,0))
+        theme(legend.position=c(.84,-.03),legend.justification=c(0,0))
     }
   }
   return(g)
