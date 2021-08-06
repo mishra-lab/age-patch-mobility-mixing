@@ -10,7 +10,7 @@ and any corresponding parameters from \cite{Arenas2020}.
   \label{tab:notation}
 \end{table}
 % ==================================================================================================
-\subsection{Interpretation of ``Non-mobile''}\label{app.nonmobile}
+\subsection{Interpretation of ``Non-mobile''}\label{app.non-mob}
 As described in \S~\ref{meth.orig}, \citet{Arenas2020} model the degree of mobility of age group $a$
 using a parameter $\rho_a$ (our notation),
 incorporated into a convenience matrix $M_{gg'}$ per Eq.~(\ref{eq:Arenas.M})\,/\,(\ref{eq:Arenas.M.app}),
@@ -19,20 +19,23 @@ repeated here for reference:
   M_{gg'a} = (1-\rho_a)\,\delta_{gg'} + \rho_a B_{gg'a}
 \end{equation}
 The implicit assumption of this approach is that
-non-mobile individuals may form contacts with visitors to their patch, which may not be as intended.
-The proposed approach to modelling mixing can avoid this assumption if desired.
+non-mobile individuals may form contacts with visitors to their patch
+(situation~\ref{situ:mob-at-home} in \S~\ref{meth.prop.mix.mob}), which may not always be desired.
+The proposed approach to modelling mixing can avoid this assumption if desired
+through the use of ``home pools'' (situation~\ref{situ:non-mob}).
 Figure~\ref{fig:nm} explores the potential influence of this assumption on network connectivity,
 as measured by the expected proportion of contacts formed with other patches, in a toy example.
-The example with 3 patches, each having equal population size and random mobility ($B_{gg'} = 1/N_{g'}$).
+The example has 3 patches, each having equal population size and random mobility ($B_{gg'} = 1/N_{g'}$).
 Age is not considered.
 \par
 By simulating mixing between non-mobile individuals and mobile visitors
-(Figures~\ref{fig:nm.half.stay}~\&~\ref{fig:nm.diff.stay})
+(Figures~\ref{fig:nm.half.stay}~\&~\ref{fig:nm.diff.stay}, situation~\ref{situ:mob-at-home})
 the proportions of contact made with other patches increases for all patches,
 as compared to the proposed approach
-(Figures~\ref{fig:nm.half.home}~\&~\ref{fig:nm.diff.home}).
+(Figures~\ref{fig:nm.half.home}~\&~\ref{fig:nm.diff.home}, situation~\ref{situ:non-mob}).
 The difference is largest in the context of differential mobility by patch
 (Figures~\ref{fig:nm.diff.stay}~vs~\ref{fig:nm.diff.home}).
+\par
 \begin{figure}[ht]
   \newcommand{\threepct}[3]{#1,~#2,~#3\,\%}
   \centering
@@ -71,9 +74,11 @@ The difference is largest in the context of differential mobility by patch
       \threepct{50}{58}{52} if non-mobile have 1/2 contact rates vs mobile}
   \end{subfigure}
   \caption{Mixing implications for two assumptions about the behaviour of non-mobile populations:
-    ``stay at home'' (\subref{fig:nm.half.home},\subref{fig:nm.diff.home}):
+    ``stay at home'' (\subref{fig:nm.half.home},\subref{fig:nm.diff.home},
+    reflecting sitation~\ref{situ:non-mob}):
     no contacts with other patches (proposed here); vs
-    ``stay within patch'' (\subref{fig:nm.half.stay},\subref{fig:nm.diff.stay}):
+    ``stay within patch'' (\subref{fig:nm.half.stay},\subref{fig:nm.diff.stay},
+    reflecting situation~\ref{situ:mob-at-home}):
     no travel, but may form contacts with travellers from other patches (as in \cite{Arenas2020}).}
   \floatfoot{
     Non-mobile populations are indicated with faded colour and green outline;
