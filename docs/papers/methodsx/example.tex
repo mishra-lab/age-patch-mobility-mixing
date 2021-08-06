@@ -5,6 +5,7 @@ to the population of Ontario, Canada, in the context of \covid transmission mode
 Ten patches were defined based on groupings of the 513 forward sortation areas (FSAs)%
 \footnote{Each FSA is the first 3 characters of the postal code.} in Ontario.
 The FSA groupings reflect deciles of cumulative \covid cases between Dec 2020--May 2021.
+% TODO: double check this period.
 Thus each patch represents approximately 10\% of the Ontario population (\mbox{37--68} FSAs),
 but not contiguous geographic regions.
 Such definitions were used to support prioritization of \covid vaccines
@@ -27,7 +28,7 @@ Age groups were then defined to reflect historical and hypothetical \covid vacci
     \includegraphics[width=.39\linewidth]{ontario-gta.png}
   \end{tabular}
   \caption{Ontario forward sorting areas (FSAs, $N=513$),
-    stratified by decile rank in cumulative \covid cases between Dec 2020--May 2021;
+    stratified by decile rank in cumulative \covid cases between Dec 2020--May 2021; % TODO: double check this period.
     decile rank was used to group FSAs into 10 patches for transmission modelling.}
   \label{fig:map}
 \end{figure}
@@ -120,10 +121,14 @@ although such differences could be included in the model by adding a relative ra
     \label{fig:Bggd}
   \end{subfigure}
   \caption{Mobility matrix $B_{gg'}$, representing
-    the proportion of individuals in decile (patch) $g$ who are expected to travel to decile $g'$ each day}
+    the expected proportion of individuals in decile (patch) $g$
+    who are mobile in decile $g'$ per day}
   \label{fig:Bgg}
-  \floatfoot{Time period: Jan--Feb 2020 (average).
-    Colour scales are square-root transformed to improve perception of smaller values.}
+  \floatfoot{Derived from mobile device geolocation data;
+    deciles represent groupings of Ontario forward sortation areas (FSAs)
+    by cumulative \covid cases between Dec 2020--May 2021; % TODO: double check this period.
+    colour scale is square-root transformed to improve perception of smaller values;
+    reference period: Jan--Feb 2020.}
 \end{figure}
 \par
 Finally, we specified the proportions of each contact type assumed to be formed with the home pool:
@@ -192,7 +197,8 @@ not the total contacts formed by that age group.%
     (expected number of type $y$ contacts per person per day in each age group $a$, with those other age groups $a'$)
     from population-weighted matrices $C_{aa'y}$ from \cite{Prem2017} which may not satisfy contact balancing}
   \label{fig:C4AAyi}
-  \floatfoot{Colour scales are square-root transformed to improve perception of smaller values.}
+  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2017};
+    colour scales are square-root transformed to improve perception of smaller values.}
 \end{figure}
 \begin{figure}
   \begin{subfigure}{\linewidth}
@@ -212,7 +218,8 @@ not the total contacts formed by that age group.%
   \end{subfigure}
   \caption{Differences between intermediate results shown in Figure~\ref{fig:C4AAyi}}
   \label{fig:C4AAyd}
-\floatfoot{Colour scales are square-root transformed to improve perception of smaller values.}
+  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2017};
+    colour scales are square-root transformed to improve perception of smaller values.}
 \end{figure}
 \begin{figure}
   \begin{subfigure}{\linewidth}
@@ -234,8 +241,9 @@ not the total contacts formed by that age group.%
     (expected number of type $y$ contacts per person per day in each age group $a_*$, with those from age groups $a'_*$)
     from matrices $C^{ub}_{a_5a'_5y}$ with 5-year age stratifications $a_5$}
   \label{fig:C4**y}
-  \floatfoot{Colour scale is square-root transformed to improve perception of smaller values.
-    The vertical streaks in (Figure~\ref{fig:C4aay}) corresponding to age groups 0--11 and 16--39 are expected,
+  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2017};
+    colour scales are square-root transformed to improve perception of smaller values;
+    the horizontal streaks in (\subref{fig:C4aay}) corresponding to age groups 0--11 and 16--39 are expected,
     as more contacts will be formed with larger age groups.}
 \end{figure}
 \par
@@ -251,10 +259,11 @@ although some details among the large 16--39 age group are lost due to substanti
     for each intermediate step in obtaining $C^{ub}_{a_*a'_*y}$,
     stratified by contact type.}
   \label{fig:C4Ay}
-  \floatfoot{Modelled contacts for each age group are plotted at the midpoint of the age group.
-    The cut points for the original age groups $a_5$ from \cite{Prem2017} and
+  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2017};
+    modelled contacts for each age group are plotted at the midpoint of the age group;
+    the cut points for the original age groups $a_5$ from \cite{Prem2017} and
     the target age groups $a_*$ in our application
-    are indicated on the bottom and top x-axis, respectively.}
+    are indicated on the bottom and top x-axes, respectively.}
 \end{figure}
 \par
 Finally, Figure~\ref{fig:CX4y} illustrates the margins
@@ -293,22 +302,24 @@ though still less than if completely random mixing was assumed.
   \end{subfigure}
   \begin{subfigure}{\linewidth}
     \includegraphics[width=\linewidth]{CX4ggy}
-    \caption{Stratified by patches/deciles and contact type; from Eq.~(\ref{eq:Cggy})}
+    \caption{Stratified by deciles (patches) and contact type; from Eq.~(\ref{eq:Cggy})}
     \label{fig:CX4ggy}
   \end{subfigure}
   \begin{subfigure}{0.48\linewidth}
     \centering
     \includegraphics[width=\linewidth]{CXaay}
-    \caption{Stratified by age groups (all types)}
+    \caption{Stratified by age groups, sum across contact types}
     \label{fig:CXaay}
   \end{subfigure}\hfill%
   \begin{subfigure}{0.48\linewidth}
     \centering
     \includegraphics[width=\linewidth]{CXggy}
-    \caption{Stratified by patches/deciles (all types)}
+    \caption{Stratified by deciles (patches), sum across contact types}
     \label{fig:CXggy}
   \end{subfigure}
-  \caption{Expected contacts per person per day, stratified by age, patch/decile, and contact type,
+  \caption{Expected contacts per person per day, stratified by age, decile (patch), and contact type,
     computed as the margins of the overall contact matrices $C_{gag'a'y}$}
   \label{fig:CX4y}
+  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2017};
+    colour scales are square-root transformed to improve perception of smaller values.}
 \end{figure}

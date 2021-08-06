@@ -155,15 +155,17 @@ after the user intends to travel, such as map-related apps.
   \includegraphics[width=\linewidth]{devices-ratios}
   \caption{Ratios of (\subref{fig:RHt}) observed devices at home
     and (\subref{fig:RVt}) total device visits
-    during each month versus during the reference period (Jan--Feb 2020),
+    during each month versus during the reference period
     suggesting that the proportion of observed devices travelling each month
-    alone is not reflective of true mobility or (\subref{fig:RHt}) would be 1;
+    alone is not reflective of true mobility or else (\subref{fig:RHt}) would be 1;
     (\subref{fig:RH0Vt}) adjusted mobility measure: ratio of
     device visits each month from versus
     the number of observed devices at home during the reference period}
   \label{fig:RHVt}
-  \floatfoot{Distributions show the density of ratio values across all 513 FSAs;
-    coloured segments indicate the 4 quantiles of each distributions.}
+  \floatfoot{Data from approximately 2\% of mobile devices in Ontario, Canada;
+    distributions show the density of ratio values across all 513 FSAs;
+    coloured segments indicate the 4 quantiles of each distributions;
+    reference period: Jan--Feb 2020.}
 \end{figure}
 \par
 To address this bias, we chose $H_{nt_0}$ as a more reliable denominator,
@@ -255,10 +257,12 @@ which is also usually acceptable (such as during Aug--Sept 2020).
     \caption{Relative time away versus reference period}
     \label{fig:W-relative}
   \end{subfigure}
-  \caption{Expected time away from home in hours and versus the reference period (Jan--Feb 2020)}
+  \caption{Expected time away from home in hours and relative to the reference period}
   \label{fig:W}
-  \floatfoot{Distributions show the density of ratio values across all 513 FSAs;
-    coloured segments indicate the 4 quantiles of each distributions.}
+  \floatfoot{Data from approximately 2\% of mobile devices in Ontario, Canada;
+    distributions show the density of ratio values across all 513 FSAs;
+    coloured segments indicate the 4 quantiles of each distributions;
+    reference period: Jan--Feb 2020.}
 \end{figure}
 \par
 Finally, as noted in \S~\ref{ex:data}, Eq.~(\ref{eq:Bgg})\,/\,(\ref{eq:Bgg.app})
@@ -276,20 +280,24 @@ proportional to the ratio $V_{nn't} / H_{nt_0}$ depicted in Figure~\ref{fig:RH0V
   \centering
   \begin{subfigure}{\linewidth}
     \includegraphics[width=\linewidth]{Bggit}
-    \caption{Directly observed mobility: no data for mobility within the residence decile}
+    \caption{Inter-FSA mobility}
     \label{fig:Bggot}
   \end{subfigure}
   \begin{subfigure}{\linewidth}
     \includegraphics[width=\linewidth]{Bggt}
-    \caption{Complete modelled mobility: including inferred mobility within the residence decile}
+    \caption{Inter + intra-FSA mobility}
     \label{fig:Bggdt}
   \end{subfigure}
-  \caption{Mobility matrices $B_{gg't}$, representing the expected proportions of individuals
-    in decile (patch) $g$ who travelled to decile $g'$ each day,
+  \caption{Mobility matrix $B_{gg'}$, representing
+    the expected proportion of individuals in decile (patch) $g$
+    who are mobile in decile $g'$ per day,
     stratified by calendar month and the reference period}
   \label{fig:Bggt}
-  \floatfoot{Colour scale is square-root transformed to improve perception of smaller values.
-    Reference period: Jan--Feb 2020.}
+  \floatfoot{Derived from mobile device geolocation data;
+    deciles represent groupings of Ontario forward sortation areas (FSAs)
+    by cumulative \covid cases between Dec 2020--May 2021; % TODO: double check this period.
+    colour scale is square-root transformed to improve perception of smaller values;
+    reference period: Jan--Feb 2020.}
 \end{figure}
 \clearpage
 % ==================================================================================================
@@ -297,15 +305,18 @@ proportional to the ratio $V_{nn't} / H_{nt_0}$ depicted in Figure~\ref{fig:RH0V
 \begin{figure}[ht]
   \centering
   \includegraphics[width=.8\linewidth]{Yg}
-  \caption{Time trends in daily \covid cases across the 10 modelled patches in Ontario}
+  \caption{Time trends in daily \covid cases across the 10 deciles (patches) in Ontario}
   \label{fig:Yg}
+  \floatfoot{Deciles represent groupings of Ontario forward sortation areas (FSAs)
+    by cumulative \covid cases between Dec 2020--May 2021.} % TODO: double check this period.
 \end{figure}
 \begin{figure}[ht]
   \centering
   \includegraphics[width=.8\linewidth]{Pga}
-  \caption{Population age distributions across the 10 modelled patches in Ontario}
+  \caption{Population age distributions across the 10 deciles (patches) in Ontario}
   \label{fig:Pga}
-  \floatfoot{Solid coloured lines correspond to the 10 patches defined by
-    deciles of cumulative \covid cases between Dec 2020--May 2021 in Ontario.
-    Dashed black line corresponds to the Canadian age distribution used by \citet{Prem2017}.}
+  \floatfoot{Deciles represent groupings of Ontario forward sortation areas (FSAs)
+    by cumulative \covid cases between Dec 2020--May 2021; % TODO: double check this period.
+    solid coloured lines correspond to deciles;
+    dashed black line corresponds to the Canadian age distribution used by \citet{Prem2017}.}
 \end{figure}
