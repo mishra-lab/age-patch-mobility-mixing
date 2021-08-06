@@ -51,25 +51,33 @@ as well as the population size of each 5-year age group used in \cite{Prem2017}.
   from \texttt{/generate\_synthetic\_matrices/input/pop/}
   within \hreftt{https://github.com/kieshaprem/synthetic-contact-matrices/tree/67c824b}.}
 We assumed that residence patch did not influence the numbers of contacts formed per person,
+only with whom those contacts are formed,
 % MH: Wouldn't variability in population sizes per patch influence contacts per person?
 % I thought we were incorporating variable age distribution?
-although such a belief could easily be incorporated in the model,
+% JK: Hmm, I meant "per person" to mean "self", rather than "other".
+% So the total number of contacts I form is fixed,
+% but the patterns of with whom they're formed are responsive to the pool.
+% Maybe it was readling like, the number of contacts I formed per *other* person?
+% Does this addition clarify?
+although such a belief could be incorporated in the model,
 perhaps in Eq.~(\ref{eq:X*.gagay}).
 \par
 The mobility matrix $B_{gg'}$ between patches was derived using
-private data on geolocation service usage among a sample of approximately 2\% of mobile devices in Ontario;
+private data on geolocation service usage among a sample of approximately 2\% of mobile devices in Ontario.
 Appendix~\ref{app.mob} details the specific methods and assumptions used.
 To summarize:
 Each device was assigned a home FSA ($n$) based on
 the most common location during overnight hours for each calendar month.
 Visits to other FSAs ($n'$) by each device were used to estimate
 the proportion of devices in each FSA that are expected to travel to each other FSA each day, averaged monthly.
-This proportion was adjusted for potential changes to the denominator associated with intention to travel.
-We also assumed that individuals not in the dataset (approximately 98\%) had
+Similarly, the average time spent away from home was used to estimate
+the proportion of devices in each FSA that were mobile within the home FSA.
+We additionally assumed that individuals not in the dataset (approximately 98\%) had
 0.9 the odds of being mobile versus the individuals in the dataset,
+because the number of devices observed each month appeared to vary with mobility restrictions,
+possibly reflecting an intention to travel preceeding use of geolocation services.
 % MH: Might be helpful to add rationale for some of these assumptions
-and that a proportion of individuals who were not observed to travel to any other FSA
-were still mobile within their residence FSA.
+% JK: Good point!
 % MH: This is the first we have discussed intra-FSA mobility
 % and we only outline assumptions for unobserved individuals.
 % What about intra-FSA mobility of observed individuals who didn't travel to other FSAs?
@@ -80,14 +88,20 @@ were still mobile within their residence FSA.
 % Think more explanation is needed here.
 % NOTE: After reading through manuscript, see we discuss intra-FSA mobility in section A.3.3.
 % Would specifically reference the appendix here.
-Then, the contribution of each FSA to overall mobility of the patch/decile (group of FSAs)
-was aggregated as follows:
+% JK: Gotcha -- yeah, we do discuss most of this in A.3,
+% which we did mention just above, before "To summarize:"
+% Do you think it's worth repeating again?
+% Also rephrased the details about intra-FSA mobility to better reflect
+% the revised methods.
+\par
+The contribution of each FSA to overall mobility of the patch/decile (group of FSAs)
+was then aggregated as:
 \begin{equation}\label{eq:Bgg}
-  B_{gg'} = \sum_{n \in S_g}\sum_{n' \in S_g'} B_{nn'}
+  B_{gg'} = \sum_{n \in S_g}\sum_{n' \in S_{g'}} B_{nn'}
 \end{equation}
-where $S_g$ is the set of FSA $n$ corresponding to patch/decile $g$.
+where $S_g$ is the set of FSAs ($n$) corresponding to patch/decile $g$.
 Mobility matrices were estimated for each month in the available dataset,
-spanning Jan 2020--Jan 2021.
+spanning Jan 2020--Dec 2020.
 A reference period reflecting pre-pandemic conditions was defined as Jan--Feb 2020;
 unless otherwise specified, all subsequent results use the average mobility patterns during that period
 (Figure~\ref{fig:Bgg}).
@@ -97,12 +111,12 @@ although such differences could be included in the model by adding a relative ra
   \centering
   \begin{subfigure}{0.49\linewidth}
     \includegraphics[width=\linewidth]{Bggi}
-    \caption{Directly observed mobility: no data for mobility within the residence FSA}
+    \caption{Inter-FSA mobility}
     \label{fig:Bggo}
   \end{subfigure}\hfill%
   \begin{subfigure}{0.49\linewidth}
     \includegraphics[width=\linewidth]{Bgg}
-    \caption{Complete modelled mobility: including assumed mobility within the residence FSA}
+    \caption{Inter + intra-FSA mobility}
     \label{fig:Bggd}
   \end{subfigure}
   \caption{Mobility matrix $B_{gg'}$, representing
@@ -114,9 +128,13 @@ although such differences could be included in the model by adding a relative ra
 \par
 Finally, we specified the proportions of each contact type assumed to be formed with the home pool:
 % MH: Why not state proportions that have been set for travel pool if we are stating for the home pool?
-% Also may be helpful to add context here in how this connects to individual mobility.
+% JK: So it should be all others (1-hy) that are formed with the travel pool---
+% I've added a bit of detail in the methods (2.2.2) to clarify. Does that help?
+% MH: Also may be helpful to add context here in how this connects to individual mobility.
 % e.g. "we specified proprotions of each contact type assumed to be formed with the home pool
 % (i.e. proportions of contact types for "not mobile" individuals).:
+% JK: now that the definitions of non-mobile etc. are more clear above,
+% maybe not needed to add more detail here?
 \begin{equation}
   h_y = \left\{
   \textsf{home}:   1,\enspace
@@ -222,11 +240,10 @@ not the total contacts formed by that age group.%
 \end{figure}
 \par
 Figure~\ref{fig:C4Ay} plots the total expected contacts per person per day,
-$C_{ay} = \sum_{a'} C_{aa'y}$, before and after each step.
-% MH: Would clarify what step you are talking about
-% given you havent referenced this since the first results paragraph.
+$C_{ay} = \sum_{a'} C_{aa'y}$, before and after each of the above steps,
+from before Eq.~(\ref{eq:C^u}) through after Eq.~(\ref{eq:Ca*}).
 Overall, patterns remained roughly consistent across transformations,
-although some details among the large 16--39 age group are lost due to substantial averaging.
+although some details among the large 16--39 age group are lost due to substantial averaging.%
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{C4ay}
@@ -259,15 +276,15 @@ which could be used as an implementation check.
 Since $h_y = 1$ for ``home'' contacts, $C_{gg'y}$ is an identity matrix.
 The equivalent matrices for ``work'', ``school'', and ``others'' contact types
 also feature a strong diagonal, due to a strong diagonal in the source mobility matrix $B_{gg'}$
-(which includes assumptions about the mobility of some individuals within their own FSA).
+(individuals who are mobile within their home FSA).
 However, the off-diagonal elements are less clustered towards the central diagonal
-versus the mobility matrix $B_{gg'}$ (Figure~\ref{fig:Bgg});
-mobile individuals from patches $g$ and $g'$ may form contacts
+versus the mobility matrix $B_{gg'}$ (Figure~\ref{fig:Bgg}).
+Mobile individuals from patches $g$ and $g'$ may form contacts
 not only when either travels to the others' patch,
 but also when they both travel to a third patch.
-Thus, the connectivity of the network is greater than the mobility matrix alone would suggest,
-but still less than random mixing.
-% MH: Wording is a bit awkward here
+Thus, the degree of mixing between patches using this approach
+is greater than the mobility matrix alone would suggest,
+though still less than if completely random mixing was assumed.
 \begin{figure}
   \begin{subfigure}{\linewidth}
     \includegraphics[width=\linewidth]{CX4aay}
