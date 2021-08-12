@@ -18,10 +18,8 @@ set.config = function(mode='10x10',n.y=2,...){ # set config stuff in global list
         '<12'   = 0,
         '12-15' = 12,
         '16-39' = 16,
-        '40-44' = 40,
-        '45-49' = 45,
-        '50-54' = 50,
-        '55-59' = 55,
+        '40-49' = 40,
+        '50-59' = 50,
         '60-64' = 60,
         '65-69' = 65,
         '70-74' = 70,
@@ -57,7 +55,7 @@ set.config = function(mode='10x10',n.y=2,...){ # set config stuff in global list
         'Non-Household Contacts' = 'nhh'
       ),
       h.y       = c('hh'=1,'nhh'=0),
-      RC.global = c('hh'=1,'nhh'=0)
+      RC.global = c('hh'=1,'nhh'=1)
     ),
     '4' = list(
       c.map=list(home='home',work='work',school='school',others='others'),
@@ -78,9 +76,9 @@ set.config = function(mode='10x10',n.y=2,...){ # set config stuff in global list
       'age.adapt'   = TRUE,
       'age.by.type' = TRUE
     ),
-    RC.decile = c(1
-      # 7.643163, 5.755709, 4.448017, 3.846107, 3.246633,
-      # 2.983167, 2.539929, 2.136271, 1.625427, 1.000000
+    RC.decile = c(#1
+      7.643163, 5.755709, 4.448017, 3.846107, 3.246633,
+      2.983167, 2.539929, 2.136271, 1.625427, 1.000000
       # 13.029573, 9.067338, 6.610766, 5.409403, 4.522559,
       #  4.068002, 3.286063, 2.687275, 1.839832, 1.000000
     ),

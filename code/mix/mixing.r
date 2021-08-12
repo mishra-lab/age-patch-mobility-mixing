@@ -156,6 +156,36 @@ aggr.mix = function(C.gaga,what,vs,P.ga=NULL,aggr=TRUE){
   if (what=='Cp'){ stop('aggr.mix for Cp not yet implemented') }
 }
 
+save.mixing = function(X.gaga.y.t,what){
+  X. = do.call(expand.grid,dimnames(X.gaga.y.t[[1]][[1]]))
+  X  = do.call(rbind,lapply(names(X.gaga.y.t),function(t){
+    do.call(rbind,lapply(seq(config$N$y),function(y){
+      cbind(t=t,y=config$c.type[y],X.,X=as.vector(X.gaga.y.t[[t]][[y]]))
+    }))
+  }))
+  write.csv(X,root.path('data','mix','Ci_gagayt.csv'),row.names=FALSE)
+}
+
+gen.save.mixing = function(do.save=TRUE){
+  config = set.config(mode='10x10',n.y='2')
+  pop    = load.fsa.pop()
+  P.ga   = pop.to.Pga(pop)
+  C.AA.y = load.contacts()
+  C.aa.y = CAAy.to.Caay(C.AA.y)
+  RC.g.y = gen.RC.g.y()
+  B.gg.t = load.group.mob(pop)
+  Ci.gaga.y.t = lapply(names(B.gg.t),function(t){
+    CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,t)
+    return(CX.norm(CX.gaga.y,P.ga))
+  })
+  names(Ci.gaga.y.t) = names(B.gg.t)
+  if (do.save){
+    save.mixing(Ci.gaga.y.t)
+  } else {
+    return(Ci.gaga.y.t)
+  }
+}
+
 compare.mixing = function(figdir='compare'){
   set.config(n.y = '4',
              age = config$age.contact,
