@@ -16,8 +16,7 @@ if (args[1] == 'mixing'){
 }
 if (args[1] == 'runtime'){
   source('runtime.r')
-  test.runtime('2x2')
-  test.runtime('10x10')
+  test.runtime()
 }
 if (args[1] == 'contacts'){
   source('contacts.r')
@@ -26,4 +25,6 @@ if (args[1] == 'contacts'){
 }
 if (args[1] == 'debug'){
   # DEBUG
+  source('mixing.r')
+  gen.save.mixing()
 }

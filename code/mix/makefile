@@ -6,3 +6,5 @@ do.mixing:
 	Rscript main.r mixing && echo [DONE]
 do.mobility:
 	Rscript main.r mobility && echo [DONE]
+do.runtime:
+	Rscript main.r runtime && echo [DONE]
