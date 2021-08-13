@@ -86,19 +86,23 @@ void = function(){
   return(theme_void() +
     theme(strip.text.x=element_blank(),strip.text.y=element_blank()))
 }
-plot.ridge.density = function(X,x,y='month',bw=NULL,q=4,xmax=NULL,legend=FALSE){
+plot.ridge.density = function(X,x,y='month',fill='q4',xmax=NULL,legend=FALSE){
   if (is.null(xmax)){ xmax=max(X[[x]],na.rm=TRUE) }
   if (y=='month'){ y.lab='Month' } else { y.lab = y }
   X. = list.bind(X)
-  g = ggplot(X.,aes_string(y=y,fill='factor(stat(quantile))',x=x)) +
-    stat_density_ridges(
-      geom='density_ridges_gradient',
-      calc_ecdf=TRUE,
-      quantiles=q,
-      bandwidth=bw) +
-    scale_fill_viridis(discrete=TRUE,option='inferno',alpha=.7,begin=.2,end=.8) +
-    scale_y_discrete(limits=rev) +
-    xlim(0,xmax) + labs(x=x,y=y.lab,fill='Quantile') +
+  g = ggplot(X.,aes_string(y=y,x=x))
+  if (fill=='q4'){
+    g = g + stat_density_ridges(
+        aes_string(fill='factor(stat(quantile))'),
+        geom='density_ridges_gradient',calc_ecdf=TRUE,quantiles=4) +
+      cmap.fun('fill',cmap='inferno',discrete=TRUE,alpha=.7,begin=.2,end=.8)
+    }
+  if (fill=='decile'){
+    g = g + stat_density_ridges(aes_string(fill='decile'),alpha=.5,color=NA) +
+      cmap.fun('fill',cmap='Spectral',discrete=TRUE)
+  }
+  g = g + scale_y_discrete(limits=rev) +
+    xlim(0,xmax) + labs(x=x,y=y.lab,fill=fill) +
     theme_light()
   if (!legend){
     g = g + guides(fill='none')

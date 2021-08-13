@@ -62,10 +62,15 @@ plot.mobility.margins = function(S,SR){
     'Visit Reduction'        = data.frame(month=S$month,Ratio=S$devices.vt.v0),
     'Visit / Reference Home' = data.frame(month=S$month,Ratio=S$devices.vt.h0)
   ),'Ratio',xmax=2); ggsave(figname('devices-panel'),w=15,h=5)
-  g = plot.ridge.density(S,x='away.hrs') + labs(x='Hours away from home');
+  g = plot.ridge.density(S,x='away.hrs') +
+    labs(x='Hours away from home');
     ggsave(figname('t-away-hours'),w=5,h=5)
-  g = plot.ridge.density(S,x='away.ratio') + labs(x='Relative time away from home');
+  g = plot.ridge.density(S,x='away.ratio') +
+    labs(x='Relative time away from home');
     ggsave(figname('t-away-relative'),w=5,h=5)
+  g = plot.ridge.density(S,x='away.ratio',fill='decile',legend=TRUE) +
+    labs(x='Relative time away from home');
+    ggsave(figname('t-away-relative-g'),w=6,h=5)
 }
 
 save.mobility = function(X,S,key='all'){
