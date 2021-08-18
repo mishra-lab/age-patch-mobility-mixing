@@ -5,11 +5,10 @@ which is relevant to dynamic models of infectious disease transmission, such as 
 The original approach simulates contact patterns between
 age groups and geographic patches connected by recurrently mobile individuals,
 and considers changes to mixing between patches due to reduced mobility among some individuals.
-However, the method could be improved to:
+In this paper, we proposed approaches to improve upon the approach to:
 ensure contact balancing between age groups;
 model changes to age contact patterns in response to reduced mobility; and
 allow complete isolation of non-mobile individuals from mobility-related contacts.
-We propose a modification of the approach that achieves these improvements.
 \par
 The first key change in the proposed approach draws on \cite{Arregui2018} to
 combine preferential patterns of age mixing with the age distribution of the mixing population,
@@ -19,6 +18,9 @@ and ensures that the number of contacts simulated from age group $a$ to age grou
 will equal those from age group $a'$ to age group $a$.
 \par
 The second key change in the proposed approach is to
+% SM: the issue/solution also applies if
+% the occupational or household, etc. context might be different between patches
+% [i.e. not just age-distribution being different between patches] - could mention that here?
 maintain separate mixing patterns for each type of contact,
 only aggregating the contribution of different contact types to overall transmission
 within the force of infection equation.

@@ -2,10 +2,13 @@ Infectious disease transmission models often stratify populations by age and geo
 Contact patterns between age groups and patches are key parameters in such models.
 Arenas et al.\ (2020) develop an approach to simulate contact patterns associated with
 recurrent mobility between patches, such as due to work, school, and other regular travel.
-We build upon this approach to address several potential weaknesses.
-In our approach, the distribution of contacts by age
-is responsive to underlying age distribution of the mixing pool.
+We build upon this approach to address potential gaps that remain.
+% SM: revised wording to sound more like what is left to do vs. weaknesses :)
+Our expansion includes a distribution of contacts by age
+% SM: or approach instead of expansion probably...
+that is responsive to underlying age distribution of the mixing pool.
 Different age distributions by contact type are also maintained in our model,
+% SM: model or approach? suggest using one term throughout
 such that changes to the numbers of different types of contacts
 are appropriately reflected in changes to the overall age mixing patterns.
 Finally, we introduce and distinguish between two mixing pools associated with each patch,
@@ -14,3 +17,6 @@ the home pool, in which contacts can only be formed with other individuals resid
 and the travel pool, in which contacts can be formed with some residents and any other visitor to the patch.
 We describe in detail the steps required to implement our approach,
 and present results of an example application.
+% SM: excellent - succint & clear. and the graphical abstract is fantastic.
+% consdier maybe indicating something like we our expansion/approach includes
+% 3 elements/features (or something like that...)...

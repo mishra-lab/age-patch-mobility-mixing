@@ -1,4 +1,5 @@
 \section{Example}\label{ex}
+% SM: include mention of ethics review/REB approval here from UofT (similar to the serial interval paper).
 % HM: We describe all ON specific data here? For others want to implement the method,
 % they will need to change data section to their context? so polymond Canada data will be here too?
 % JK: Yes, that's right -- basically they can plop in their own methods / data to obtain
@@ -6,15 +7,23 @@
 % those 4 parameters that are listed at the end of section 3.1: Pga, Caa'y, Bgg', hy.
 We applied the proposed methodology for generating a mixing matrix $C_{gag'a'y}$,
 which reflects patterns of age mixing, recurrent mobility between patches, and different contact types,
-to the population of Ontario, Canada, in the context of \covid transmission modelling.
-Ten patches were defined based on groupings of the 513 forward sortation areas (FSAs)%
+to the population (14 million) of Ontario, Canada, in the context of \covid transmission modelling.
+Ten patches were defined based on groupings of the 513 forward sortation areas (FSAs)
+% SM: for the patches, cite either Brown et al. or the ICES Dashboard
+% depending on which FSA-decile file we used for this example.
+% (will forward email re: the ICES dashboard for the reference on how the FSAs were converted to deciles).
 \footnote{Each FSA is the first 3 characters of the postal code.} in Ontario.
-The FSA groupings reflect deciles of cumulative \covid cases between Dec 2020--May 2021.
+The FSA groupings reflect deciles of cumulative \covid cases, excluding cases among residents of long-term are homes,
+between January 2020--March 28. 2021.
+% SM: if using ICES dashboad FSA-decile; the date is Jan 2020 to Jan 16, 2021 if using Brown et al FSA-decile.
+% and for this sentence, cite Brown et al or the ICES Dashboard.
 % TODO: double check this period.
 Thus each patch represents approximately 10\% of the Ontario population (\mbox{37--68} FSAs),
 but not contiguous geographic regions.
-Such definitions were used to support prioritization of \covid vaccines
+Such definitions were used to support allocation and prioritization of \covid vaccines
 to ``hot spot'' neighbourhoods in Ontario \cite{Mishra2021}.
+% SM: also cite Brown et al.
+% https://covid19-sciencetable.ca/sciencebrief/covid-19-vaccination-strategy-for-ontario-using-age-and-neighbourhood-based-prioritization/
 Figure~\ref{fig:map} illustrates the locations of the FSAs and their decile rank,
 which is synonymous with their patch index.
 Figure~\ref{fig:Yg} plots the daily incidence of \covid cases per patch, and
@@ -33,7 +42,8 @@ Age groups were then defined to reflect historical and hypothetical \covid vacci
     \includegraphics[width=.39\linewidth]{ontario-gta.png}
   \end{tabular}
   \caption{Ontario forward sorting areas (FSAs, $N=513$),
-    stratified by decile rank in cumulative \covid cases between Dec 2020--May 2021; % TODO: double check this period.
+    stratified by decile rank in cumulative \covid cases between Dec 2020--May 2021;
+    % TODO: double check this period. % SM: see above
     decile rank was used to group FSAs into 10 patches for transmission modelling.}
   \label{fig:map}
 \end{figure}
@@ -70,6 +80,7 @@ perhaps in Eq.~(\ref{eq:X*.gagay}).
 \par
 The mobility matrix $B_{gg'}$ between patches was derived using
 private data on geolocation service usage among a sample of approximately 2\% of mobile devices in Ontario.
+% SM: here, can we cite some of Amir's papers as a reference (even if pre-print)?
 Appendix~\ref{app.mob} details the specific methods and assumptions used.
 To summarize:
 Each device was assigned a home FSA ($n$) based on
@@ -140,6 +151,7 @@ Finally, we specified the proportions of each contact type assumed to be formed 
 % MH: Why not state proportions that have been set for travel pool if we are stating for the home pool?
 % JK: So it should be all others (1-hy) that are formed with the travel pool---
 % I've added a bit of detail in the methods (2.2.2) to clarify. Does that help?
+% SM: yes, great point by MH and it helps re the current explanation
 % MH: Also may be helpful to add context here in how this connects to individual mobility.
 % e.g. "we specified proprotions of each contact type assumed to be formed with the home pool
 % (i.e. proportions of contact types for "not mobile" individuals).:
@@ -159,6 +171,13 @@ and presents all major intermediate results.
 \clearpage % TEMP
 % ==================================================================================================
 \subsection{Results}\label{ex:results}
+% SM: so we made explicit that we did not 'modify' the age-age contacts by contact type beyond Prem et al.
+% which means we still would want to fit to observed data on cases by patches, etc.
+% So, just as age-distribution may be different between patches;
+% so might the age-specific contacts by contact time
+% (for example, a patch may have larger  household sizes; a larger subset of the population who work in high-contact occupations, etc.)
+% - so can translate/relate this re: how important the element of patch-context might be.
+% Could bring that up in Conclusion?
 Figure~\ref{fig:C4AAyi} illustrates the contact matrices $C_{aa'y}$ from \citet{Prem2017},
 before and after the steps of unweighting by population age distributions, Eq.~(\ref{eq:C^u}),
 and ensuring contact balancing, Eq.~(\ref{eq:C^ub}).
@@ -297,6 +316,7 @@ Mobile individuals from patches $g$ and $g'$ may form contacts
 not only when either travels to the others' patch,
 but also when they both travel to a third patch.
 Thus, the degree of mixing between patches using this approach
+% SM: this sentence/statement is a really importnat message/point - can we include in abstract?
 is greater than the mobility matrix alone would suggest,
 though still less than if completely random mixing was assumed.
 \begin{figure}

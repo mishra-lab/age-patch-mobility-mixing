@@ -8,14 +8,16 @@ Consider a population stratified by $N_g$ patches and $N_a$ age groups.%
   a comparison is given in Table~\ref{tab:notation}.}
 Let $P_{ga}$ be the number of people in patch $g$ and age group $a$.
 Let $y$ denote $N_y$ different types of contacts.
+% SM: consider include here something like a 'for example' with respect to 'type'
+% "(e.g. household contacts, workplace contacts, etc.)"
 Let $B_{gg'}$ be the proportion of population $P_{g}$ who travel to $g'$ each day,
-or the ``mobility matrix''.%
+or the ``mobility matrix''.% SM: could mobility vary by age as well? oh I see now footnote 2! nice.
 \footnote{\citet{Arenas2020} consider different mobility patterns by age: $B_{gg'a}$.
   For simplicity, we consider $B_{gg'}$ unstratified by age,
   but age stratification could be added to our approach.}
 % ==================================================================================================
 \subsection{Original Approach}\label{meth.orig}
-\citet{Arenas2020} model the force of infection (incidence) experienced by population $P_{ga}$ as:
+\citet{Arenas2020} model the force of infection (incidence per susceptible) experienced by population $P_{ga}$ as:
 \begin{equation}\label{eq:Arenas.lambda}
   \lambda_{ga}(t) = (1-\rho_a)\,\Phi_{ga}(t) + \rho_a \sum_{g^*} B_{gg^*a} \Phi_{g^*a}(t)
 \end{equation}
@@ -54,6 +56,11 @@ and by allowing age mixing patterns to respond to local demographic and interven
 Three specific issues with the original approach are as follows:
 \begin{enumerate}
   \item \textbf{Contact balancing:}\label{issue:balance}
+  % SM: an assumption here is also that infection-attributable death
+  % does not alter the age-distribution, or mixing, so could speak to that as well?
+  % or perhaps in discussion section? i.e. like we do with HIV for example where
+  % we explicitly account for HIV-attributable death reducing a group's available contacts
+  % (b/c less people over time)
   The contact balancing principle states that
   the total number of contacts formed by group $a$ with group $a'$
   should equal the number formed by group $a'$ with group $a$ \cite{Arregui2018}:
@@ -61,38 +68,53 @@ Three specific issues with the original approach are as follows:
     P_{a} C_{a} \theta_{aa'} = P_{a'} C_{a'} \theta_{a'a}
   \end{equation}
   For a model with non-random age mixing and random mixing by patches,
+  % SM: do we mean random or proportionate here?
   Eq.~(\ref{eq:balance}) could be satisfied by a single fixed age mixing matrix $\theta_{aa'}$,
   i.e. for the population overall.
   However, in the context of patch-based mixing reflecting recurrent mobility,
   Eq.~(\ref{eq:balance}) should be satisfied in each mixing context (patch).
-  If different patches have different age distributions,
+  Specifically, if different patches have different age distributions,
   then it would not be possible to satisfy Eq.~(\ref{eq:balance})
   with a single fixed age mixing matrix $\theta_{aa'}$.
-  The implications of violating Eq.~(\ref{eq:balance}) depend on the context.
+  The implications of violating Eq.~(\ref{eq:balance}) depend on the demographic context.
+  % SM: suggest could define/explain what is meant by 'context' a bit more... e.g. here referring to demographic context?
   For example, if $\theta_{aa'}$ overestimates
-  the proportion of contacts formed with a highly infectious age group,
+  the proportion of contacts formed with a highly infectious age group
+  by assuming equal age-distribution across patches,
   then the modelled incidence would be higher than it should be, etc.
+  % SM: in which patch would that occur, or would it be overall (sum of patches)?
   \item \textbf{Age mixing by contact type:}\label{issue:age-mix}
   A related issue is that the expected contact rates by age group $C_a$ reflect
-  the summation of different types,
+  the summation of different types of contacts,
   and so the fixed age mixing matrix $\theta_{aa'}$ is applied to all contact types.
-  Then, when mobility restrictions are simulated,
-  and overall average contact rates are reduced to reflect reductions in external versus home contacts,
+  % SM: rephrase the following sentence for a bit more clarity
+  As such, when mobility restrictions are simulated as an intervention
+  (for example, in the setting of lockdowns for example in the context of the COVID-19 pandemic),
+  the overall average contact rates are reduced to reflect reductions in external versus home contacts, and
   $\theta_{aa'}$ is not updated.
+  % SM: so saying here that overall reductions in contact rates due to an intervention
+  % subsume the effect of the intervention across contact types?
   As illustrated by the \polymod study \cite{Mossong2008}, age mixing patterns vary by contact type.
+  % SM: could give examples of some contact types here...?
   Thus, differential reductions in each contact type would affect age mixing patterns.
+  % SM: nice. suggest rephrasing the sentence abvoe around simulating mobility restrictions just a bit to land here a bit easier
   For example, if reduced contacts between working-aged adults were not reflected in $\theta_{aa'}$,
   then the relative contribution of this age group to transmission could be overestimated.
+  % SM: so here the example is with age-specific effects of the intervention vs. by type of contacts?
+  % clarify this a bit more re: the key message/point here in the example....
+  % do we mean reduced non-household contacts between working-aged adults?
   \item \textbf{Modelling contact \& mobility reductions:}\label{issue:mobility}
   The term $(1-\rho_a)\,\Phi_{ga}(t)$ in Eq.~(\ref{eq:Arenas.lambda})
   represents transmission to non-mobile individuals in patch $g$.
   The associated definitions in Eqs.~(\ref{eq:Arenas.Phi}--\ref{eq:Arenas.M})
   consider transmission to these individuals from visitors to patch $g$.
+  % SM: 'these' refers to? would write out and limit use of 'these'/'this' given the various strata we have :)
   Such definitions therefore imply that
   non-mobile individuals still form contacts with visitors to their residence patch.
   However, it may be useful to model some or all non-mobile individuals
-  only forming contacts with other individuals from their residence patch,
-  such as reflecting household contacts.
+  as only forming contacts with other individuals from their residence patch.
+  That is, scenarios may exist wherein a fraction of the population only has
+  household contacts, as could be the case with public health measures such as lockdowns.
   % MH: This section is quite unclear.
   % Not sure I follow logic on why proportional reductions in mobility and non-home contacts
   % would suggest non-mobile individuals are forming home contacts with mobile visitors?
@@ -101,17 +123,20 @@ Three specific issues with the original approach are as follows:
   % would suggest non-mobile individuals are forming *only home contacts*,
   % which *shouldn't* be formed with mobile visitors, but that's what the model does, so it's kinda "wrong".
   % Have revised entirely to re-frame it hopefully in a more simple way.
-  As illustrated in Figure~\ref{fig:nm}, the original approach potentially
-  overestimates the contact network connectivity during reduced mobility
-  versus an approach in which non-mobile populations do not contact visitors.
-  Thus \cite{Arenas2020} could underestimate the impact of confinement strategies
-  on inter-patch transmission.
-  While it may be desirable to sometimes allow mixing of ``non-mobile'' individuals
-  with visitors to their residence patch,
-  the original approach does not provide a parameterization to prevent this from happening.
+  As illustrated in Figure~\ref{fig:nm}, the original approach may
+  overestimate inter-patch connectivity during periods of reduced mobility (via lockdowns)
+  versus an approach in which some or all non-mobile populations are limited to
+  contacts with others from their residence patch and not with visitors.
+  Thus, the original approach \cite{Arenas2020} could underestimate
+  the impact of confinement lockdown strategies on inter-patch transmission.
+  % SM: impact on trasmission reduction or transmission?
+  % SM: not sure the following sentence is needed.
+  % While it may be desirable to sometimes allow mixing of ``non-mobile'' individuals
+  % with visitors to their residence patch,
+  % the original approach does not provide a parameterization to prevent this from happening.
 \end{enumerate}
 We therefore develop a refinement of the original approach,
-with the aim of addressing these three issues.
+with the aim of addressing the above three issues.
 % ==================================================================================================
 \subsection{Proposed Approach}\label{meth.prop}
 In the proposed approach, the contributions of different contact types to the force of infection
@@ -162,7 +187,9 @@ We aim to incorporate these contact numbers and patterns into $C_{gag'a'y}$.
 % HM: do we need describe polymod data in Data section as it s Canada specific?
 % JK: good point -- I think we have not mentioned that it is Canada specific there, but I've added now.
 \par
-The first challenge is that these contact matrices $C_{aa'y}$ are
+The first challenge is that the contact matrices $C_{aa'y}$ are
+% SM: stylistic suggestion re: reducinig use of 'this' and 'these' where possible
+% to make thigns a bit easier to read/follow...
 inherently weighted by the underlying population age distribution---%
 the proportion of expected contacts with age group~$a'$ is proportional to the size of age group~$a'$.
 To overcome this challenge and apply these patterns to new population age structures,
@@ -179,8 +206,11 @@ The next challenge is that $C^u_{aa'y}$ may not satisfy
 the contact balancing principle, Eq.~(\ref{eq:balance}),
 due to potential differences in age distribution of
 the \polymod survey respondents versus that of the contacts the respondents reported.
-In order to ensure that $C_{gag'a'y}$ will satisfy the balancing principle,
+% SM: did not understand what was meant by "...vs that of the contacts the respondents reported."
+% refphrase for clarity
+To ensure that $C_{gag'a'y}$ will satisfy the balancing principle,
 $C^u_{aa'y}$ must satisfy the principle.
+% SM: rephrase sentence for clarity as sentence circular?
 A simple solution is to average $C^u_{aa'y}$ with its transpose
 to obtain the ``balanced'' matrix $C^{ub}_{aa'y}$ (Figure~\ref{fig:C4AAy2}):
 \begin{equation}\label{eq:C^ub}
@@ -193,6 +223,7 @@ However, such changes are reasonable if understood as a correction for sampling 
   a contact matrix $C^u_{aa'y}$ that is already balanced.}
 \par
 A final challenge in applying the contact matrices from \cite{Prem2017} is that
+% SM: love this part and the solution!
 the 5-year age groups may not align with the age groups of interest.
 Overcoming this challenge is not theoretically required to obtain $C_{gag'a'y}$,
 but we describe a solution here in case it is useful for modelling applications.
@@ -234,6 +265,7 @@ described in \S~\ref{meth.orig}.
 % Have made some suggestions to improve clarity.
 % JK: Thanks! As you can see, I did a bit of an overhaul using more definitions.
 % Hopefully it's better now?
+% SM: read well and flowed nicely
 In conceptualizing mobility-related mixing,
 we define two types of contexts in which contacts can be formed:
 \begin{itemize}
@@ -309,6 +341,7 @@ as both are already reflected in the off-diagonal and diagonal elements of $B_{g
 If we assume that mixing by residence patch $g$ within the pool is random,
 we need only consider age mixing within the pool.
 Under completely random mixing,
+% SM: do we mean proportionate mixing?
 the total number of contacts formed between $P^{\,g^*}_{gay}$ and $P^{\,g^*}_{g'a'y}$
 is given by the outer product:
 \begin{equation}\label{eq:X*r.gagay}
