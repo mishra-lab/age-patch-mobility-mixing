@@ -11,6 +11,7 @@ and any corresponding parameters from \cite{Arenas2020}.
 \end{table}
 % ==================================================================================================
 \subsection{Interpretation of ``Non-mobile''}\label{app.non-mob}
+% SM: love this section and its examples which are clear and powerful
 As described in \S~\ref{meth.orig}, \citet{Arenas2020} model the degree of mobility of age group $a$
 using a parameter $\rho_a$ (our notation),
 incorporated into a convenience matrix $M_{gg'}$ per Eq.~(\ref{eq:Arenas.M})\,/\,(\ref{eq:Arenas.M.app}),
@@ -19,21 +20,29 @@ repeated here for reference:
   M_{gg'a} = (1-\rho_a)\,\delta_{gg'} + \rho_a B_{gg'a}
 \end{equation}
 The implicit assumption of this approach is that
-non-mobile individuals may form contacts with visitors to their patch
-(situation~\ref{situ:mob-at-home} in \S~\ref{meth.prop.mix.mob}), which may not always be desired.
-The proposed approach to modelling mixing can avoid this assumption if desired
+non-mobile individuals may form contacts with visitors to the former's residence patch
+(situation~\ref{situ:mob-at-home} in \S~\ref{meth.prop.mix.mob}):
+an assumption which may not be desired depending on the research question or intervention effect.
+The proposed approach to modelling mixing can avoid this assumption if needed
 through the use of ``home pools'' (situation~\ref{situ:non-mob}).
 Figure~\ref{fig:nm} explores the potential influence of this assumption on network connectivity,
+% SM: clarify what "this" refers to (the original assumption?)
 as measured by the expected proportion of contacts formed with other patches, in a toy example.
 The example has 3 patches, each having equal population size and random mobility ($B_{gg'} = 1/N_{g'}$).
 Age is not considered.
 \par
 By simulating mixing between non-mobile individuals and mobile visitors
 (Figures~\ref{fig:nm.half.stay}~\&~\ref{fig:nm.diff.stay}, situation~\ref{situ:mob-at-home})
+% SM: minor point - the greying out of "travel pool" label, etc.
+% may need to be a few shades darker to read on some screens.
+% these figures are +++stunning and clear!
+% I also really like the use of the figures to demonstrate the examples
 the proportions of contact made with other patches increases for all patches,
 as compared to the proposed approach
 (Figures~\ref{fig:nm.half.home}~\&~\ref{fig:nm.diff.home}, situation~\ref{situ:non-mob}).
 The difference is largest in the context of differential mobility by patch
+% SM: here, refer to issue 2? and also could refer back to its implications
+% v. briefly (differential mobility by age, but also other contexts...)
 (Figures~\ref{fig:nm.diff.stay}~vs~\ref{fig:nm.diff.home}).
 \par
 \begin{figure}[ht]
@@ -75,7 +84,9 @@ The difference is largest in the context of differential mobility by patch
   \end{subfigure}
   \caption{Mixing implications for two assumptions about the behaviour of non-mobile populations:
     ``stay at home'' (\subref{fig:nm.half.home},\subref{fig:nm.diff.home},
-    reflecting sitation~\ref{situ:non-mob}):
+    reflecting situation~\ref{situ:non-mob}):
+    % SM: in main text, sometimes referred to as issue 3, etc...
+    % suggest either situation or issue for consistency...
     no contacts with other patches (proposed here); vs
     ``stay within patch'' (\subref{fig:nm.half.stay},\subref{fig:nm.diff.stay},
     reflecting situation~\ref{situ:mob-at-home}):
@@ -92,15 +103,19 @@ The difference is largest in the context of differential mobility by patch
 \clearpage
 % ==================================================================================================
 \subsection{Deriving the Mobility Matrix: Example}\label{app.mob}
+% SM: this is great. I like that you outlined each step and put it here - it was a lot of work,
+% and is nice to be transparent but also enable its use by others
+% who can request/work with similar cell phone data, etc.
 Here we describe the methods used to obtain the mobility matrix $B_{gg'}$
 for our applied example in Ontario Canada (details in \S~\ref{ex}).
-The mobility matrix  represents
+The mobility matrix represents
 the expected proportions of individuals residing in decile (patch) $g$ who travel to decile $g'$ each day.
 We will begin by producing the FSA-level mobility matrix $B_{nn'}$ ($513 \times 513$),
 and later aggregate this matrix to obtain $B_{gg'}$ ($10 \times 10$).
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Data}\label{app.mob.data}
 The raw data represent logs of: timestamp, geolocation (latitude\,/\,longitude), and unique device ID.
+% SM: cite a paper by Amir if possible where he used these types of data
 A log entry (``ping'') is generated when an app on the device
 requests the current geolocation from the service provider.
 Geolocation is logged using Geohash level 6 (1.2 \,km $\times$ 609.4\,m).
@@ -117,6 +132,8 @@ The following definitions were then used to determine device mobility.
   By this definition, it was possible for a device to visit multiple FSAs, or no FSA during a given day.
   Repeated visits to the same FSA by the same device on the same calendar date are treated as a single visit.
   \item \textbf{Time away from home:} the proportion of time each device
+  % SM: for some reason I thought it was % of devices that were away from home for X period of time
+  % [like at least 1 hour, etc.]? but I think you have already double-checked this with Amir?
   was estimated to be away from the home dwelling (not just home FSA).
   The home dwelling was defined by the Geohash 6 tile
   with the greatest daily-average time between 8:00\,pm and 5:00\,am each month.
@@ -168,13 +185,13 @@ after the user intends to travel, such as map-related apps.
     reference period: Jan--Feb 2020.}
 \end{figure}
 \par
-To address this bias, we chose $H_{nt_0}$ as a more reliable denominator,
+To address the above measurement bias, we chose $H_{nt_0}$ as a more reliable denominator,
 and thus modelled mobility using: $V_{nn't} / H_{nt_0}$ (Figure~\ref{fig:RH0Vt}).%
 \footnote{One limitation of this approach is that the reference period only includes winter months,
-  which may not be representative of mobility year-round.
+  which may not be representative of mobility year-round or seasonal variablity in mobility.
   Indeed, all three ratios in Figure~\ref{fig:RHVt} have substantial tails above 1 during Aug--Sept 2020,
   suggesting that mobility was higher during that period versus the pre-pandemic reference period.}
-However, the results of Figure~\ref{fig:RHVt} also suggest that
+The results of Figure~\ref{fig:RHVt} also suggest that
 unobserved devices are less mobile than observed devices;
 thus the unobserved devices would not have the same expected mobility as the observed devices.
 To account for this observation, we first estimated the total number of devices per FSA, denoted $D_n$,
@@ -189,7 +206,8 @@ During the pandemic, additional devices go unobserved ($H_{nt}$ decreases)
 but we assume that the newly unobserved devices do not travel.
 Therefore, the number of devices that may travel unobserved
 is a proportion of $D_n - H_{nt_0}$, not a proportion of $D_n - H_{nt}$.
-Since we have no data on these individuals, we assume that they are mobile
+Since we have no data on unobserved individuals, we assume that they are mobile
+% SM: 'these' refers to unobserved individuatls?
 at a rate $\phi_1 \le 1$ (default 0.9) relative to the observed devices.
 Similarly, for individuals who do not own devices ($P_n - D_n$) we assume that they are mobile
 at a rate $\phi_2 \le 1$ (default 0.9) relative to the observed devices.
@@ -217,10 +235,11 @@ all individuals who do not travel to other FSAs are still mobile within their ho
 \end{equation}
 During pandemic months, we assume that
 a proportion of such individuals remain mobile within their home FSA;
-this proportion is derived from the time away from home $W_{nt}$ as follows.
+this proportion is derived using the time away from home $W_{nt}$ as follows.
+% SM: refer back to Section A.3.1. here
 We assume that individuals who are mobile within their home FSA
 spend $\psi \le 1$ (default 1) as much time away from home as
-those who are mobile within other FSAs.
+those who travel to other FSAs.
 Thus, the model for $W_{nt}$ is:
 \begin{equation}\label{eq:Wnt}
   W_{nt} = W^*_n \left(\psi B_{nn't\,(n = n')} + \sum_{n'} B_{nn't\,(n \ne n')} \right)
