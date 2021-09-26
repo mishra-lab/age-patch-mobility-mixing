@@ -1,7 +1,7 @@
 \section{Conclusion}\label{conc}
 \citet{Arenas2020} develop an approach to modelling
 contact patterns associated with recurrent mobility,
-which is relevant to dynamic models of infectious disease transmission, such as \covid.
+which is relevant to dynamic models of infectious disease transmission, such as \sarscovii.
 The original approach simulates contact patterns between
 age groups and geographic patches connected by recurrently mobile individuals,
 and considers changes to mixing between patches due to reduced mobility among some individuals.
@@ -16,11 +16,25 @@ such that the actual number of contacts formed reflects both elements.
 This change is incorporated into each separate mixing ``pool'' where contacts are formed,
 and ensures that the number of contacts simulated from age group $a$ to age group $a'$
 will equal those from age group $a'$ to age group $a$.
+% JK: this next sentence added from suggestion in method.tex & also based on the comment below
+This revised approach can also ensure contacts balance
+if population sizes change over time,
+such as in the case of large differntial mortality by age group or patch;
+or if the numbers of contacts formed per-person differ by patch,
+such as if individuals in some patches have higher numbers of work contacts.
 \par
 The second key change in the proposed approach is to
 % SM: the issue/solution also applies if
-% the occupational or household, etc. context might be different between patches
-% [i.e. not just age-distribution being different between patches] - could mention that here?
+%     the occupational or household, etc. context might be different between patches
+%     [i.e. not just age-distribution being different between patches] - could mention that here?
+% JK: Hmm, do you mean different numbers of contacts formed per-person for each patch?
+%     I actually think that is more related to contact balancing above,
+%     as different contact numbers by patch could still be integrated in a model
+%     that does not implement change 2 = different mixing patterns by type of contact;
+%     in which case, those patterns would just presumably be the weighted average
+%     of all the patterns across different contact types.
+%     But I did add an extra comment about different contact numbers by patch
+%     to the previous paragraph.
 maintain separate mixing patterns for each type of contact,
 only aggregating the contribution of different contact types to overall transmission
 within the force of infection equation.

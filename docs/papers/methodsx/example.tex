@@ -1,29 +1,30 @@
 \section{Example}\label{ex}
 % SM: include mention of ethics review/REB approval here from UofT (similar to the serial interval paper).
+% JK: I added in the acknowledgements in meta.tex (same as serial interval paper)
+%     but let me know if it should be here instead?
 % HM: We describe all ON specific data here? For others want to implement the method,
-% they will need to change data section to their context? so polymond Canada data will be here too?
+%     they will need to change data section to their context? so polymond Canada data will be here too?
 % JK: Yes, that's right -- basically they can plop in their own methods / data to obtain
-% the four parameters required for our mixing approach,
-% those 4 parameters that are listed at the end of section 3.1: Pga, Caa'y, Bgg', hy.
+%     the four parameters required for our mixing approach,
+%     those 4 parameters that are listed at the end of section 3.1: Pga, Caa'y, Bgg', hy.
 We applied the proposed methodology for generating a mixing matrix $C_{gag'a'y}$,
 which reflects patterns of age mixing, recurrent mobility between patches, and different contact types,
 to the population (14 million) of Ontario, Canada, in the context of \covid transmission modelling.
-Ten patches were defined based on groupings of the 513 forward sortation areas (FSAs)
+Ten patches were defined based on groupings of the 513 forward sortation areas (FSAs)%
 % SM: for the patches, cite either Brown et al. or the ICES Dashboard
-% depending on which FSA-decile file we used for this example.
-% (will forward email re: the ICES dashboard for the reference on how the FSAs were converted to deciles).
+%     depending on which FSA-decile file we used for this example.
+%     (will forward email re: the ICES dashboard for the reference on how the FSAs were converted to deciles).
+% JK: cited just below -- reading the embedded documentation for that xlsx file (FSA-decile mapping),
+%     the dates they give are 15 Jan 2020 - 28 Mar 2021, so I wrote that,
+%     but not sure if there is an earlier version we were working from instead?
 \footnote{Each FSA is the first 3 characters of the postal code.} in Ontario.
-The FSA groupings reflect deciles of cumulative \covid cases, excluding cases among residents of long-term are homes,
-between January 2020--March 28. 2021.
-% SM: if using ICES dashboad FSA-decile; the date is Jan 2020 to Jan 16, 2021 if using Brown et al FSA-decile.
-% and for this sentence, cite Brown et al or the ICES Dashboard.
-% TODO: double check this period.
+The FSA groupings reflect deciles of cumulative \covid cases,
+excluding cases among residents of long-term are homes,
+between 15 January 2020 and 28 March 2021 \cite{ICES2020}.
 Thus each patch represents approximately 10\% of the Ontario population (\mbox{37--68} FSAs),
 but not contiguous geographic regions.
 Such definitions were used to support allocation and prioritization of \covid vaccines
-to ``hot spot'' neighbourhoods in Ontario \cite{Mishra2021}.
-% SM: also cite Brown et al.
-% https://covid19-sciencetable.ca/sciencebrief/covid-19-vaccination-strategy-for-ontario-using-age-and-neighbourhood-based-prioritization/
+to ``hot spot'' neighbourhoods in Ontario \cite{Mishra2021,Brown2021}.
 Figure~\ref{fig:map} illustrates the locations of the FSAs and their decile rank,
 which is synonymous with their patch index.
 Figure~\ref{fig:Yg} plots the daily incidence of \covid cases per patch, and
@@ -41,9 +42,9 @@ Age groups were then defined to reflect historical and hypothetical \covid vacci
     \includegraphics[width=.31\linewidth]{ontario-south.png} &
     \includegraphics[width=.39\linewidth]{ontario-gta.png}
   \end{tabular}
+  % JK: note - changed the colormap to improve contrast for mid-levels (yellows)
   \caption{Ontario forward sorting areas (FSAs, $N=513$),
-    stratified by decile rank in cumulative \covid cases between Dec 2020--May 2021;
-    % TODO: double check this period. % SM: see above
+    stratified by decile rank in cumulative \covid cases between 15 Jan 2020--28 Mar 2021;
     decile rank was used to group FSAs into 10 patches for transmission modelling.}
   \label{fig:map}
 \end{figure}
@@ -53,9 +54,9 @@ Ontario population sizes by age and FSA $P_{ga}$ were obtained from
 the 2016 Canadian Census via Statistics Canada%
 \footnote{\hreftt{https://www150.statcan.gc.ca/n1/en/catalogue/98-400-X2016008}}
 and aggregated from 1-year age groups ($a_1$) into 5-year ($a_5$) and target ($a_*$) age groups as needed.
-We obtained the final output contact matrices $C_{aa'y}$ for Canada from \cite{Prem2017},
+We obtained the final output contact matrices $C_{aa'y}$ for Canada from \cite{Prem2021},
 for each of the ``home'', ``work'', ``school'', and ``others'' contact types,
-as well as the population size of each 5-year age group used in \cite{Prem2017}.%
+as well as the population size of each 5-year age group used in \cite{Prem2021}.%
 \footnote{\raggedright
   The rows for Canada in
   \texttt{contacts\_home.rdata},
@@ -65,51 +66,52 @@ as well as the population size of each 5-year age group used in \cite{Prem2017}.
   from \texttt{/generate\_synthetic\_matrices/output/syntheticcontactmatrices2020/} and
   \texttt{poptotal.rdata}
   from \texttt{/generate\_synthetic\_matrices/input/pop/}
-  within \hreftt{https://github.com/kieshaprem/synthetic-contact-matrices/tree/67c824b}.}
+  within \hreftt{https://github.com/kieshaprem/synthetic-contact-matrices/tree/6e0eebc}.}
 We assumed that residence patch did not influence the numbers of contacts formed per person,
 only with whom those contacts are formed,
 % MH: Wouldn't variability in population sizes per patch influence contacts per person?
-% I thought we were incorporating variable age distribution?
+%     I thought we were incorporating variable age distribution?
 % JK: Hmm, I meant "per person" to mean "self", rather than "other".
-% So the total number of contacts I form is fixed,
-% but the patterns of with whom they're formed are responsive to the pool.
-% Maybe it was readling like, the number of contacts I formed per *other* person?
-% Does this addition clarify?
+%     So the total number of contacts I form is fixed,
+%     but the patterns of with whom they're formed are responsive to the pool.
+%     Maybe it was readling like, the number of contacts I formed per *other* person?
+%     Does this addition clarify?
 although such a belief could be incorporated in the model,
 perhaps in Eq.~(\ref{eq:X*.gagay}).
 \par
 The mobility matrix $B_{gg'}$ between patches was derived using
-private data on geolocation service usage among a sample of approximately 2\% of mobile devices in Ontario.
-% SM: here, can we cite some of Amir's papers as a reference (even if pre-print)?
-Appendix~\ref{app.mob} details the specific methods and assumptions used.
-To summarize:
-Each device was assigned a home FSA ($n$) based on
-the most common location during overnight hours for each calendar month.
-Visits to other FSAs ($n'$) by each device were used to estimate
-the proportion of devices in each FSA that are expected to travel to each other FSA each day, averaged monthly.
-Similarly, the average time spent away from home was used to estimate
-the proportion of devices in each FSA that were mobile within the home FSA.
-We additionally assumed that individuals not in the dataset (approximately 98\%) had
-0.9 the odds of being mobile versus the individuals in the dataset,
-because the number of devices observed each month appeared to vary with mobility restrictions,
-possibly reflecting an intention to travel preceeding use of geolocation services.
+private data on geolocation service usage among
+a sample of approximately 2\% of mobile devices in Ontario \cite{Ghasemi2021}
+during January--December 2020.
+Appendix~\ref{app.mob} details the specific methods and assumptions used; to summarize:
+Each devices was assigned an approximate home location (152.9\,m $\times$ 152.4\,m)
+based on the most common location during overnight hours for each calendar month.
+This location was then used to determine the home FSA ($n$).
+The proportion of time spent outside the home location each day,
+stratified by inside vs outside the home FSA,
+was also used to estimate the relative proportions of intra- vs inter-FSA mobility.
+Finally, the total numbers of visits to other FSAs ($n'$) by all devices were used to estimate
+the conditional probability of travelling from FSA $n$ to FSA $n'$,
+given that an individual will travel outside the home FSA $n$.
 % MH: Might be helpful to add rationale for some of these assumptions
 % JK: Good point!
 % MH: This is the first we have discussed intra-FSA mobility
-% and we only outline assumptions for unobserved individuals.
-% What about intra-FSA mobility of observed individuals who didn't travel to other FSAs?
-% What about intra-FSA mobility of individuals who did travel to other FSAs?
-% Also, wouldn't most people be mobile within home FSA
-% to run critical errands such as grocery shopping?
-% Does this mean that we are assuming some individuals are not mobile whatsoever?
-% Think more explanation is needed here.
-% NOTE: After reading through manuscript, see we discuss intra-FSA mobility in section A.3.3.
-% Would specifically reference the appendix here.
+%     and we only outline assumptions for unobserved individuals.
+%     What about intra-FSA mobility of observed individuals who didn't travel to other FSAs?
+%     What about intra-FSA mobility of individuals who did travel to other FSAs?
+%     Also, wouldn't most people be mobile within home FSA
+%     to run critical errands such as grocery shopping?
+%     Does this mean that we are assuming some individuals are not mobile whatsoever?
+%     Think more explanation is needed here.
+%     NOTE: After reading through manuscript, see we discuss intra-FSA mobility in section A.3.3.
+%     Would specifically reference the appendix here.
 % JK: Gotcha -- yeah, we do discuss most of this in A.3,
-% which we did mention just above, before "To summarize:"
-% Do you think it's worth repeating again?
-% Also rephrased the details about intra-FSA mobility to better reflect
-% the revised methods.
+%     which we did mention just above, before "To summarize:"
+%     Do you think it's worth repeating again?
+%     Also rephrased the details about intra-FSA mobility to better reflect
+%     the revised methods.
+% JK: [update] largely revised again to reflect
+%     most recent updates to methods for computing the mobility matrix.
 \par
 The contribution of each FSA to overall mobility of the patch/decile (group of FSAs)
 was then aggregated as:
@@ -117,8 +119,7 @@ was then aggregated as:
   B_{gg'} = \sum_{n \in S_g}\sum_{n' \in S_{g'}} B_{nn'}
 \end{equation}
 where $S_g$ is the set of FSAs ($n$) corresponding to patch/decile $g$.
-Mobility matrices were estimated for each month in the available dataset,
-spanning Jan 2020--Dec 2020.
+Mobility matrices were estimated for each month in the available dataset (Jan--Dec 2020).
 A reference period reflecting pre-pandemic conditions was defined as Jan--Feb 2020;
 unless otherwise specified, all subsequent results use the average mobility patterns during that period
 (Figure~\ref{fig:Bgg}).
@@ -127,13 +128,13 @@ although such differences could be included in the model by adding a relative ra
 \begin{figure}
   \centering
   \begin{subfigure}{0.49\linewidth}
-    \includegraphics[width=\linewidth]{Bggi}
-    \caption{Inter-FSA mobility}
+    \includegraphics[width=\linewidth]{Bcgg}
+    \caption{Conditional inter-FSA mobility}
     \label{fig:Bggo}
   \end{subfigure}\hfill%
   \begin{subfigure}{0.49\linewidth}
     \includegraphics[width=\linewidth]{Bgg}
-    \caption{Inter + intra-FSA mobility}
+    \caption{Overall inter/intra-FSA mobility}
     \label{fig:Bggd}
   \end{subfigure}
   \caption{Mobility matrix $B_{gg'}$, representing
@@ -142,7 +143,7 @@ although such differences could be included in the model by adding a relative ra
   \label{fig:Bgg}
   \floatfoot{Derived from mobile device geolocation data;
     deciles represent groupings of Ontario forward sortation areas (FSAs)
-    by cumulative \covid cases between Dec 2020--May 2021; % TODO: double check this period.
+    by cumulative \covid cases between 15 Jan 2020--28 Mar 2021;
     colour scale is square-root transformed to improve perception of smaller values;
     reference period: Jan--Feb 2020.}
 \end{figure}
@@ -150,15 +151,15 @@ although such differences could be included in the model by adding a relative ra
 Finally, we specified the proportions of each contact type assumed to be formed with the home pool:
 % MH: Why not state proportions that have been set for travel pool if we are stating for the home pool?
 % JK: So it should be all others (1-hy) that are formed with the travel pool---
-% I've added a bit of detail in the methods (2.2.2) to clarify. Does that help?
+%     I've added a bit of detail in the methods (2.2.2) to clarify. Does that help?
 % SM: yes, great point by MH and it helps re the current explanation
 % MH: Also may be helpful to add context here in how this connects to individual mobility.
-% e.g. "we specified proprotions of each contact type assumed to be formed with the home pool
-% (i.e. proportions of contact types for "not mobile" individuals).:
+%     e.g. "we specified proprotions of each contact type assumed to be formed with the home pool
+%     (i.e. proportions of contact types for "not mobile" individuals).:
 % JK: now that the definitions of non-mobile etc. are more clear above,
-% maybe not needed to add more detail here?
+%     maybe not needed to add more detail here?
 \begin{equation}
-  h_y = \left\{
+  h_y = \left\{\textstyle
   \textsf{home}:   1,\enspace
   \textsf{work}:   0,\enspace
   \textsf{school}: 0,\enspace
@@ -172,18 +173,21 @@ and presents all major intermediate results.
 % ==================================================================================================
 \subsection{Results}\label{ex:results}
 % SM: so we made explicit that we did not 'modify' the age-age contacts by contact type beyond Prem et al.
-% which means we still would want to fit to observed data on cases by patches, etc.
-% So, just as age-distribution may be different between patches;
-% so might the age-specific contacts by contact time
-% (for example, a patch may have larger  household sizes; a larger subset of the population who work in high-contact occupations, etc.)
-% - so can translate/relate this re: how important the element of patch-context might be.
-% Could bring that up in Conclusion?
-Figure~\ref{fig:C4AAyi} illustrates the contact matrices $C_{aa'y}$ from \citet{Prem2017},
+%     which means we still would want to fit to observed data on cases by patches, etc.
+% JK: Yes that's right.
+% SM: So, just as age-distribution may be different between patches;
+%     so might the age-specific contacts by contact time
+%     (for example, a patch may have larger  household sizes;
+%     a larger subset of the population who work in high-contact occupations, etc.)
+%     - so can translate/relate this re: how important the element of patch-context might be.
+%     Could bring that up in Conclusion?
+% JK: added to the conclusion! (end of para 2)
+Figure~\ref{fig:C4AAyi} illustrates the contact matrices $C_{aa'y}$ from \citet{Prem2021},
 before and after the steps of unweighting by population age distributions, Eq.~(\ref{eq:C^u}),
 and ensuring contact balancing, Eq.~(\ref{eq:C^ub}).
 Figure~\ref{fig:C4AAyd} illustrates the differences in contact matrices between each step.
 These differences can be explained as follows.
-The Canadian age distribution used by \citet{Prem2017} (Figure~\ref{fig:Pga}, black dashed line),
+The Canadian age distribution used by \citet{Prem2021} (Figure~\ref{fig:Pga}, black dashed line),
 is below the mean for the youngest and oldest age groups;
 thus inverting the weighting by this age distribution
 increases the contacts expected with these age groups (Figure~\ref{fig:C4AAyd01}).
@@ -204,7 +208,7 @@ not the total contacts formed by that age group.%
   \setlength{\belowcaptionskip}{.5\smallskipamount}
   \begin{subfigure}{\linewidth}
     \includegraphics[width=\linewidth]{C4AAy0}
-    \caption{Original contact matrix from \cite{Prem2017}, $C_{aa'y}$}
+    \caption{Original contact matrix from \cite{Prem2021}, $C_{aa'y}$}
     \label{fig:C4AAy0}
   \end{subfigure}
   \begin{subfigure}{\linewidth}
@@ -219,9 +223,9 @@ not the total contacts formed by that age group.%
   \end{subfigure}
   \caption{Intermediate results in obtaining unweighted and balanced age contact matrices $C^{ub}_{aa'y}$
     (expected number of type $y$ contacts per person per day in each age group $a$, with those other age groups $a'$)
-    from population-weighted matrices $C_{aa'y}$ from \cite{Prem2017} which may not satisfy contact balancing}
+    from population-weighted matrices $C_{aa'y}$ from \cite{Prem2021} which may not satisfy contact balancing}
   \label{fig:C4AAyi}
-  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2017};
+  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2021};
     colour scales are square-root transformed to improve perception of smaller values.}
 \end{figure}
 \begin{figure}
@@ -242,7 +246,7 @@ not the total contacts formed by that age group.%
   \end{subfigure}
   \caption{Differences between intermediate results shown in Figure~\ref{fig:C4AAyi}}
   \label{fig:C4AAyd}
-  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2017};
+  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2021};
     colour scales are square-root transformed to improve perception of smaller values.}
 \end{figure}
 \begin{figure}
@@ -265,7 +269,7 @@ not the total contacts formed by that age group.%
     (expected number of type $y$ contacts per person per day in each age group $a_*$, with those from age groups $a'_*$)
     from matrices $C^{ub}_{a_5a'_5y}$ with 5-year age stratifications $a_5$}
   \label{fig:C4**y}
-  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2017};
+  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2021};
     colour scales are square-root transformed to improve perception of smaller values;
     the horizontal streaks in (\subref{fig:C4aay}) corresponding to age groups 0--11 and 16--39 are expected,
     as more contacts will be formed with larger age groups.}
@@ -283,9 +287,9 @@ although some details among the large 16--39 age group are lost due to substanti
     for each intermediate step in obtaining $C^{ub}_{a_*a'_*y}$,
     stratified by contact type.}
   \label{fig:C4Ay}
-  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2017};
+  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2021};
     modelled contacts for each age group are plotted at the midpoint of the age group;
-    the cut points for the original age groups $a_5$ from \cite{Prem2017} and
+    the cut points for the original age groups $a_5$ from \cite{Prem2021} and
     the target age groups $a_*$ in our application
     are indicated on the bottom and top x-axes, respectively.}
 \end{figure}
@@ -317,8 +321,9 @@ not only when either travels to the others' patch,
 but also when they both travel to a third patch.
 Thus, the degree of mixing between patches using this approach
 % SM: this sentence/statement is a really importnat message/point - can we include in abstract?
+% JK: done!
 is greater than the mobility matrix alone would suggest,
-though still less than if completely random mixing was assumed.
+though less than if completely random mixing was assumed.
 \begin{figure}
   \begin{subfigure}{\linewidth}
     \includegraphics[width=\linewidth]{CX4aay}
@@ -327,7 +332,7 @@ though still less than if completely random mixing was assumed.
   \end{subfigure}
   \begin{subfigure}{\linewidth}
     \includegraphics[width=\linewidth]{CX4ggy}
-    \caption{Stratified by deciles (patches) and contact type; from Eq.~(\ref{eq:Cggy})}
+    \caption{Stratified by patches and contact type; from Eq.~(\ref{eq:Cggy})}
     \label{fig:CX4ggy}
   \end{subfigure}
   \begin{subfigure}{0.48\linewidth}
@@ -339,12 +344,12 @@ though still less than if completely random mixing was assumed.
   \begin{subfigure}{0.48\linewidth}
     \centering
     \includegraphics[width=\linewidth]{CXggy}
-    \caption{Stratified by deciles (patches), sum across contact types}
+    \caption{Stratified by patches, sum across contact types}
     \label{fig:CXggy}
   \end{subfigure}
   \caption{Expected contacts per person per day, stratified by age, decile (patch), and contact type,
     computed as the margins of the overall contact matrices $C_{gag'a'y}$}
   \label{fig:CX4y}
-  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2017};
+  \floatfoot{Contact matrices for Canada, derived from \cite{Prem2021};
     colour scales are square-root transformed to improve perception of smaller values.}
 \end{figure}

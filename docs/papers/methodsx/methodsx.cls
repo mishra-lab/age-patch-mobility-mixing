@@ -11,7 +11,7 @@
 \usepackage[
   style=numeric,
   doi=false,
-  url=false,
+  url=true,
   isbn=false,
   natbib=true,
   backend=biber,
@@ -20,6 +20,7 @@
   minbibnames=3,
   giveninits=true,
 ]{biblatex}
+\renewcommand{\bibfont}{\small}
 % spacing
 \setlength{\parskip}{1ex}
 \setlength{\parindent}{0ex}
