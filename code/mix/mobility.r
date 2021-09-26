@@ -1,106 +1,143 @@
 source('data.r')
 source('plot.r')
 
-# Objective: 1. estimate mobility matrix (decile) from cell-phone count data (FSA)
-#            2. plot some marginal distributions of the mobility data
-
-merge.mobility.margin = function(X,H){
-  # load some needed stuff
-  phones = load.fsa.smartphones()
-  pop = load.fsa.pop(age=FALSE)
-  pop$decile = as.factor(pop$decile)
-  # aggregate over visited
-  S = merge(
-    aggregate(devices.home ~FSA+month,X,mean,na.rm=TRUE,drop=FALSE),
-    aggregate(devices.visit~FSA+month,X,sum, na.rm=TRUE,drop=FALSE))
-  S = merge(S,merge(pop,phones),all.x=TRUE)
-  S = merge(S,H,all.x=TRUE)
-  return(S[order(S$month,S$FSA),]) # reshape for implicit repeat along FSA
+check.align = function(X1,X2,...){ # for DEBUG only
+  args = list(...)
+  for (arg in args){
+    print(mean(X1[[arg]]==X2[[arg]]))
+  }
 }
 
-gen.mobility.refs = function(S,idx.ref){
-  return(list(
-    devices.home  = aggregate(devices.home ~FSA,S[idx.ref,],mean,drop=FALSE)$devices.home,
-    devices.visit = aggregate(devices.visit~FSA,S[idx.ref,],mean,drop=FALSE)$devices.visit,
-    away.time     = aggregate(away.time    ~FSA,S[idx.ref,],mean,drop=FALSE)$away.time
-  ))
+CoV.by = function(X,name,by){
+  X.by = lapply(by,function(i){X[[i]]})
+  print(summary(sapply(split(X,X.by),function(Xi){
+    sd(Xi[[name]]) / mean(Xi[[name]])
+  })))
 }
 
-add.within.fsa.mobility = function(X,S,SR){
-  X = X[order(X$month,X$FSA.visited,X$FSA),]
-  idx.self = X$FSA == X$FSA.visited
-  X[idx.self,]$devices.home = S$devices.home # was NA
-  X[idx.self,]$devices.visit =
-    # TODO: implement ratio psi (assumes 1 for now)
-    S$away.ratio * SR$devices.home - S$devices.visit
-    # pmin(S$away.ratio, 1.5) * pmax(0, SR$devices.home - S$devices.visit)
+plot.mobility = function(Tg,Tn,Xgg,Xnn){
+  Tgc = Tg[Tg$is.covid,]
+  # CoV stats
+  CoV.by(Xgg,'Bc',c('decile','decile.visited'))
+  CoV.by(Tgc,'R.rho.gt','decile')
+  CoV.by(Tg,'R.phi.gt','decile')
+  CoV.by(Tg,'R.phi.0.gt','decile')
+  # Xgg
+  plot.B.approx(Xgg); ggsave(figname('B-vs-Ba'),w=10,h=5)
+  plot.cond.mob(Xgg,'line'); ggsave(figname('Bc-t'),w=10,h=5.5)
+  plot.cond.mob(Xgg,'box');  ggsave(figname('Bc-box'),w=10,h=5)
+  # Tg: p.mob (rho)
+  plot.p.mob(Tg,y='rho.t',style='mean');        ggsave(figname('rho-t'),w=3.5,h=3)
+  plot.p.mob(Tg,y='rho.gt/rho.t',style='line'); ggsave(figname('R-rho-gt'),w=4,h=3)
+  plot.p.mob(Tgc,y='rho.gt/rho.t',style='box'); ggsave(figname('R-rho-box'),w=4,h=3)
+  # Tg: p.intra (phi)
+  plot.p.mob(Tg,y='phi.t',style='mean');        ggsave(figname('phi-t'),w=3.5,h=3)
+  plot.p.mob(Tg,y='phi.gt/phi.t',style='line'); ggsave(figname('R-phi-gt'),w=4,h=3)
+  plot.p.mob(Tg,y='phi.gt/phi.t',style='box');  ggsave(figname('R-phi-box'),w=4,h=3)
+  # Tn
+  plot.ridge.density(Tn,'rho.gt',fill='decile',xmax=2,legend=TRUE) +
+    xlab('Relative time away from home')
+    ggsave(figname('rho-gnt'),w=5.5,h=5)
+  plot.ridge.density(Tn,'phi.gt',fill='decile',xmax=1,legend=TRUE) +
+    xlab('Proportion of away time within home FSA')
+    ggsave(figname('phi-gnt'),w=5.5,h=5)
+  # Xnn
+  Xn = gen.device.ratios(Xnn)
+  plot.ridge.density(Xn,'R.home',xmax=2) +
+    xlab('Reduction in observed devices') + theme(legend.position='top')
+    ggsave(figname('RHt'),w=5,h=5)
+  plot.ridge.density(Xn,'R.visit',xmax=2) +
+    xlab('Reduction in device visits') + theme(legend.position='top')
+    ggsave(figname('RVt'),w=5,h=5)
+}
+
+gen.device.ratios = function(Xnn){
+  Xn = merge(
+    aggregate(devices.home~FSA+month,Xnn,mean),
+    aggregate(devices.visit~FSA+month,Xnn,sum))
+  Xn = Xn[order(Xn$month,Xn$FSA),]
+  Xn.ref = aggregate(cbind(devices.home,devices.visit)~FSA,
+    Xn[Xn$month %in% config$t.ref,],mean)
+  check.align(Xn,Xn.ref,'FSA') # DEBUG == 1
+  Xn$R.home  = aggregate(devices.home~FSA+month,Xn,mean)$devices.home / Xn.ref$devices.home
+  Xn$R.visit = aggregate(devices.visit~FSA+month,Xn,sum)$devices.visit / Xn.ref$devices.visit
+  return(Xn)
+}
+
+gen.p.mob = function(T,by,do.extra=TRUE,rm.src=TRUE){
+  T$is.covid = T$month %in% config$t.covid
+  Ti = aggregate(formula(paste('cbind(t.away.total,t.away.intra) ~',by)),
+    T[!T$is.covid,],mean,na.rm=FALSE,drop=TRUE)
+  T = T[order(T[['month']],T[[by]]),]
+  # check.align(T,Ti,by) # DEBUG == 1
+  T$rho.gt   = T$t.away.total / Ti$t.away.total
+  T$phi.gt   = T$t.away.intra / T$t.away.total
+  if (do.extra){
+    T = T[order(T[[by]],T[['month']]),]
+    T$rho.t   = aggregate(rho.gt~month,T,mean)$rho.gt
+    T$phi.t   = aggregate(phi.gt~month,T,mean)$phi.gt
+    T$phi.0   = mean(T$phi.t)
+    T = T[order(T[['month']],T[[by]]),]
+    T$R.rho.gt = T$rho.gt / T$rho.t
+    T$R.phi.gt = T$phi.gt / T$phi.t
+    T$R.phi.0.gt = T$phi.gt / T$phi.0
+    T$R.rho.g = aggregate(R.rho.gt~decile,T,mean)[[2]]
+    T$R.phi.g = aggregate(R.phi.gt~decile,T,mean)[[2]]
+    T$R.phi.0.g = aggregate(R.phi.0.gt~decile,T,mean)[[2]]
+  }
+  if (rm.src){
+    T$t.away.total = NULL
+    T$t.away.intra = NULL
+  }
+  return(T)
+}
+
+merge.Xnn.pop = function(Xnn,pop){
+  Xn = aggregate(devices.visit~FSA+month,Xnn,sum,drop=FALSE)
+  Xn = merge(Xn,pop,all.x=TRUE)
+  Xn  = Xn[order(Xn$month,Xn$FSA),]
+  Xnn = Xnn[order(Xnn$FSA.visited,Xnn$month,Xnn$FSA),];
+  Xnn$decile = Xn$decile
+  Xnn = Xnn[order(Xnn$FSA,Xnn$month,Xnn$FSA.visited),];
+  Xnn$decile.visited = Xn$decile
+  return(Xnn)
+}
+
+gen.Bc = function(X,by){
+  by.v = paste0(by,'.visited')
+  X.   = aggregate(formula(paste('devices.visit ~',by,'+ month')),X,sum,drop=FALSE)
+  X    = X[order(X[[by.v]],X[['month']],X[[by]]),]
+  # check.align(X,X.,'month',by) # DEBUG == 1
+  X$Bc = X$devices.visit / X.$devices.visit
+  # print(aggregate(formula(paste('Bc ~',by,'+ month')),X,sum)) # DEBUG == 1
   return(X)
-}
-
-mobility.scale.up = function(X,S,SR){
-  X = X[order(X$FSA.visited,X$month,X$FSA),]
-  X$visit.total = X$devices.visit / SR$devices.home * (1 # "extrapolate" the unobserved people
-    + config$phi['unobs.device'] * (S$devices.total - SR$devices.home)
-    + config$phi['no.device'] * (S$pop - S$devices.total))
-  return(X)
-}
-
-plot.mobility.margins = function(S,SR){
-  S$away.hrs   = S$away.time*24
-  S$devices.vt.ht = S$devices.visit / S$devices.home
-  S$devices.vt.v0 = S$devices.visit / SR$devices.visit
-  S$devices.ht.h0 = S$devices.home  / SR$devices.home
-  S$devices.vr.hr = S$devices.vt.v0 / S$devices.ht.h0
-  S$devices.vt.h0 = S$devices.visit / SR$devices.home
-  # print(summary(S[!idx.ref,]$devices.vr.hr))
-  # print(summary(100*S[ idx.ref,]$devices.home / S[ idx.ref,]$devices.total))
-  # print(summary(100*S[!idx.ref,]$devices.home / S[!idx.ref,]$devices.total))
-  # print(summary(100*(S$pop - S$devices.total) / S$pop))
-  # print(summary(S$devices.vt.h0[idx.ref]))
-  g = plot.ridge.density(list(
-    'Home Reduction'         = data.frame(month=S$month,Ratio=S$devices.ht.h0),
-    'Visit Reduction'        = data.frame(month=S$month,Ratio=S$devices.vt.v0),
-    'Visit / Reference Home' = data.frame(month=S$month,Ratio=S$devices.vt.h0)
-  ),'Ratio',xmax=2); ggsave(figname('devices-panel'),w=15,h=5)
-  g = plot.ridge.density(S,x='away.hrs') +
-    labs(x='Hours away from home');
-    ggsave(figname('t-away-hours'),w=5,h=5)
-  g = plot.ridge.density(S,x='away.ratio') +
-    labs(x='Relative time away from home');
-    ggsave(figname('t-away-relative'),w=5,h=5)
-  g = plot.ridge.density(S,x='away.ratio',fill='decile',legend=TRUE) +
-    labs(x='Relative time away from home');
-    ggsave(figname('t-away-relative-g'),w=6,h=5)
-}
-
-save.mobility = function(X,S,key='all'){
-  # NOTE: this is a bit dangerous since we rely on implicit replication of S
-  #       to match X (hence reordering) but it is much faster than merging
-  P.g. = aggregate(pop~decile+month,S,sum,na.rm=TRUE,drop=FALSE)$pop
-  X = X[order(X$FSA.visited,X$month,X$FSA),]; X$decile = S$decile
-  X = X[order(X$FSA,X$month,X$FSA.visited),]; X$decile.visited = S$decile
-  X.gg. = aggregate(visit.total~decile+decile.visited+month,X,sum,na.rm=TRUE,drop=FALSE)
-  X.gg. = X.gg.[order(X.gg.$decile.visited,X.gg.$month,X.gg.$decile),]
-  X.gg.$visit.prop = X.gg.$visit.total / P.g.
-  X.gg.$visit.total = NULL
-  X.gg. = X.gg.[order(X.gg.$month,X.gg.$decile,X.gg.$decile.visited),]
-  write.csv(X.gg.,root.path('data','mix',paste0('mobility_decile_',key,'.csv')),row.names=FALSE)
 }
 
 main.mobility = function(do.plot=TRUE,do.csv=TRUE){
-  H  = load.fsa.t.away()
-  X  = load.fsa.mob()
-  S  = merge.mobility.margin(X,H)
-  SR = gen.mobility.refs(S,S$month %in% config$t.ref)
-  S$away.ratio = S$away.time / SR$away.time
-  if (do.csv){
-    X = mobility.scale.up(X,S,SR)
-    save.mobility(X,S,key='inter')
-    X = add.within.fsa.mobility(X,S,SR)
-    X = mobility.scale.up(X,S,SR)
-    save.mobility(X,S,key='all')
-  }
+  pop = load.fsa.pop(age=FALSE)
+  pop$decile = as.factor(pop$decile)
+  # time away data -> relative mobility vs REF (p.mob) & % mobility intra (p.intra)
+  Tn = merge(load.fsa.t.away(),pop)
+  Tg = aggregate(cbind(t.away.total,t.away.intra)~decile+month,Tn,mean)
+  Tg = gen.p.mob(Tg,'decile')
+  # inter FSA mobility data -> Bc
+  Xnn = load.fsa.mob()
+  Xnn = merge.Xnn.pop(Xnn,pop)
+  Xgg = aggregate(devices.visit~decile+decile.visited+month,Xnn,sum,na.rm=TRUE)
+  Xgg = gen.Bc(Xgg,'decile')
+  Xgg = merge(Xgg,Tg)
+  igg = Xgg$decile == Xgg$decile.visited
+  Xgg$B  = Xgg$rho.gt * (Xgg$phi.gt * igg + (1 - Xgg$phi.gt) * Xgg$Bc)
+  Xgg$Ba = Xgg$rho.t * Xgg$R.rho.g *
+    ((Xgg$phi.0 * Xgg$R.phi.0.g) * igg + (1 - (Xgg$phi.0 * Xgg$R.phi.0.g)) * Xgg$Bc)
+  Xgg = Xgg[order(Xgg$month,Xgg$decile,Xgg$decile.visited),]
   if (do.plot){
-    plot.mobility.margins(S,SR)
+    Tn  = gen.p.mob(Tn,'FSA',do.extra=FALSE,rm.src=FALSE)
+    # Xnn = gen.Bc(Xnn,'FSA') # unused & expensive
+    plot.mobility(Tg,Tn,Xgg,Xnn)
+  }
+  if (do.csv){
+    Xgg = Xgg[,c('decile','month','decile.visited','rho.t','phi.0','Bc','B','Ba')]
+    write.csv(Xgg,root.path('data','mix','mobility_decile.csv'),row.names=FALSE)
   }
 }

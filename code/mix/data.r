@@ -16,8 +16,7 @@ aggr.mob.decile = function(B,pop){
   p = ave(P$pop,P$group,FUN=function(pop){pop/sum(pop)})
   A = t(tail(outer(c(0,config$group),seq(10),'<=') * outer(c(config$group,Inf),seq(10),'>'),-1))
   B = t(p*A) %*% B %*% A
-  colnames(B) = config$group
-  rownames(B) = config$group
+  dimnames(B)=list(g=config$group,g.=config$group)
   return(B)
 }
 
@@ -39,17 +38,19 @@ load.fsa.pop = function(age=TRUE,aggr=TRUE){
   }
 }
 
-load.group.mob = function(pop,key='all'){
-  mob = read.csv(root.path('data','mix',paste0('mobility_decile_',key,'.csv')))
+load.group.mob = function(pop,B='B',do.ref=TRUE,rm.ref=TRUE){
+  # TODO
+  mob = read.csv(root.path('data','mix','mobility_decile.csv'))
   mob = map.decile(mob)
-  months = levels(mob$month)
-  B.gg.t = lapply(months,function(t){
-    B.m = matrix(mob[mob$month == t,]$visit.prop,nrow=10,ncol=10)
+  months = c(config$t.ref,config$t.covid)
+  B.gg.t = lapply(months,function(month){
+    B.m = t(matrix(mob[mob$month==month,B],nrow=10,ncol=10))
+    dimnames(B.m) = list(g=seq(10),g.=seq(10))
     return(aggr.mob.decile(B.m,pop))
   })
   names(B.gg.t) = months
-  B.gg.t[['REF']] = Reduce('+',B.gg.t[config$t.ref]) / length(config$t.ref)
-  B.gg.t = B.gg.t[c('REF',config$t.covid)]
+  if (do.ref){ B.gg.t[['REF']] = Reduce('+',B.gg.t[config$t.ref]) / length(config$t.ref) }
+  if (rm.ref){ for (month in config$t.ref){ B.gg.t[month] = NULL } }
   return(B.gg.t)
 }
 
@@ -59,11 +60,12 @@ load.fsa.mob = function(refresh=FALSE){
     load(rdata)
   } else {
     FSA = levels(load.fsa.pop(age=FALSE)$FSA)
-    X = read.csv(root.path('data','mix','mobility_fsa.csv'))
-    colnames(X) = c('FSA.visited','FSA','month','devices.visit','visit.prop','province','devices.home')
+    X = read.csv(root.path('data','mix','.raw','inter_fsa_monthly2.csv'))
+    colnames(X) = c('FSA.visited','FSA','month','devices.visit','visit.prop','devices.home')
     X = X[X$FSA %in% FSA & X$FSA.visited %in% FSA,] # remove external travel
+    X = X[X$month %in% c(config$t.ref,config$t.covid),]
+    X$month = factor(X$month)
     X$visit.prop = NULL
-    X$province = NULL
     X = merge(expand.grid(FSA=FSA,FSA.visited=FSA,month=levels(X$month)),X,all.x=TRUE)
     save(X,file=rdata)
   }
@@ -72,9 +74,10 @@ load.fsa.mob = function(refresh=FALSE){
 
 load.fsa.t.away = function(){
   X = read.csv(root.path('data','mix','fsa_t_away.csv'))
-  X$away.time = X$time.away.mean
-  X$time.away.mean = NULL
-  X$time.away.median = NULL
+  X$t.away.inter = X$time.away.inter.mean
+  X$t.away.intra = X$time.away.intra.mean
+  X$t.away.total = X$t.away.intra + X$t.away.inter
+  X[,grepl('time\\.away\\.',names(X))] = NULL
   return(X)
 }
 
