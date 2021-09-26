@@ -1,10 +1,9 @@
 \section{Introduction}
-Contact patterns by age and geography are often key determinants of infectious disease dynamics in humans.
-Arenas et al.\ (2020) develop a method to simulate contact patterns associated with
-age and recurrent mobility between geographic patches, such as for work and school.
-However, their approach makes several assumptions which may not always be suitable.
-We sought to improve the approach to make those assumptions optional,
-and examine the potential influence of each assumption on simulated contact patterns.
+Contact patterns by age and geography mediate the dynamics of directly-transmitted infectious diseases in humans.
+Arenas et al.\ (2020) developed an approach to simulate contact patterns associated with
+age and recurrent mobility between geographic patches, e.g. for work and school, with three important assumptions.
+We sought to build on this approach by relaxing these assumptions (make the assumptions optional),
+and to examine the potential influence of each assumption on simulated contact patterns.
 \section{Methods}
 In our proposed approach:
 age mixing patterns from the \textsc{polymod} study are maintained separate by contact type
@@ -14,10 +13,11 @@ so that changes to the numbers of different types of contacts are reflected in o
 age mixing patterns are demographically adjusted to each mixing pool,
 versus fixed for the whole population (assumption~2),
 so that contacts in the model are balanced; and
-non-mobile individuals can be fully isolated from mobile travellers to their patch,
+non-mobile individuals can be fully isolated from mobile travellers to their geographic patch,
 versus isolation from travellers being impossible (assumption~3),
-so that various intervention options can be explored.
-We compared contact matrices for Ontario, Canada under reduced mobility
+so that various interventions can be explored.
+We compared contact matrices for Ontario, Canada,
+using \textsc{polymod} and cellphone mobility data during the \textsc{covid-19} pandemic (reduced mobility)
 before versus after relaxing each assumption.
 \section{Results}
 Relaxing assumption~1 led to
@@ -26,10 +26,9 @@ Relaxing assumption~2 led to
 more contacts with more populous age strata, and fewer contacts with less populous age strata,
 for all contact types.
 Relaxing assumption~3 led to
-a greater proportion of contacts with residents of the same patch for non-household contact types,
+a greater proportion of contacts with residents of the same geographic patch for non-household contact types,
 and no change to household contacts.
 \section{Significance}
-Precise assumptions about contact patterns
-are important for parameterizing transmission models stratified by age and geography,
-and essential for using those models to answer research questions
-related to differential interventions and/or outcomes by age and/or geography.
+In the context of risk heterogeneity by age and/or geography,
+assumptions used to generate contact patterns yield different inferences about mixing,
+and could therefore influence model-based transmission projections and intervention assessments.
