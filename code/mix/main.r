@@ -2,10 +2,6 @@ args = commandArgs(trailingOnly=TRUE)
 source('config.r')
 set.config('10x10')
 
-if (args[1] == 'epsilon'){
-  source('epsilon.r')
-  main.epsilon()
-}
 if (args[1] == 'mobility'){
   source('mobility.r')
   main.mobility()
@@ -26,5 +22,7 @@ if (args[1] == 'contacts'){
 if (args[1] == 'debug'){
   # DEBUG
   source('mixing.r')
-  gen.save.mixing()
+  plot.map.main()
+  plot.cases(load.cases());
+  ggsave(figname('Yg'),w=8,h=4)
 }
