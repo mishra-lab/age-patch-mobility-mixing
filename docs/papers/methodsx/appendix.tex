@@ -11,7 +11,6 @@ and any corresponding parameters from \cite{Arenas2020}.
 \end{table}
 % ==================================================================================================
 \subsection{Interpretation of ``Non-mobile''}\label{app.non-mob}
-% SM: love this section and its examples which are clear and powerful
 As described in \S~\ref{meth.orig}, \citet{Arenas2020} model the degree of mobility of age group $a$
 using a parameter $\rho_a$ (our notation),
 incorporated into a convenience matrix $M_{gg'}$ per Eq.~(\ref{eq:Arenas.M})\,/\,(\ref{eq:Arenas.M.app}),
@@ -25,25 +24,29 @@ non-mobile individuals may form contacts with visitors to the former's residence
 an assumption which may not be desired depending on the research question or intervention effect.
 The proposed approach to modelling mixing can avoid this assumption if needed
 through the use of ``home pools'' (situation~\ref{situ:non-mob}).
-Figure~\ref{fig:nm} explores the potential influence of this assumption on network connectivity,
-% SM: clarify what "this" refers to (the original assumption?)
+Figure~\ref{fig:nm} explores the potential influence of
+compulsory mixing of non-mobile individuals with mobile visitors on network connectivity,
 as measured by the expected proportion of contacts formed with other patches, in a toy example.
 The example has 3 patches, each having equal population size and random mobility ($B_{gg'} = 1/N_{g'}$).
 Age is not considered.
 \par
-By simulating mixing between non-mobile individuals and mobile visitors
-(Figures~\ref{fig:nm.half.stay}~\&~\ref{fig:nm.diff.stay}, situation~\ref{situ:mob-at-home})
-% SM: minor point - the greying out of "travel pool" label, etc.
-% may need to be a few shades darker to read on some screens.
-% these figures are +++stunning and clear!
-% I also really like the use of the figures to demonstrate the examples
+By simulating mixing between non-mobile individuals and mobile visitors,
+as described in issue~\ref{issue:mobility}
+(Figures \ref{fig:nm.half.stay}~\&~\ref{fig:nm.diff.stay}, situation~\ref{situ:mob-at-home})
 the proportions of contact made with other patches increases for all patches,
 as compared to the proposed approach
-(Figures~\ref{fig:nm.half.home}~\&~\ref{fig:nm.diff.home}, situation~\ref{situ:non-mob}).
+(Figures \ref{fig:nm.half.home}~\&~\ref{fig:nm.diff.home}, situation~\ref{situ:non-mob}).
 The difference is largest in the context of differential mobility by patch
 % SM: here, refer to issue 2? and also could refer back to its implications
-% v. briefly (differential mobility by age, but also other contexts...)
+%     v. briefly (differential mobility by age, but also other contexts...)
+% JK: I guess it kind of includes both issues
+%     2 (different age mixing by contact type) and
+%     3 (whether non-mobile mix with visitors),
+%     but I've added an implication sentence next; hopefully it helps?
 (Figures~\ref{fig:nm.diff.stay}~vs~\ref{fig:nm.diff.home}).
+Thus, the original approach could underestimate
+the transmission reduction impacts of reduced mobility,
+especially when some patches can reduce mobility-related mixing while others cannot.
 \par
 \begin{figure}[ht]
   \newcommand{\threepct}[3]{#1,~#2,~#3\,\%}
@@ -82,15 +85,19 @@ The difference is largest in the context of differential mobility by patch
       \threepct{33}{48}{59} if non-mobile have equal contact rates vs mobile\\
       \threepct{50}{58}{52} if non-mobile have 1/2 contact rates vs mobile}
   \end{subfigure}
-  \caption{Mixing implications for two assumptions about the behaviour of non-mobile populations:
+  \caption{Mixing implications for two assumptions about
+    the behaviour of non-mobile populations (issue~\ref{issue:mobility}):
     ``stay at home'' (\subref{fig:nm.half.home},\subref{fig:nm.diff.home},
     reflecting situation~\ref{situ:non-mob}):
     % SM: in main text, sometimes referred to as issue 3, etc...
-    % suggest either situation or issue for consistency...
+    %     suggest either situation or issue for consistency...
+    % JK: Hmm, I would say the three situations from 2.2.2 all pertain to
+    %     the proposed solution to issue #3 (how changes to mobility are modelled) from 2.1,
+    %     so I reference both here now -- does that work?
     no contacts with other patches (proposed here); vs
     ``stay within patch'' (\subref{fig:nm.half.stay},\subref{fig:nm.diff.stay},
     reflecting situation~\ref{situ:mob-at-home}):
-    no travel, but may form contacts with travellers from other patches (as in \cite{Arenas2020}).}
+    no travel, but may form contacts with travellers from other patches (as~in~\cite{Arenas2020}).}
   \floatfoot{
     Non-mobile populations are indicated with faded colour and green outline;
     patch-specific values ordered from top (yellow) to bottom (purple).
@@ -99,64 +106,68 @@ The difference is largest in the context of differential mobility by patch
     equal population sizes and contact rates by patch;
     random mobility (equal probability of visiting any patch if mobile).}
   \label{fig:nm}
+  \vspace{-5ex} % TEMP
 \end{figure}
 \clearpage
 % ==================================================================================================
 \subsection{Deriving the Mobility Matrix: Example}\label{app.mob}
-% SM: this is great. I like that you outlined each step and put it here - it was a lot of work,
-% and is nice to be transparent but also enable its use by others
-% who can request/work with similar cell phone data, etc.
+% JK: big re-writes to this section to reflect the latest data from AG
+%     (% away time within home FSA)
+%     and corresponding changes to the methodology incorporating the new data
 Here we describe the methods used to obtain the mobility matrix $B_{gg'}$
 for our applied example in Ontario Canada (details in \S~\ref{ex}).
 The mobility matrix represents
 the expected proportions of individuals residing in decile (patch) $g$ who travel to decile $g'$ each day.
-We will begin by producing the FSA-level mobility matrix $B_{nn'}$ ($513 \times 513$),
-and later aggregate this matrix to obtain $B_{gg'}$ ($10 \times 10$).
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Data}\label{app.mob.data}
-The raw data represent logs of: timestamp, geolocation (latitude\,/\,longitude), and unique device ID.
-% SM: cite a paper by Amir if possible where he used these types of data
+The data are from a private anonymized database representing
+approximately 2\% of mobile devices in Ontario.%
+\footnote{\hreftt{https://www.veraset.com}}
+The raw data represent logs of: unique device ID, timestamp, and geolocation
+(latitude\,/\,longitude, with accuracies of meters to tens of meters).
 A log entry (``ping'') is generated when an app on the device
 requests the current geolocation from the service provider.
-Geolocation is logged using Geohash level 6 (1.2 \,km $\times$ 609.4\,m).
-The midpoint of each Geohash is then compared to boundary files representing all 513 Ontario FSAs%
+The geolocation is compared to:
+a) boundary files representing all 513 Ontario FSAs%
 \footnote{\hreftt{https://www150.statcan.gc.ca/n1/en/catalogue/92-179-X}}
-to determine which FSA the ping is attributed to.
-The following definitions were then used to determine device mobility.
+to determine which FSA the ping is attributed to; and
+%b) Geohash-6 tiles (1.2 \,km $\times$ 609.4\,m)
+b) Geohash-7 tiles (152.9\,m $\times$ 152.4\,m)
+to help identify the approximate home location.
+The following definitions were then used in determining device mobility.
 \begin{itemize}
-  \item \textbf{Home FSA:} for each unique device,
-  the FSA with the greatest daily-average time between 8:00\,pm--5:00\,am during each calendar month.
-  Devices for which it was not possible to determine the home FSA were excluded from all further analysis.
+  \item \textbf{Home dwelling:} for each unique device, the Geohash-6 tile with
+  the greatest total evening time (8:00\,pm--5:00\,am) each calendar month.
+  Devices for which it was not possible to determine the home dwelling
+  were excluded from all further analysis.
+  \item \textbf{Home FSA:} for each device, the FSA containing
+  the midpoint of the home dwelling Geohash-6 tile.
   \item \textbf{Visited FSA:} FSAs that a device travelled to within a 24-hour period,
   as defined by at least 2 consecutive pings spanning at least 2 hours within the FSA.
-  By this definition, it was possible for a device to visit multiple FSAs, or no FSA during a given day.
-  Repeated visits to the same FSA by the same device on the same calendar date are treated as a single visit.
-  \item \textbf{Time away from home:} the proportion of time each device
-  % SM: for some reason I thought it was % of devices that were away from home for X period of time
-  % [like at least 1 hour, etc.]? but I think you have already double-checked this with Amir?
-  was estimated to be away from the home dwelling (not just home FSA).
-  The home dwelling was defined by the Geohash 6 tile
-  with the greatest daily-average time between 8:00\,pm and 5:00\,am each month.
-% MH: Given you have already defined home FSA above think this is unneccessary.
-% JK: Hm, but the definition of dwelling has not been introduced?
-% actually, I also need AG to confirm this detail.
-% MH: Also reads as if the "time away from home" is defined by
-% the greatest daily average time between 8:00pm  to 5:00am each month.
-% JK: good point this though, I edited a bit to clarify.
+  By this definition, it was possible for a device to visit
+  multiple FSAs, or no FSA during a given day.
+  Repeated visits to the same FSA by the same device on the same calendar date
+  are treated as a single visit.
+  \item \textbf{Time away from home:} for each device,
+  the proportion of total time spent away from the home dwelling.
+  Only devices with at least 5 pings spanning at least 4 hours were included.
+  \item \textbf{Time away from home within home FSA:} for each device,
+  the proportion of total time spent away from the home dwelling but still within the home FSA.
 \end{itemize}
 \par
 These definitions were applied to each calendar month $t$ from Jan 2020--Dec 2020 (12 months) to compute:
 the mean number of devices with home FSA $n$ per day, denoted $H_{nt}$ or ``observed devices'';
-the mean number of devices with home FSA $n$ that visited FSA $n'$ per day, denoted $V_{nn't}$, or ``device visits''; and
-the mean proportion of time each device spent outside the home per day for each FSA, denoted $W_{nt}$.
+the mean number of devices with home FSA $n$ that visited FSA $n'$ per day, denoted $V_{nn't}$, or ``device visits'';
+the mean proportion of time each device spent outside the home per day for each FSA, denoted $\Psi_{nt}$; and
+the mean proportion of time each device spent outside the home but within the home FSA per day for each FSA, denoted $\Psi^h_{nt}$
 % --------------------------------------------------------------------------------------------------
-\subsubsection{Inter-FSA Mobility}\label{app.mob.inter}
+\subsubsection{Mobility Matrix}\label{app.mob.matrix}
 The inter-FSA mobility matrix $B_{nn't}$ ($n \ne n'$) could be defined as
-the proportion of observed devices that travelled to each FSA ($V_{nn't} / H_{nt}$).
+the expected proportion of observed devices that travelled to each FSA per day ($V_{nn't} / H_{nt}$).
 However, the following analysis of the data suggested that such an approach may bias estimates of mobility.
 A reference period $t_0$ was defined as Jan--Feb 2020, to reflect pre-pandemic conditions.
-The expected values of $H_{nt}$ and $V_{nt} = \sum_{n' V_{nn't}}$ for each FSA during this period were then
-computed and compared to the expected values during each subsequent month.
+The expected values of $H_{nt}$ and $V_{nt} = \sum_{n'}V_{nn't}$ for each FSA $n$ during this period
+were then computed and compared to the expected values during each subsequent month.
 Figure~\ref{fig:RHVt} plots the distribution of ratios
 $H_{nt} / H_{nt_0}$ (\subref{fig:RHt}) and $V_{nt} / V_{nt_0}$ (\subref{fig:RVt})
 across all 513 FSAs, for each month.
@@ -164,20 +175,24 @@ These ratios illustrate that both $V_{nt}$ and $H_{nt}$ were influenced (reduced
 and thus $V_{nn't} / H_{nt}$ would overestimate mobility.
 The trend in $H_{nt}$ might be because apps accessing geolocation services are only opened
 after the user intends to travel, such as map-related apps.
+As such, we term this bias ``mobility-intention bias''.
 \begin{figure}
   \centering
-  \begin{subfigure}{0pt}\refstepcounter{subfigure}\label{fig:RHt}\end{subfigure}%
-  \begin{subfigure}{0pt}\refstepcounter{subfigure}\label{fig:RVt}\end{subfigure}%
-  \begin{subfigure}{0pt}\refstepcounter{subfigure}\label{fig:RH0Vt}\end{subfigure}%
-  \includegraphics[width=\linewidth]{devices-ratios}
+  \begin{subfigure}[t]{0.45\linewidth}
+    \includegraphics[width=\linewidth]{RHt}
+    \caption{Observed devices at home}
+    \label{fig:RHt}
+  \end{subfigure}\quad
+  \begin{subfigure}[t]{0.45\linewidth}
+    \includegraphics[width=\linewidth]{RVt}
+    \caption{Total device visits}
+    \label{fig:RVt}
+  \end{subfigure}
   \caption{Ratios of (\subref{fig:RHt}) observed devices at home
     and (\subref{fig:RVt}) total device visits
     during each month versus during the reference period
     suggesting that the proportion of observed devices travelling each month
-    alone is not reflective of true mobility or else (\subref{fig:RHt}) would be 1;
-    (\subref{fig:RH0Vt}) adjusted mobility measure: ratio of
-    device visits each month from versus
-    the number of observed devices at home during the reference period}
+    alone is not reflective of true mobility or else (\subref{fig:RHt}) would be 1}
   \label{fig:RHVt}
   \floatfoot{Data from approximately 2\% of mobile devices in Ontario, Canada;
     distributions show the density of ratio values across all 513 FSAs;
@@ -185,138 +200,261 @@ after the user intends to travel, such as map-related apps.
     reference period: Jan--Feb 2020.}
 \end{figure}
 \par
-To address the above measurement bias, we chose $H_{nt_0}$ as a more reliable denominator,
-and thus modelled mobility using: $V_{nn't} / H_{nt_0}$ (Figure~\ref{fig:RH0Vt}).%
-\footnote{One limitation of this approach is that the reference period only includes winter months,
-  which may not be representative of mobility year-round or seasonal variablity in mobility.
-  Indeed, all three ratios in Figure~\ref{fig:RHVt} have substantial tails above 1 during Aug--Sept 2020,
-  suggesting that mobility was higher during that period versus the pre-pandemic reference period.}
-The results of Figure~\ref{fig:RHVt} also suggest that
-unobserved devices are less mobile than observed devices;
-thus the unobserved devices would not have the same expected mobility as the observed devices.
-To account for this observation, we first estimated the total number of devices per FSA, denoted $D_n$,
-using Statistics Canada data on smart-phone ownership by age group.%
-\footnote{\hreftt{https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=2210011501}}
-Based on these data, we estimate that $H_{nt}$ represents
-2.2~[IQR:~1.9,~2.6]\,\% of devices pre-pandemic, and
-1.8~[IQR:~1.4,~2.3]\,\% after from March 2020--Jan 2021.
-The number of unobserved devices in FSA $n$ before the pandemic is therefore $D_n - H_{nt_0}$.
+To address the mobility-intention bias, we
+separated the probability of an individual being mobile overall $\rho_{nt}$ from
+the conditional probability of travelling to FSA $n'$
+given that the individual is going to travel outside their home FSA $B^c_{nn't}$.
+We defined this conditional probability of visiting FSA $n'$,
+given that the individual is travelling outside the home FSA as:
+\begin{equation}
+  B^c_{nn't} = \frac{V_{nn't}}{\sum_{n'} V_{nn't}},\quad n \ne n'
+\end{equation}
+which no longer considers the total number of devices observed $H_{nt}$.
+We then aggregated $B^c_{nn't}$ to obtain $B^c_{gg't}$
+as noted in \S~\ref{ex:data}:
+\begin{equation}\label{eq:Bgg.app}
+  B^c_{gg't} = \sum_{n \in S_g}\sum_{n' \in S_g'} B^c_{nn't}
+\end{equation}
+where $S_g$ is the set of FSAs ($n$) corresponding to decile $g$.
 \par
-During the pandemic, additional devices go unobserved ($H_{nt}$ decreases)
-but we assume that the newly unobserved devices do not travel.
-Therefore, the number of devices that may travel unobserved
-is a proportion of $D_n - H_{nt_0}$, not a proportion of $D_n - H_{nt}$.
-Since we have no data on unobserved individuals, we assume that they are mobile
-% SM: 'these' refers to unobserved individuatls?
-at a rate $\phi_1 \le 1$ (default 0.9) relative to the observed devices.
-Similarly, for individuals who do not own devices ($P_n - D_n$) we assume that they are mobile
-at a rate $\phi_2 \le 1$ (default 0.9) relative to the observed devices.
-We assume $\phi_1 \le 1$ and $\phi_2 \le 1$ because, as noted above,
-the trends in Figure~\ref{fig:RHt} suggest that
-individuals are more likely to be observed via geolocation pings after forming an intention to travel.
-Thus, the total proportion of individuals in FSA $n$ who travel to FSA $n'$ during month $t$ is modelled~as:
-\begin{equation}\label{eq:Bnnt.inter}
-  B_{nn't \,(n\ne n')} = \frac{V_{nn't}}{H_{nt_0}} \big[
-  \underbrace{1\vphantom{\phi}}_{\textrm{(a)}}
-  + \underbrace{\phi_1 \left(D_n - H_{nt_0}\right)}_{\textrm{(b)}}
-  + \underbrace{\phi_2 \left(P_n - D_n\right)}_{\textrm{(c)}} \big] P_n^{-1}
+Next, we defined the overall probability of being mobile outside the home
+for individuals from FSA $n$ during month $t$ as:
+\begin{equation}
+  \rho_{nt} = \frac{\Psi_{nt}}{\Psi_{nt_0}}
 \end{equation}
-where (a) represents the observed devices,
-(b) unobserved devices, and
-(c) individuals without devices.
-% --------------------------------------------------------------------------------------------------
-\subsubsection{Intra-FSA Mobility}\label{app.mob.intra}
-Since device visits to other FSA $V_{nn't}$ do not include ``visits'' within the home FSA,
-the proportion of individuals who are mobile (making contacts) within their home FSA is not yet determined.
-During the reference period, we assume that
-all individuals who do not travel to other FSAs are still mobile within their home FSA:
-\begin{equation}\label{eq:Bnnt.intra.t0}
-  B_{nn't_0\,(n = n')} = 1 - \sum_{n'} B_{nn't_0\,(n \ne n')}
-\end{equation}
-During pandemic months, we assume that
-a proportion of such individuals remain mobile within their home FSA;
-this proportion is derived using the time away from home $W_{nt}$ as follows.
-% SM: refer back to Section A.3.1. here
-We assume that individuals who are mobile within their home FSA
-spend $\psi \le 1$ (default 1) as much time away from home as
-those who travel to other FSAs.
-Thus, the model for $W_{nt}$ is:
-\begin{equation}\label{eq:Wnt}
-  W_{nt} = W^*_n \left(\psi B_{nn't\,(n = n')} + \sum_{n'} B_{nn't\,(n \ne n')} \right)
-\end{equation}
-where $W^*_n$ is the expected proportion of time away from home
-among travellers from FSA $n$ to other FSAs.
-During the reference period, all individuals are mobile so $B_{nn't_0\,(n = n')} = 0$ is known, and
-$W^*_n$ can be calculated by rearranging Eq.~(\ref{eq:Wnt}).
-Then, during the pandemic months, the observed $W_{nt}$ can be used to infer $B_{nn't\,(n = n')}$
-by rearranging again:
-\begin{equation}\label{eq:Bnnt.intra.t}
-  B_{nn't\,(n = n')} = \left(\frac{W_{nt}}{W^*_n} - \sum_{n'} B_{nn't\,(n \ne n')}\right) \psi^{-1}
-\end{equation}
-Figure~\ref{fig:W} plots the distribution of expected times away from home $W_{nt}$
-in hours (\subref{fig:W-hours}) and relative to the reference period $W_{nt_0}$ (\subref{fig:W-relative}).
+reflecting an assumption that
+100\% of individuals are mobile outside the home during the reference period~$t_0$,
+and thus $\rho_{nt}$ represents a relative reduction from this baseline.
+This definition of $\rho_{nt}$ aims to avoid the mobility-intention bias
+because it is not directly affected by the numbers of observed devices each month
+($V_{nn't}$ and/or $H_{nt}$), but rather
+the behaviour (relative change in time away from home) associated with those devices.
+Even if observed devices are more mobile than unobserved devices,
+we think the reduction in time away from home relative to $t_0$
+among observed devices/individuals
+would be reasonably representative of the reduction
+among unobserved devices/individuals.
 \par
-During the pandemic months, $B_{nn't}$ will sum to less than 1 for many FSAs;
-this is desirable, since we interpret $1 - \sum_{n'} B_{nn't}$ as
-the expected proportion of individuals in FSA $n$
-who did not leave the home each day during month~$t$,
-and thus would not form any mobility-related contacts.
-Similarly, if $B_{nn't}$ sums to greater than 1, the net result in the force of infection is that
-individuals may form more contacts than expected from the reference period,
-which is also usually acceptable (such as during Aug--Sept 2020).
+Similar to $\rho_{nt}$, we then defined
+the proportion of time away from home spent within the home FSA as:
+\begin{equation}
+  \phi_{nt} = \frac{\Psi^h_{nt}}{\Psi_{nt}}
+\end{equation}
+Figure~\ref{fig:t-away} illustrates the distribution of
+$\rho_{nt}$ (\subref{fig:rho-gt}) and
+$\phi_{nt}$ (\subref{fig:phi-gt})
+across different FSAs, stratified by month and decile.
+We observe that the lower incidence deciles had
+the lowest relative reduction in mobility $\rho_{nt}$ (\subref{fig:rho-gt}),
+and sometimes had greater mobility during the pandemic as compared to the reference period.
+We also observe that the majority of time spent away from home
+is spent within the home FSA $\phi_{nt}$,
+and that individuals in the lowest incidence deciles
+spent the most time outside their home FSA (\subref{fig:phi-gt}).
+We aggregate $\rho_{nt}$ and $\phi_{nt}$ for each decile $g$
+using the mean across corresponding FSA $n$ to yield $\rho_{gt}$ and $\phi_{gt}$.
 \begin{figure}
   \centering
-  \begin{subfigure}{0.4\linewidth}
-    \includegraphics[width=\linewidth]{t-away-hours}
-    \caption{Hours away from home}
-    \label{fig:W-hours}
+  \begin{subfigure}[t]{0.45\linewidth}
+    \includegraphics[width=\linewidth]{rho-gnt}
+    \caption{Proportion of time away from home relative to the reference period
+      ($\rho_{nt}$)}
+    \label{fig:rho-gt}
+  \end{subfigure}\quad
+  \begin{subfigure}[t]{0.45\linewidth}
+    \includegraphics[width=\linewidth]{phi-gnt}
+    \caption{Proportion of time away spent within the home FSA
+      ($\phi_{nt}$)}
+    \label{fig:phi-gt}
   \end{subfigure}
-  \begin{subfigure}{0.4\linewidth}
-    \includegraphics[width=\linewidth]{t-away-relative}
-    \caption{Relative time away versus reference period}
-    \label{fig:W-relative}
-  \end{subfigure}
-  \caption{Expected time away from home in hours and relative to the reference period}
-  \label{fig:W}
+  \caption{Measures of time away from home used to calculate the mobility matrix}
+  \label{fig:t-away}
   \floatfoot{Data from approximately 2\% of mobile devices in Ontario, Canada;
     distributions show the density of ratio values across all 513 FSAs;
-    coloured segments indicate the 4 quantiles of each distributions;
     reference period: Jan--Feb 2020.}
 \end{figure}
 \par
-Finally, as noted in \S~\ref{ex:data}, Eq.~(\ref{eq:Bgg})\,/\,(\ref{eq:Bgg.app})
-can be used to aggregate $B_{nn'}$ to obtain $B_{gg'}$ (repeated here for reference):
-\begin{equation}\label{eq:Bgg.app}
-  B_{gg'} = \sum_{n \in S_g}\sum_{n' \in S_g'} B^h_{nn'}
+Finally, we define the overall mobility matrix $B_{ggt}$ as
+\begin{equation}\label{eq:Bgg.t}
+  B_{gg't} = \rho_{gt} \Big[
+    (\phi_{gt}) \delta_{gg'} + (1-\phi_{gt}) B^c_{gg't}
+  \Big]
 \end{equation}
-where $S_g$ is the set of FSAs ($n$) corresponding to decile $g$.
-Figure~\ref{fig:Bggt} illustrates the monthly matrices $B_{gg't}$ for the study period
-with and without the inferred mobility within the home decile.
-Mobility patterns outlined in Figure~\ref{fig:Bggt} are generally consistent across months,
-with the overall proportions of travelling individuals
-proportional to the ratio $V_{nn't} / H_{nt_0}$ depicted in Figure~\ref{fig:RH0Vt}.
+representing a weighted average of
+the identity matrix $\delta_{gg'}$ and
+the conditional mobility matrix $B^c_{gg't}$, weighted by
+intra-FSA mobility ($\phi_{gt}$) and
+inter-FSA mobility ($1 - \phi_{gt}$), respectively,
+and overall proportional to $\rho_{nt}$.
+% --------------------------------------------------------------------------------------------------
+\subsubsection{Dimensionality Reduction}\label{app.mob.reduce}
+% JK: this section completely new -- and possibly out of scope,
+%     but the work needed to get done for the hotspot modelling,
+%     so might as well write it up...
+As written, Eq.~(\ref{eq:Bgg.t}) requires an additional observation of
+$B^c_{gg't}$, $\phi_{gt}$, and $\rho_{gt}$ for each month $t$.
+If any retrospective data are missing,
+or for projecting $B_{gg't}$ into the future,
+we are interested to know whether any of these three parameters
+can be extrapolated based on a subset of the original inputs.
+\par
+First, we explored whether
+the conditional distribution of mobility destinations $B^c_{gg't}$
+could be replaced by the mean across months:
+\begin{equation}\label{eq:Bc-approx}
+  B^c_{gg'} = \frac{1}{N_t} B^c_{gg't}
+\end{equation}
+Figure~\ref{fig:Bc} plots the elements ($g,g'$) of $B^c_{gg't}$,
+showing the time trend (\subref{fig:Bc-t})
+and overall distribution of values (\subref{fig:Bc-box}).
+Variation in $B^c_{gg't}$ between months was relatively small
+(coefficients of variation were:
+median~[min~(IRQ)~max] = 5.4~[2.4~(4.2,~8.2)~37.9]\%\,)
+suggesting that the conditional probabilities for each month
+could indeed be replaced by the mean as in Eq.~(\ref{eq:Bc-approx}).
 \begin{figure}[ht]
-  \centering
   \begin{subfigure}{\linewidth}
-    \includegraphics[width=\linewidth]{Bggit}
-    \caption{Inter-FSA mobility}
-    \label{fig:Bggot}
+    \includegraphics[width=\linewidth]{Bc-t}
+    \caption{Trend versus month}
+    \label{fig:Bc-t}
   \end{subfigure}
   \begin{subfigure}{\linewidth}
-    \includegraphics[width=\linewidth]{Bggt}
-    \caption{Inter + intra-FSA mobility}
-    \label{fig:Bggdt}
+    \includegraphics[width=\linewidth]{Bc-box}
+    \caption{Distribution of conditional probabilities}
+    \label{fig:Bc-box}
   \end{subfigure}
-  \caption{Mobility matrix $B_{gg'}$, representing
-    the expected proportion of individuals in decile (patch) $g$
-    who are mobile in decile $g'$ per day,
-    stratified by calendar month and the reference period}
+  \caption{Conditional probabilities of
+    travelling from decile $g$ (panels) to decile $g'$ (colours) for Jan--Dec 2020,
+    showing relative stability of conditional probabilities over time}
+  \label{fig:Bc}
+  \floatfoot{Data from approximately 2\% of mobile devices in Ontario, Canada.}
+\end{figure}
+\par
+Next, we explored whether the proportion of time away from home
+for each group and month could be replaced by
+the mean for each month $\rho_{t}$and a relative group effect $R^{\,\rho}_{g}$:
+\begin{equation}\label{eq:rho-gt-approx}
+  \rho_{gt} \approx \rho_{t}\,R^{\,\rho}_{g}
+\end{equation}
+Figure~\ref{fig:rho} plots the mean $\rho_{t}$ for each month,
+and the relative difference $R^{\,\rho}_{g} = \rho_{gt} / \rho_{t}$.
+Again, variation between months in $R^{\,\rho}_{g}$ was small
+(coefficients of variation: 2.8~[1.6~(2.0,~3.6)~4.2]\%\,)
+suggesting that the approximation Eq.~(\ref{eq:rho-gt-approx}) is reasonable.
+We ignore the pre-\covid reference period for estimating $R^{\,\rho}_{g}$,
+as relative mobility $\rho_{gt} = 1$ by definition during this period.
+\begin{figure}[ht]
+  \begin{subfigure}[t]{0.297\linewidth}
+    \includegraphics[width=\linewidth]{rho-t}
+    \caption{Trend versus month: average mobility probability ($\rho_{t}$)}
+    \label{fig:rho-t}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.33\linewidth}
+    \includegraphics[width=\linewidth]{R-rho-gt}
+    \caption{Trend versus month: relative differences in mobility by decile ($\rho_{gt} / \rho_{t}$)}
+    \label{fig:rho-gt}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.33\linewidth}
+    \includegraphics[width=\linewidth]{R-rho-box}
+    \caption{Distribution of relative differences\,* ($\rho_{gt} / \rho_{t}$)}
+    \label{fig:rho-box}
+  \end{subfigure}
+  \caption{Probability of being mobile for each decile $\rho_{gt}$
+    versus the population average,
+    showing relative stability over time}
+  \label{fig:rho}
+  \floatfoot{
+    *\,During March--Dec 2020 only;
+    data from approximately 2\% of mobile devices in Ontario, Canada.}
+\end{figure}
+\par
+Finally, we likewise explored whether the ``intra-FSA mobility''
+(proportion of away time spent within the home FSA)
+for each group and month could be replaced by
+the mean for each month $\phi_{t}$and a relative group effect $R^{\,\phi}_{g}$:
+\begin{equation}\label{eq:phi-gt-approx}
+  \phi_{gt} \approx \phi_{t}\,R^{\,\phi}_{g}
+\end{equation}
+Figure~\ref{fig:rho} plots the mean $\phi_{t}$ for each month,
+and the relative difference $R^{\,\phi}_{g} = \phi_{gt} / \phi_{t}$.
+Again, variation between months in $R^{\,\phi}_{g}$ was small
+(coefficients of variation: 1.3~[0.8~(1.1,~2.5)~4.4]\%\,)
+suggesting that the approximation Eq.~(\ref{eq:phi-gt-approx}) is also reasonable.
+Since data on overall mobility $\rho_{t}$ may be easier to obtain or approximate than
+the proportion of away time spent within the home FSA $\phi_{t}$,
+we may also be interested to remove the time component of $\phi_{t}$ and use fixed $\phi$;
+in this case the approximation is worse, but still very reasonable
+(coefficients of variation: 7.2~[5.1~(6.5,~7.7)~11.2]\%\,).%
+\footnote{It would also be helpful if $\phi_{t}$ could be predicted by $\rho_{t}$,
+  but comparing the plots (Figures~\ref{fig:rho-t}~and~\ref{fig:phi-t}),
+  we see they are poorly correlated.}
+\begin{figure}[ht]
+  \begin{subfigure}[t]{0.297\linewidth}
+    \includegraphics[width=\linewidth]{phi-t}
+    \caption{Trend versus month: average mobility probability ($\phi_{t}$)}
+    \label{fig:phi-t}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.33\linewidth}
+    \includegraphics[width=\linewidth]{R-phi-gt}
+    \caption{Trend versus month: relative differences in mobility by decile ($\phi_{gt} / \phi_{t}$)}
+    \label{fig:phi-gt}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.33\linewidth}
+    \includegraphics[width=\linewidth]{R-phi-box}
+    \caption{Distribution of relative differences ($\phi_{gt} / \phi_{t}$)}
+    \label{fig:phi-box}
+  \end{subfigure}
+  \caption{Conditional probability of intra-FSA mobility for each decile $\phi_{gt}$
+    versus the population average,
+    showing relative stability over time}
+  \label{fig:phi}
+  \floatfoot{
+    Data from approximately 2\% of mobile devices in Ontario, Canada.}
+\end{figure}
+\par
+Thus, overall Eq.(\ref{eq:Bgg.t}) can be re-written as:
+\begin{equation}\label{eq:Bgg.t.approx}
+  B_{gg't} \approx \rho_{t} R^{\,\rho}_{g} \Big[
+    (\phi_{(t)}\,R^{\,\phi}_{g}) \delta_{gg'} + (1-\phi_{(t)}\,R^{\,\phi}_{g}) B^c_{gg't}
+  \Big]
+\end{equation}
+where $\rho_{t}$, and possibly $\phi_{t}$, are the only required inputs.
+Using the simpler approximation with fixed $\phi$, Figure~\ref{fig:Bggt}
+compares (\subref{fig:Bggt-orig}) the unapproximated mobility matrix from Eq.~(\ref{eq:Bgg.t})
+with (\subref{fig:Bggt-approx}) the approximated mobility matrix from Eq.~(\ref{eq:Bgg.t.approx}).
+\begin{figure}[ht]
+  \begin{subfigure}{\linewidth}
+    \includegraphics[width=\linewidth]{Bggt-log}
+    \caption{Observed}
+    \label{fig:Bggt-orig}
+  \end{subfigure}
+  \begin{subfigure}{\linewidth}
+    \includegraphics[width=\linewidth]{Baggt-log}
+    \caption{Approximated}
+    \label{fig:Bggt-approx}
+  \end{subfigure}
+  \caption{Visual comparison of
+    observed mobility matrix $B_{gg't}$, Eq.~(\ref{eq:Bgg.t}) and
+    approximated mobility matrix, Eq.~(\ref{eq:Bgg.t.approx})}
   \label{fig:Bggt}
   \floatfoot{Derived from mobile device geolocation data;
     deciles represent groupings of Ontario forward sortation areas (FSAs)
-    by cumulative \covid cases between Dec 2020--May 2021; % TODO: double check this period.
+    by cumulative \covid cases between 15 Jan 2020--28 Mar 2021;
     colour scale is square-root transformed to improve perception of smaller values;
     reference period: Jan--Feb 2020.}
+\end{figure}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\linewidth]{B-vs-Ba}
+  \caption{Comparison of element values ($g$, panels; $g'$, colours) in the
+    observed mobility matrix $B_{gg't}$, Eq.~(\ref{eq:Bgg.t}) and
+    approximated mobility matrix, Eq.~(\ref{eq:Bgg.t.approx}),
+    showing close agreement}
+  \label{fig:B.vs.Ba}
+  \floatfoot{Derived from mobile device geolocation data;
+    deciles represent groupings of Ontario forward sortation areas (FSAs)
+    by cumulative \covid cases between 15 Jan 2020--28 Mar 2021;
+    scales are log\textsubscript{10} transformed to improve perception of smaller values}
 \end{figure}
 \clearpage
 % ==================================================================================================
@@ -327,7 +465,7 @@ proportional to the ratio $V_{nn't} / H_{nt_0}$ depicted in Figure~\ref{fig:RH0V
   \caption{Time trends in daily \covid cases across the 10 deciles (patches) in Ontario}
   \label{fig:Yg}
   \floatfoot{Deciles represent groupings of Ontario forward sortation areas (FSAs)
-    by cumulative \covid cases between Dec 2020--May 2021.} % TODO: double check this period.
+    by cumulative \covid cases between 15 Jan 2020--28 Mar 2021.}
 \end{figure}
 \begin{figure}[ht]
   \centering
@@ -335,7 +473,7 @@ proportional to the ratio $V_{nn't} / H_{nt_0}$ depicted in Figure~\ref{fig:RH0V
   \caption{Population age distributions across the 10 deciles (patches) in Ontario}
   \label{fig:Pga}
   \floatfoot{Deciles represent groupings of Ontario forward sortation areas (FSAs)
-    by cumulative \covid cases between Dec 2020--May 2021; % TODO: double check this period.
+    by cumulative \covid cases between 15 Jan 2020--28 Mar 2021;
     solid coloured lines correspond to deciles;
-    dashed black line corresponds to the Canadian age distribution used by \citet{Prem2017}.}
+    dashed black line corresponds to Canadian age distribution used by \citet{Prem2017}.}
 \end{figure}
