@@ -10,6 +10,7 @@ figname = function(name,...,ext='.pdf'){ # e.g. /out/fig/fsa/.../name.pdf
   path = root.path('out','fig','mix',...,create=TRUE)
   return(file.path(path,paste0(name,ext)))
 }
+# TODO: remove unused 2x2 
 set.config = function(mode='10x10',n.y=2,...){ # set config stuff in global list variable
   config = list( # see [[mode]] below
     # TODO: remove support for 2x2 ?
