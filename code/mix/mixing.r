@@ -127,7 +127,7 @@ CX.norm = function(CX.gaga.y,P.ga,C.a.y=NULL){
   # - Ci: per person, divide by P.ga (if C.ga.y is NULL)
   # - Cp: probability, divide by P.ga & C.ga (if C.ga.y is given)
   C.gaga.y = lapply(CX.gaga.y,function(X){ X*0 }) # initialize output
-  for (y in seq(config$N$y)){
+  for (y in seq(length(CX.gaga.y))){
     for (g in seq(config$N$g)){
       for (a in seq(config$N$a)){
         c.a.y = ifelse(is.null(C.a.y),1,C.a.y[[y]][a])
@@ -156,31 +156,36 @@ aggr.mix = function(C.gaga,what,vs,P.ga=NULL,aggr=TRUE){
   if (what=='Cp'){ stop('aggr.mix for Cp not yet implemented') }
 }
 
-save.mixing = function(X.gaga.y.t,what){
+melt.mixing = function(X.gaga.y.t,what){
+  # TODO: use what
   X. = do.call(expand.grid,dimnames(X.gaga.y.t[[1]][[1]]))
-  X  = do.call(rbind,lapply(names(X.gaga.y.t),function(t){
+  return(do.call(rbind,lapply(names(X.gaga.y.t),function(t){
     do.call(rbind,lapply(seq(config$N$y),function(y){
-      cbind(t=t,y=config$c.type[y],X.,X=as.vector(X.gaga.y.t[[t]][[y]]))
+      cbind(t=t,y=config$c.type[y],X.,C=as.vector(X.gaga.y.t[[t]][[y]]))
     }))
-  }))
-  write.csv(X,root.path('data','mix','Ci_gagayt.csv'),row.names=FALSE)
+  })))
 }
 
-gen.save.mixing = function(do.save=TRUE){
-  config = set.config(mode='10x10',n.y='2')
+gen.save.mixing = function(do.save=TRUE,norm=TRUE,t=NULL,...){
+  config = set.config(...)
   pop    = load.fsa.pop()
   P.ga   = pop.to.Pga(pop)
   C.AA.y = load.contacts()
   C.aa.y = CAAy.to.Caay(C.AA.y)
   RC.g.y = gen.RC.g.y()
-  B.gg.t = load.group.mob(pop)
-  Ci.gaga.y.t = lapply(names(B.gg.t),function(t){
-    CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,t)
-    return(CX.norm(CX.gaga.y,P.ga))
+  B.gg.t = load.group.mob(pop,B='B')
+  if (missing(t)){ t = names(B.gg.t) }
+  Ci.gaga.y.t = lapply(t,function(ti){
+    CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,ti)
+    if (norm){
+      CX.gaga.y = CX.norm(CX.gaga.y,P.ga)
+    }
+    return(CX.gaga.y)
   })
-  names(Ci.gaga.y.t) = names(B.gg.t)
+  names(Ci.gaga.y.t) = t
   if (do.save){
-    save.mixing(Ci.gaga.y.t)
+    X = melt.mixing(Ci.gaga.y.t)
+    write.csv(X,root.path('data','mix','Ci_gagayt.csv'),row.names=FALSE)
   } else {
     return(Ci.gaga.y.t)
   }
@@ -202,10 +207,10 @@ compare.mixing = function(figdir='compare'){
     config$method[[name]] <<- args[[name]]
     CX = CX.norm(gen.mix.main(P.ga, C.aa.y, RC.g.y, B.gg.t, t),P.ga)
     CX. = Reduce('+',CX)
-    plot.mix(CX,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE); ggsave(figname(paste0('C4iaa',key),figdir),w=14,h=4)
-    plot.mix(CX,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE); ggsave(figname(paste0('C4igg',key),figdir),w=14,h=4)
-    plot.mix(CX.,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE); ggsave(figname(paste0('Ciaa',key),figdir),w=5,h=4)
-    plot.mix(CX.,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE); ggsave(figname(paste0('Cigg',key),figdir),w=5,h=4)
+    plot.mix(CX,'Ci','a',P.ga=P.ga,aggr=TRUE); ggsave(figname(paste0('C4iaa',key),figdir),w=14,h=4)
+    plot.mix(CX,'Ci','g',P.ga=P.ga,aggr=TRUE); ggsave(figname(paste0('C4igg',key),figdir),w=14,h=4)
+    plot.mix(CX.,'Ci','a',P.ga=P.ga,aggr=TRUE); ggsave(figname(paste0('Ciaa',key),figdir),w=5,h=4)
+    plot.mix(CX.,'Ci','g',P.ga=P.ga,aggr=TRUE); ggsave(figname(paste0('Cigg',key),figdir),w=5,h=4)
     return(CX)
   }
   Ci.gaga.y.m = list( # steps: home pool, age adapt, age by type
@@ -269,11 +274,11 @@ main.mixing = function(figdir=''){
     ggsave(figname('C4ay',figdir),w=14,h=4)
   # compare the various versions of C.AA.y
   b.1 = seq(0,length(age.1),5)
-  plot.mix(C.AA.y.0,'Ci','a',trans='sqrt',clim=clim); ggsave(figname('C4AAy0',figdir),w=14,h=4)
-  plot.mix(C.AA.y.1,'Ci','a',trans='sqrt',clim=clim); ggsave(figname('C4AAy1',figdir),w=14,h=4)
-  plot.mix(C.AA.y,  'Ci','a',trans='sqrt',clim=clim); ggsave(figname('C4AAy', figdir),w=14,h=4)
-  plot.mix(C.aa.y,  'Ci','a',trans='sqrt'); ggsave(figname('C4aay', figdir),w=14,h=4)
-  plot.mix(C.11.y,  'Ci','a',trans='sqrt') +
+  plot.mix(C.AA.y.0,'Ci','a',clim=clim); ggsave(figname('C4AAy0',figdir),w=14,h=4)
+  plot.mix(C.AA.y.1,'Ci','a',clim=clim); ggsave(figname('C4AAy1',figdir),w=14,h=4)
+  plot.mix(C.AA.y,  'Ci','a',clim=clim); ggsave(figname('C4AAy', figdir),w=14,h=4)
+  plot.mix(C.aa.y,  'Ci','a'); ggsave(figname('C4aay', figdir),w=14,h=4)
+  plot.mix(C.11.y,  'Ci','a') +
     scale_x_discrete(breaks=b.1) +
     scale_y_discrete(breaks=b.1); ggsave(figname('C411y',figdir),w=14,h=4)
   # difference plots
@@ -287,25 +292,30 @@ main.mixing = function(figdir=''){
   plot.mix(C.AA.y.d02,'Ci','a',trans='nsqrt',clim=c(-2,+2),cmap='RdBu',gez=FALSE)
     ggsave(figname('C4AAy-d02',figdir),w=14,h=4)
   # mobility plots
-  B.ggi.t = load.group.mob(pop,key='inter')
-  B.gg.t = load.group.mob(pop)
-  plot.mix(B.ggi.t[['REF']],'B','g',trans='sqrt'); ggsave(figname('Bggi', figdir),w= 5,h=4)
-  plot.mix(B.gg.t[['REF']],'B','g',trans='sqrt');  ggsave(figname('Bgg',  figdir),w= 5,h=4)
-  plot.mix(B.ggi.t,'B','g',trans='sqrt');          ggsave(figname('Bggit',figdir),w=10,h=4)
-  plot.mix(B.gg.t,'B','g',trans='sqrt');           ggsave(figname('Bggt', figdir),w=10,h=4)
+  Bc.gg.t = load.group.mob(pop,B='Bc')
+  Ba.gg.t = load.group.mob(pop,B='Ba')
+  B.gg.t  = load.group.mob(pop,B='B')
+  plot.mix(Bc.gg.t[['REF']],'Bc','g'); ggsave(figname('Bcgg', figdir),w= 5,h=4)
+  plot.mix(Ba.gg.t[['REF']],'B','g');  ggsave(figname('Bagg', figdir),w= 5,h=4)
+  plot.mix(B.gg.t[['REF']], 'B','g');  ggsave(figname('Bgg',  figdir),w= 5,h=4)
+  plot.mix(Bc.gg.t,'Bc','g');          ggsave(figname('Bcggt',figdir),w=10,h=4)
+  plot.mix(Ba.gg.t,'B','g');           ggsave(figname('Baggt',figdir),w=10,h=4)
+  plot.mix(B.gg.t, 'B','g');           ggsave(figname('Bggt', figdir),w=10,h=4)
+  plot.mix(Ba.gg.t,'B','g',trans='log10'); ggsave(figname('Baggt-log',figdir),w=10,h=4)
+  plot.mix(B.gg.t, 'B','g',trans='log10'); ggsave(figname('Bggt-log', figdir),w=10,h=4)
   # compute 4D
   RC.g.y = gen.RC.g.y()
   CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,'REF')
   Ci.gaga.y = CX.norm(CX.gaga.y,P.ga)
   Ci.gaga   = Reduce('+',Ci.gaga.y)
   # plot 4D margins in a/a', g/g'
-  plot.mix(Ci.gaga.y,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE)
+  plot.mix(Ci.gaga.y,'Ci','a',P.ga=P.ga,aggr=TRUE)
     ggsave(figname('CX4aay',figdir),w=14,h=4)
-  plot.mix(Ci.gaga.y,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE)
+  plot.mix(Ci.gaga.y,'Ci','g',P.ga=P.ga,aggr=TRUE)
     ggsave(figname('CX4ggy',figdir),w=14,h=4)
-  plot.mix(Ci.gaga,'Ci','a',P.ga=P.ga,trans='sqrt',aggr=TRUE)
+  plot.mix(Ci.gaga,'Ci','a',P.ga=P.ga,aggr=TRUE)
     ggsave(figname('CXaay',figdir),w=5,h=4)
-  plot.mix(Ci.gaga,'Ci','g',P.ga=P.ga,trans='sqrt',aggr=TRUE)
+  plot.mix(Ci.gaga,'Ci','g',P.ga=P.ga,aggr=TRUE)
     ggsave(figname('CXggy',figdir),w=5,h=4)
   # compare 2D to 4D: should be exactly the same for REF
   P.a = replicate(config$N$a,colSums(P.ga)/mean(P.ga))
@@ -321,11 +331,11 @@ main.mixing = function(figdir=''){
   lapply(names(C.list),function(n1){
     lapply(names(C.list[[n1]]),function(n2){
       C = C.list[[n1]][[n2]]
-      plot.mix(C,'Ci','a',trans='sqrt') + void() + guides(fill='none')
+      plot.mix(C,'Ci','a') + void() + guides(fill='none')
         ggsave(tikzpath(paste0('CAA-',n1,'-',n2,'.pdf')),w=1,h=1)
     })
   })
-  plot.mix(B.ggi.t[['REF']],'B','g',trans='sqrt') + void() + guides(fill='none')
-    ggsave(tikzpath('Bggi.pdf'),w=1,h=1)
+  plot.mix(Bc.gg.t[['REF']],'Bc','g') + void() + guides(fill='none')
+    ggsave(tikzpath('Bcgg.pdf'),w=1,h=1)
   return(NULL)
 }

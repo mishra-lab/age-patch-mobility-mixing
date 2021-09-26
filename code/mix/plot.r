@@ -3,6 +3,7 @@ library(reshape2)
 library(viridis)
 library(ggplot2)
 library(ggridges)
+library(pals)
 library(scales)
 })
 source('utils.r')
@@ -38,40 +39,40 @@ mix.melt = function(C,what,vs,aggr=TRUE,xfun=NULL,...){
 nsqrt_trans = function(){ # sqrt transform that preserves -/+
   trans_new('nsqrt',function(x){sign(x)*sqrt(abs(x))},function(x){sign(x)*x^2})
 }
-cmap.fun = function(do='color',cmap='inferno',discrete=FALSE,end=.95,...){
-  # it adds joy to my life that every package uses different conventions
-  if (cmap %in% c('inferno')){
-    return(get(paste('scale',do,'viridis',sep='_'))(
-      option=cmap,end=end,discrete=discrete,...))
-  }
-  if (cmap %in% c('Spectral','RdBu')){
-    return(get(paste('scale',do,ifelse(discrete,'brewer','distiller'),sep='_'))(
-      palette=cmap,...))
-  }
+scale_deciles = function(what='color',...){
+  return(switch(what,
+    color = scale_color_discrete(type=rev(tol.rainbow(10)),...),
+    fill  = scale_fill_discrete( type=rev(tol.rainbow(10)),...)
+  ))
 }
 plot.mix = function(C,what,vs,aggr=FALSE,xfun=NULL,
-    trans='identity',clim=c(0,NA),cmap='inferno',gez=TRUE,...){
+    trans='sqrt',clim=c(NA,NA),cmap='inferno',gez=TRUE,...){
   C. = mix.melt(C,what,vs,aggr=aggr,xfun=xfun,...)
   if (gez){ C.$X[C.$X<0] = 0 }
   v.name = switch(what,
     CX = 'Total contacts\n(Millions)',
     Ci = 'Contacts\nper person',
     Cp = 'Contact\nformation\nprobability',
-    B  = '% Decile g pop.\nwho are mobile\nin decile g\' per day')
+    B  = '% decile g\nwho are mobile\nin decile g\'',
+    Bc = '% decile g\ntravellers who\nvisit decile g\'')
   g = ggplot(C.,aes(x=factor(i),y=factor(i.),fill=X,color=X)) +
     geom_tile() +
     coord_fixed(ratio=1) +
     scale_y_discrete(expand=c(0,0)) +
     scale_x_discrete(expand=c(0,0)) +
     labs(x=config$labels[[vs]]$x,y=config$labels[[vs]]$y,fill=v.name) +
-    cmap.fun('fill', cmap=cmap,limits=clim,na.value='gray',trans=trans) +
-    cmap.fun('color',cmap=cmap,limits=clim,na.value='gray',trans=trans) +
     theme_light() +
     guides(color='none',fill=guide_colorbar(barheight=5)) +
     switch(vs,
       a = theme(axis.text.x=element_text(angle=90,hjust=1)),
       n = theme(axis.text.x=element_blank(),axis.text.y=element_blank())
-    )
+    ) +
+    switch(cmap,
+      inferno = scale_fill_viridis_c(option='B',end=.95,limits=clim,trans=trans),
+      RdBu    = scale_fill_distiller(palette='RdBu',limits=clim,trans=trans)) +
+    switch(cmap,
+      inferno = scale_color_viridis_c(option='B',end=.95,limits=clim,trans=trans),
+      RdBu    = scale_color_distiller(palette='RdBu',limits=clim,trans=trans))
   if (is.list.(C)){
     if (length(C) <= 6) { # HACK
       g = g + facet_grid(cols=vars(group))
@@ -95,11 +96,11 @@ plot.ridge.density = function(X,x,y='month',fill='q4',xmax=NULL,legend=FALSE){
     g = g + stat_density_ridges(
         aes_string(fill='factor(stat(quantile))'),
         geom='density_ridges_gradient',calc_ecdf=TRUE,quantiles=4) +
-      cmap.fun('fill',cmap='inferno',discrete=TRUE,alpha=.7,begin=.2,end=.8)
+      scale_fill_viridis_d(option='B',alpha=.7,begin=.2,end=.8)
     }
   if (fill=='decile'){
     g = g + stat_density_ridges(aes_string(fill='decile'),alpha=.5,color=NA) +
-      cmap.fun('fill',cmap='Spectral',discrete=TRUE)
+      scale_deciles('fill')
   }
   g = g + scale_y_discrete(limits=rev) +
     xlim(0,xmax) + labs(x=x,y=y.lab,fill=fill) +
@@ -115,7 +116,7 @@ plot.pop.density = function(){
   P = aggregate(pop~group+age,pop,sum)
   g = ggplot(P,aes(x=age,y=pop/mean(pop))) +
     geom_line(aes(color=group)) +
-    cmap.fun('color','Spectral',discrete=TRUE) +
+    scale_deciles('color') +
     labs(x='Age',y='Relative Population Proportion',color='Decile') +
     theme_light()
   return(g)
@@ -128,7 +129,7 @@ plot.contact.margins = function(C.aa.y.list,age.list,style='line'){
   })
   g = ggplot(C.a.y.,aes(x=Age,y=Contacts,group=vs,color=vs)) +
     facet_grid(cols=vars(Type)) +
-    cmap.fun('color','inferno',discrete=TRUE,begin=.15,end=.85) +
+    scale_color_viridis_d(option='B',begin=.15,end=.85) +
     theme_light()
   if (style=='line'){ g = g + geom_line() }
   if (style=='dots'){ g = g + geom_line() + geom_point(size=1,alpha=.5) }
@@ -136,19 +137,63 @@ plot.contact.margins = function(C.aa.y.list,age.list,style='line'){
   if (style=='bars'){ g = g + geom_bar(aes(fill=vs),stat='identity',position='identity',alpha=.5) }
   return(g)
 }
+plot.cond.mob = function(Xgg,style='line'){
+  g = ggplot(Xgg,aes(y=Bc,color=decile.visited,group=decile.visited)) +
+    facet_wrap(vars(decile),ncol=5) +
+    scale_deciles('color') +
+    labs(y='Conditional destination probability') +
+    theme_light() +
+    guides(color=guide_legend(ncol=10)) + theme(legend.position='top')
+  if (style=='line'){
+    g = g + geom_line(aes(x=month)) + xlab('Month') +
+      scale_x_discrete(guide = guide_axis(angle = 90)) }
+  if (style=='box') {
+    g = g + geom_boxplot(aes(x=decile.visited)) + xlab('Decile Visited') }
+  return(g)
+}
+plot.p.mob = function(Tg,y,style='line'){
+  y.lab = switch(y,
+    'rho.gt/rho.t' = 'Relative time away from home vs mean',
+    'rho.t'        = 'Mean time away from home',
+    'phi.gt/phi.t' = 'Relative proportion of away time within home FSA vs mean',
+    'phi.t'        = 'Mean proportion of away time within home FSA',
+  )
+  g = ggplot(Tg,aes_string(y=y,color='decile',group='decile')) +
+    scale_deciles('color') +
+    ylab(y.lab) +
+    theme_light()
+  if (style=='line'){
+    g = g + geom_line(aes(x=ordered(month))) + xlab('Month') +
+      scale_x_discrete(guide = guide_axis(angle = 90)) }
+  if (style=='mean'){
+    g = g + geom_line(aes(color=NULL,x=ordered(month))) + xlab('Month') +
+      scale_x_discrete(guide = guide_axis(angle = 90)) }
+  if (style=='box'){
+    g = g + geom_boxplot(aes(x=decile)) + xlab('Home Decile') }
+  return(g)
+}
+plot.B.approx = function(Xgg){
+  g = ggplot(Xgg,aes(x=B,y=Ba,color=decile.visited)) +
+    geom_point(size=0.5) +
+    facet_wrap(vars(decile),ncol=5) +
+    scale_x_continuous(trans='log10') + xlab('Observed Mobility') +
+    scale_y_continuous(trans='log10') + ylab('Approximated Mobility') +
+    scale_deciles('color') +
+    theme_light() +
+    guides(color=guide_legend(ncol=10)) + theme(legend.position='top')
+  return(g)
+}
 plot.cases = function(cases){
   g = ggplot(cases,aes(x=as.Date(t),y=cases,group=decile,color=decile)) +
     geom_line() +
-    cmap.fun('color','Spectral',discrete=TRUE) +
+    scale_deciles('color') +
     labs(y='Cases',x='Date') +
     theme_light()
   return(g)
 }
-plot.distr = function(C,y,ylabel,cmap='',...){
+plot.distr = function(C,y,ylabel,...){
   g = ggplot(C,aes_string(y=y,...)) +
     geom_boxplot(alpha=.2,aes(x=decile)) +
-    cmap.fun('color',cmap=cmap,discrete=TRUE) +
-    cmap.fun('fill',cmap=cmap,discrete=TRUE) +
     labs(y=ylabel,x='Decile') +
     lims(y=c(0,30)) +
     theme_light()
@@ -156,9 +201,10 @@ plot.distr = function(C,y,ylabel,cmap='',...){
 }
 plot.map = function(shp=NULL){
   if (is.null(shp)){ shp = load.shape() }
+  shp$decile = factor(shp$decile,levels=seq(10))
   g = ggplot(shp) +
-    geom_sf(aes(fill=factor(decile,levels=seq(10))),lwd=.0) +
-    cmap.fun('fill',cmap='Spectral',discrete=TRUE,drop=FALSE) +
+    geom_sf(aes(fill=decile),lwd=.1,color='white') +
+    scale_deciles('fill',drop=FALSE) +
     labs(fill='Decile') +
     theme_light()
   return(g)
