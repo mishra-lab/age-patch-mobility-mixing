@@ -27,8 +27,8 @@ map.decile = function(x){
 }
 
 load.fsa.pop = function(age=TRUE,aggr=TRUE){
-  dec = read.csv(root.path('data','mix','fsa_decile.csv'))
-  pop = read.csv(root.path('data','mix','pop_age_fsa.csv'))
+  dec = read.csv(root.path('data','fsa_decile.csv'))
+  pop = read.csv(root.path('data','pop_age_fsa.csv'))
   if (aggr){ pop = aggr.age(pop,age=age) }
   pop = merge(pop,map.decile(dec))
   if (age){
@@ -40,7 +40,7 @@ load.fsa.pop = function(age=TRUE,aggr=TRUE){
 
 load.group.mob = function(pop,B='B',do.ref=TRUE,rm.ref=TRUE){
   # TODO
-  mob = read.csv(root.path('data','mix','mobility_decile.csv'))
+  mob = read.csv(root.path('data','mobility_decile.csv'))
   mob = map.decile(mob)
   months = c(config$t.ref,config$t.covid)
   B.gg.t = lapply(months,function(month){
@@ -55,12 +55,12 @@ load.group.mob = function(pop,B='B',do.ref=TRUE,rm.ref=TRUE){
 }
 
 load.fsa.mob = function(refresh=FALSE){
-  rdata = root.path('data','mix','.rdata','mobility_fsa.rdata')
+  rdata = root.path('data','.rdata','mobility_fsa.rdata')
   if (file.exists(rdata) & !refresh){
     load(rdata)
   } else {
     FSA = levels(load.fsa.pop(age=FALSE)$FSA)
-    X = read.csv(root.path('data','mix','.raw','inter_fsa_monthly2.csv'))
+    X = read.csv(root.path('data','.raw','inter_fsa_monthly2.csv'))
     colnames(X) = c('FSA.visited','FSA','month','devices.visit','visit.prop','devices.home')
     X = X[X$FSA %in% FSA & X$FSA.visited %in% FSA,] # remove external travel
     X = X[X$month %in% c(config$t.ref,config$t.covid),]
@@ -73,7 +73,7 @@ load.fsa.mob = function(refresh=FALSE){
 }
 
 load.fsa.t.away = function(){
-  X = read.csv(root.path('data','mix','fsa_t_away.csv'))
+  X = read.csv(root.path('data','fsa_t_away.csv'))
   X$t.away.inter = X$time.away.inter.mean
   X$t.away.intra = X$time.away.intra.mean
   X$t.away.total = X$t.away.intra + X$t.away.inter
@@ -81,14 +81,9 @@ load.fsa.t.away = function(){
   return(X)
 }
 
-load.fsa.smartphones = function(){
-  X = read.csv(root.path('data','mix','smartphones_fsa.csv'))
-  return(X)
-}
-
 load.contacts = function(c.map=NULL,P.norm=TRUE,sym=TRUE){
   if (is.null(c.map)){ c.map = config$c.map }
-  load(root.path('data','mix','.rdata','Prem2017.rdata'))
+  load(root.path('data','.rdata','Prem2017.rdata'))
   C.AA.y = list()
   for (y in names(c.map)){
     C.AA = Reduce('+',Prem2017$C.AA.y[c.map[[y]]])
@@ -102,21 +97,21 @@ load.contacts = function(c.map=NULL,P.norm=TRUE,sym=TRUE){
 }
 
 load.cases = function(){
-  X = read.csv(root.path('data','covid','new-cases.csv'))
+  X = read.csv(root.path('data','new-cases.csv'))
   X$decile = as.factor(X$decile)
   return(X)
 }
 
 load.shape = function(){
   library('sf')
-  load(root.path('data','mix','.raw','lfsa000b16a_e.rdata'))
-  dec = read.csv(root.path('data','mix','fsa_decile.csv'))
+  load(root.path('data','.raw','lfsa000b16a_e.rdata'))
+  dec = read.csv(root.path('data','fsa_decile.csv'))
   return(merge(shp,dec,all.y=TRUE))
 }
 
 clean.raw.pop = function(){
-  fsa = read.csv(root.path('data','mix','fsa.csv'))$FSA
-  pop = read.csv(root.path('data','mix','.raw','pop_age_fsa.csv'))
+  fsa = read.csv(root.path('data','fsa.csv'))$FSA
+  pop = read.csv(root.path('data','.raw','pop_age_fsa.csv'))
   pop$age = as.character(pop$Age_cat)
   pop$Age = NULL
   pop$Age_cat = NULL
@@ -130,13 +125,13 @@ clean.raw.pop = function(){
   pop = col.rename(pop,'Total','pop')
   pop = col.rename(pop,'GEO_NAME','FSA')
   pop = pop[pop$FSA %in% fsa,]
-  write.csv(pop,root.path('data','mix','pop_age_fsa.csv'),row.names=FALSE)
+  write.csv(pop,root.path('data','pop_age_fsa.csv'),row.names=FALSE)
 }
 
 clean.Prem2017 = function(){
   # TODO: why does rdata school =/= Prem2017 appendix for a > 30
   rdata = function(name){
-    load(root.path('data','mix','.raw',paste0(name,'.rdata')))
+    load(root.path('data','.raw',paste0(name,'.rdata')))
     return(get(name))
   }
   P.raw = rdata('poptotal')
@@ -149,11 +144,11 @@ clean.Prem2017 = function(){
     })
   )
   # plot.mix(Prem2017$C.AA.y,'Ci','a',trans='sqrt'); ggsave('Rplots.pdf',w=14,h=4) # DEBUG
-  save(Prem2017,file=root.path('data','mix','.rdata','Prem2017.rdata')) # TODO: save as CSV?
+  save(Prem2017,file=root.path('data','.rdata','Prem2017.rdata')) # TODO: save as CSV?
 }
 
 clean.shape = function(which='FSA'){
-  fname = function(ext){ root.path('data','mix','.raw',paste0('lfsa000b16a_e.',ext)) }
+  fname = function(ext){ root.path('data','.raw',paste0('lfsa000b16a_e.',ext)) }
   shp = sf::st_read(dsn=fname('shp'),quiet=TRUE)
   shp = subset(shp,PRNAME=='Ontario')
   shp$FSA = shp$CFSAUID
