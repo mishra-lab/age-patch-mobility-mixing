@@ -46,8 +46,10 @@ main.contacts = function(){
   ylabel = 'Ratio of Contacts vs Lowest Decile'
   Y.vs = melt(rbind(YRc,YRSc),variable.name='decile',value.name='ratio')
   YRC. = melt(YRc,variable.name='decile',value.name='ratio')
-  plot.distr(Y.vs,'ratio',ylabel,color='vs',fill='vs'); ggsave(figname('RCg-dvs','contacts'),width=6,height=4)
-  plot.distr(YRC.,'ratio',ylabel,color='decile',fill='decile',cmap='Spectral') + theme(legend.position='none');
+  plot.distr(Y.vs,'ratio',ylabel,color='vs',fill='vs')
+    ggsave(figname('RCg-dvs','contacts'),width=6,height=4)
+  plot.distr(YRC.,'ratio',ylabel,color='decile',fill='decile') +
+    scale_deciles('color') + scale_deciles('fill') + theme(legend.position='none');
     ggsave(figname('RCg','contacts'),width=6,height=4)
   # print(colMeans(YRSc[,1:10])) # DEBUG
 }
