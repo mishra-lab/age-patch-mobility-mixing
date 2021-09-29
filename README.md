@@ -9,6 +9,7 @@ This project uses a few private datasets, masked from the repo via .gitignore.
 Please contact us for any questions or clarifications about these data.
 
 ## Contact
+jesse.knight@mail.utoronto.ca
 
 ## Reference
 Forthcoming paper (submitted to MethodsX):
