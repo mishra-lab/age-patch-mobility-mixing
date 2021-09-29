@@ -73,7 +73,7 @@ load.fsa.mob = function(refresh=FALSE){
 }
 
 load.fsa.t.away = function(){
-  X = read.csv(root.path('data','fsa_t_away.csv'))
+  X = read.csv(root.path('data','.raw','t_away_fsa.csv'))
   X$t.away.inter = X$time.away.inter.mean
   X$t.away.intra = X$time.away.intra.mean
   X$t.away.total = X$t.away.intra + X$t.away.inter
@@ -97,7 +97,7 @@ load.contacts = function(c.map=NULL,P.norm=TRUE,sym=TRUE){
 }
 
 load.cases = function(){
-  X = read.csv(root.path('data','new-covid-cases.csv'))
+  X = read.csv(root.path('data','covid_cases_decile.csv'))
   X$decile = as.factor(X$decile)
   return(X)
 }
@@ -111,7 +111,7 @@ load.shape = function(){
 
 clean.raw.pop = function(){
   fsa = read.csv(root.path('data','fsa.csv'))$FSA
-  pop = read.csv(root.path('data','.raw','pop_age_fsa.csv'))
+  pop = read.csv(root.path('data','pop_age_fsa.csv')) # TODO: this was .raw before, why?
   pop$age = as.character(pop$Age_cat)
   pop$Age = NULL
   pop$Age_cat = NULL
