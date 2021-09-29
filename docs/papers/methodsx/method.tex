@@ -56,7 +56,8 @@ Three specific issues with the original approach are as follows:
   %     or perhaps in discussion section? i.e. like we do with HIV for example where
   %     we explicitly account for HIV-attributable death reducing a group's available contacts
   %     (b/c less people over time)
-  % JK: @SM added to the conclusion! (end of para 2) SM: noted and nice!
+  % JK: @SM added to the conclusion! (end of para 2)
+  % SM: noted and nice!
   The contact balancing principle states that
   the total number of contacts formed by group $a$ with group $a'$
   should equal the number formed by group $a'$ with group $a$ \cite{Arregui2018}:
@@ -69,9 +70,18 @@ Three specific issues with the original approach are as follows:
   %     since I think a "correct" implementation of "random" mixing would be proportionate
   %     to the total contacts made available by each group (pop size * #-contacts per-person),
   %     and for this reason I prefer "random", as I think it is a slightly more accessible word
-  %     (readers unfamiliar with mixing may wonder: "proportionate" to what? -- 
+  %     (readers unfamiliar with mixing may wonder: "proportionate" to what? --
   %     and we could explain/define but then it may detract from the flow of ideas)
-  %     For now, what about "random (proportionate)" as edited above?  %SM: agree but its just that in the ID modeling textbooks (and in how we teach about mixing and balancing partnerships) though, random is different than proportioante mixing. i.e. random does not account for subgroup population size (i.e. does not have to account for how many contacts could be on offer). Its ok as long as clearly defined....i.e. would consider that other modelers (esp HIV/STI modelers) would read this the way I have and expect it to have been proportionate so I like the solution you posed by explicitly defining that when you uset he term 'random' here - you are referring to propotionate to the total contacts made available by each group. 
+  %     For now, what about "random (proportionate)" as edited above?
+  % SM: agree but its just that in the ID modeling textbooks
+  %     (and in how we teach about mixing and balancing partnerships)
+  %     though, random is different than proportioante mixing.
+  %     i.e. random does not account for subgroup population size
+  %     (i.e. does not have to account for how many contacts could be on offer).
+  %     Its ok as long as clearly defined....i.e. would consider that other modelers
+  %     (esp HIV/STI modelers) would read this the way I have and expect it to have been proportionate
+  %     so I like the solution you posed by explicitly defining that when you uset he term 'random' here
+  %     - you are referring to propotionate to the total contacts made available by each group.
   Eq.~(\ref{eq:balance}) could be satisfied by a single fixed age mixing matrix $\theta_{aa'}$,
   i.e. for the population overall.
   However, in the context of patch-based mixing reflecting recurrent mobility,
@@ -109,7 +119,8 @@ Three specific issues with the original approach are as follows:
   % SM: so here the example is with age-specific effects of the intervention vs. by type of contacts?
   %     clarify this a bit more re: the key message/point here in the example....
   %     do we mean reduced non-household contacts between working-aged adults?
-  % JK: @SM hopefully the revisions & example above now flow better? SM :yes
+  % JK: @SM hopefully the revisions & example above now flow better?
+  % SM: yes
   \item \textbf{Modelling contact \& mobility reductions:}\label{issue:mobility}
   The term $(1-\rho_a)\,\Phi_{ga}(t)$ in Eq.~(\ref{eq:Arenas.lambda})
   represents transmission to non-mobile individuals in patch $g$.
@@ -213,7 +224,8 @@ the contact balancing principle, Eq.~(\ref{eq:balance}),
 due to sampling and/or reporting error in the \polymod survey.
 % SM: did not understand what was meant by "...vs that of the contacts the respondents reported."
 %     refphrase for clarity
-% JK: @SM (re. above) better? SM: yes
+% JK: @SM (re. above) better?
+% SM: yes
 To ensure that the overall mixing matrix $C_{gag'a'y}$ will satisfy the balancing principle,
 the input age mixing matrix $C^u_{aa'y}$ must satisfy the principle.
 % SM: rephrase sentence for clarity as sentence circular?
@@ -231,7 +243,8 @@ However, such changes are reasonable if understood as a correction for sampling 
 \par
 A final challenge in applying the contact matrices from \cite{Prem2021} is that
 % SM: love this part and the solution!
-% JK: @SM :) "it was easy". Narrator: it was not. SM: LOL!
+% JK: @SM :) "it was easy". Narrator: it was not.
+% SM: LOL!
 the 5-year age groups may not align with the age groups of interest.
 Overcoming this challenge is not theoretically required to obtain $C_{gag'a'y}$,
 but we describe a solution here in case it is useful for modelling applications.
