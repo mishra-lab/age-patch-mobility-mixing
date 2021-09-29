@@ -153,10 +153,10 @@ plot.cond.mob = function(Xgg,style='line'){
 }
 plot.p.mob = function(Tg,y,style='line'){
   y.lab = switch(y,
-    'rho.gt/rho.t' = 'Relative time away from home vs mean',
-    'rho.t'        = 'Mean time away from home',
-    'phi.gt/phi.t' = 'Relative proportion of away time within home FSA vs mean',
-    'phi.t'        = 'Mean proportion of away time within home FSA',
+    'rho.gt/rho.t' = 'Relative away time vs mean',
+    'rho.t'        = 'Mean away time',
+    'phi.gt/phi.t' = 'Relative proportion of away time\nwithin home FSA vs mean',
+    'phi.t'        = 'Mean proportion of away time\nwithin home FSA',
   )
   g = ggplot(Tg,aes_string(y=y,color='decile',group='decile')) +
     scale_deciles('color') +
@@ -211,11 +211,11 @@ plot.map = function(shp=NULL){
 }
 plot.map.main = function(ext='.png'){
   shp = load.shape()
-  shp = merge(shp,read.csv(root.path('data','mix','fsa_region.csv')))
+  shp = merge(shp,read.csv(root.path('data','fsa_region.csv')))
   plot.map(subset(shp,substr(FSA,1,1)=='P')) + theme_void() + guides(fill='none');
-    ggsave(figname('ontario-north','map',ext=ext),w=3,h=3,dpi=600)
+    ggsave(figname('ontario-north','..','map',ext=ext),w=3,h=3,dpi=600)
   plot.map(subset(shp,substr(FSA,1,1)!='P')) + theme_void() + guides(fill='none');
-    ggsave(figname('ontario-south','map',ext=ext),w=3,h=3,dpi=600)
+    ggsave(figname('ontario-south','..','map',ext=ext),w=3,h=3,dpi=600)
   plot.map(subset(shp,GTA==1)) + theme_void();
-    ggsave(figname('ontario-gta','map',ext=ext),w=4,h=3,dpi=600)
+    ggsave(figname('ontario-gta','..','map',ext=ext),w=4,h=3,dpi=600)
 }
