@@ -1,0 +1,53 @@
+\usetheme{Malmoe}
+% font
+\usepackage[osf]{biolinum}
+\usepackage{bm}
+% colors
+\definecolor{C0}{HTML}{00204E}
+\definecolor{C1}{HTML}{133EBB}%{335381}
+\definecolor{C2}{HTML}{BB133E}
+\definecolor{C3}{HTML}{999999}
+\setbeamercolor{title}     {fg=C0}
+\setbeamercolor{frametitle}{fg=C0}
+\setbeamercolor{structure} {fg=C0}
+\setbeamercolor{section}   {fg=white,bg=C0}
+\setbeamercolor{link}      {fg=white,bg=C2}
+\setbeamersize{text margin left=2em,text margin right=2em}
+\setbeamercovered{transparent=5}
+\expandafter\def\expandafter\insertshorttitle\expandafter{%
+  \insertshorttitle\hskip 0pt plus 999fill\insertframenumber}
+% links
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=,urlcolor=C2}
+% style
+\usepackage{xspace}
+\newcommand{\covid}{\textsc{covid-19}\xspace}
+\newcommand{\Covid}{\textsc{Covid-19}\xspace}
+\newcommand{\polymod}{\textsc{polymod}\xspace}
+\newcommand{\Polymod}{\textsc{Polymod}\xspace}
+\newcommand{\bfcolor}[1]{\textbf{\color{C2}#1}}
+\newcommand{\paragraph}[1]{\par\textbf{#1}\par}
+\newcommand{\ttilde}{\raisebox{-.8ex}{\textasciitilde}}
+\setbeamertemplate{navigation symbols}{}
+\newcommand{\fnote}[1]{\vfill\scriptsize#1}
+\newcommand{\rom}[1]{\textsc{\expandafter{\romannumeral#1\relax})}}
+\setlength{\tabcolsep}{.5ex}
+\setbeamertemplate{enumerate subitem}{\alph{enumii}.}
+\setbeamertemplate{enumerate subsubitem}{\textsc{\roman{enumiii}}.}
+% figs
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\def\figroot{../../../out/fig}
+\graphicspath{
+  {fig/}
+  {\figroot/fsa/map/}
+  {\figroot/fsa/epsilon/}
+  {\figroot/fsa/contacts/}
+  {\figroot/fsa/pop/}
+  {\figroot/fsa/mobility/}
+  {\figroot/fsa/mixing/10x10/REF/}
+  {\figroot/fsa/mixing/10x10/REF1/}
+}
+% tikz
+\def\tikzroot{../../../code/tikz}
+\input{\tikzroot/config}
