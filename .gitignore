@@ -25,6 +25,9 @@ Rplots.pdf
 *.blg
 *-blx.bib
 *.bcf
+*.nav
+*.snm
+*.vrb
 *.run.xml
 *.synctex
 *.synctex.gz
