@@ -24,7 +24,7 @@ plot.mobility = function(Tg,Tn,Xgg,Xnn){
   CoV.by(Tg,'R.phi.0.gt','decile')
   # Xgg
   plot.B.approx(Xgg); ggsave(figname('B-vs-Ba'),w=10,h=5)
-  plot.cond.mob(Xgg,'line'); ggsave(figname('Bc-t'),w=10,h=5.5)
+  plot.cond.mob(Xgg,'line'); ggsave(figname('Bc-gt'),w=10,h=5.5)
   plot.cond.mob(Xgg,'box');  ggsave(figname('Bc-box'),w=10,h=5)
   # Tg: p.mob (rho)
   plot.p.mob(Tg,y='rho.t',style='mean');        ggsave(figname('rho-t'),w=3.5,h=3)
@@ -138,6 +138,6 @@ main.mobility = function(do.plot=TRUE,do.csv=TRUE){
   }
   if (do.csv){
     Xgg = Xgg[,c('decile','month','decile.visited','rho.t','phi.0','Bc','B','Ba')]
-    write.csv(Xgg,root.path('data','mix','mobility_decile.csv'),row.names=FALSE)
+    write.csv(Xgg,root.path('data','mobility_decile.csv'),row.names=FALSE)
   }
 }

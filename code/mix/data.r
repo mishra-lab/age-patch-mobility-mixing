@@ -97,7 +97,7 @@ load.contacts = function(c.map=NULL,P.norm=TRUE,sym=TRUE){
 }
 
 load.cases = function(){
-  X = read.csv(root.path('data','new-cases.csv'))
+  X = read.csv(root.path('data','new-covid-cases.csv'))
   X$decile = as.factor(X$decile)
   return(X)
 }

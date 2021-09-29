@@ -185,7 +185,7 @@ gen.save.mixing = function(do.save=TRUE,norm=TRUE,t=NULL,...){
   names(Ci.gaga.y.t) = t
   if (do.save){
     X = melt.mixing(Ci.gaga.y.t)
-    write.csv(X,root.path('data','mix','Ci_gagayt.csv'),row.names=FALSE)
+    write.csv(X,root.path('data','Ci_gagayt.csv'),row.names=FALSE)
   } else {
     return(Ci.gaga.y.t)
   }
@@ -243,7 +243,7 @@ main.mixing = function(figdir=''){
   clim=c(0,12.3)
   # load stuff
   config   = set.config(mode='10x10',n.y='4')
-  load(root.path('data','mix','.rdata','Prem2017.rdata')) # -> Prem2017
+  load(root.path('data','.rdata','Prem2017.rdata')) # -> Prem2017
   pop      = load.fsa.pop()
   P.ga     = pop.to.Pga(pop)
   P.a      = colSums(P.ga)
@@ -325,7 +325,7 @@ main.mixing = function(figdir=''){
     ggsave(figname('C4aay-diff',figdir),w=14,h=4) # should be white
   # void plots for tikz figure (grabstract)
   tikzpath = function(...){ root.path('code','tikz','methodsx','grabstract','fig',...) }
-  load(root.path('data','mix','.rdata','Prem2017.rdata'))
+  load(root.path('data','.rdata','Prem2017.rdata'))
   C.list = list('0'=C.AA.y.0,'1'=C.AA.y.1,'2'=C.AA.y)
   P.list = list('0'=Prem2017$P.a/mean(Prem2017$P.a),'1'=rep(1,16),'2'=rep(1,16))
   lapply(names(C.list),function(n1){
