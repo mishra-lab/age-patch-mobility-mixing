@@ -217,6 +217,19 @@ as noted in \S~\ref{ex:data}:
   B^c_{gg't} = \sum_{n \in S_g}\sum_{n' \in S_g'} B^c_{nn't}
 \end{equation}
 where $S_g$ is the set of FSAs ($n$) corresponding to decile $g$.
+Figure~\ref{fig:Bcggt} illustrates the conditional probabilities over the available months.
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{Bcggt}
+  \caption{Conditional probabilities $B^c_{gg't}$ of
+      travelling from decile $g$ to decile $g'$
+      for Mar--Dec 2020, plus REF ($t_0$) as the average of Jan--Feb 2020}
+  \label{fig:Bcggt}
+  \floatfoot{Derived from mobile device geolocation data;
+    deciles represent groupings of Ontario forward sortation areas (FSAs)
+    by cumulative \covid cases between 15 Jan 2020--28 Mar 2021;
+    colour scale is square-root transformed to improve perception of smaller values}
+\end{figure}
 \par
 Next, we defined the overall probability of being mobile outside the home
 for individuals from FSA $n$ during month $t$ as:
@@ -308,18 +321,18 @@ could be replaced by the mean across months:
   B^c_{gg'} = \frac{1}{N_t} B^c_{gg't}
 \end{equation}
 Figure~\ref{fig:Bc} plots the elements ($g,g'$) of $B^c_{gg't}$,
-showing the time trend (\subref{fig:Bc-t})
+showing the time trend (\subref{fig:Bc-gt})
 and overall distribution of values (\subref{fig:Bc-box}).
 Variation in $B^c_{gg't}$ between months was relatively small
 (coefficients of variation were:
 median~[min~(IRQ)~max] = 5.4~[2.4~(4.2,~8.2)~37.9]\%\,)
 suggesting that the conditional probabilities for each month
 could indeed be replaced by the mean as in Eq.~(\ref{eq:Bc-approx}).
-\begin{figure}[ht]
+\begin{figure}[bt]
   \begin{subfigure}{\linewidth}
-    \includegraphics[width=\linewidth]{Bc-t}
+    \includegraphics[width=\linewidth]{Bc-gt}
     \caption{Trend versus month}
-    \label{fig:Bc-t}
+    \label{fig:Bc-gt}
   \end{subfigure}
   \begin{subfigure}{\linewidth}
     \includegraphics[width=\linewidth]{Bc-box}
@@ -346,7 +359,7 @@ Again, variation between months in $R^{\,\rho}_{g}$ was small
 suggesting that the approximation Eq.~(\ref{eq:rho-gt-approx}) is reasonable.
 We ignore the pre-\covid reference period for estimating $R^{\,\rho}_{g}$,
 as relative mobility $\rho_{gt} = 1$ by definition during this period.
-\begin{figure}[ht]
+\begin{figure}[bt]
   \begin{subfigure}[t]{0.297\linewidth}
     \includegraphics[width=\linewidth]{rho-t}
     \caption{Trend versus month: average mobility probability ($\rho_{t}$)}
@@ -391,15 +404,16 @@ in this case the approximation is worse, but still very reasonable
 \footnote{It would also be helpful if $\phi_{t}$ could be predicted by $\rho_{t}$,
   but comparing the plots (Figures~\ref{fig:rho-t}~and~\ref{fig:phi-t}),
   we see they are poorly correlated.}
-\begin{figure}[ht]
+\begin{figure}
   \begin{subfigure}[t]{0.297\linewidth}
     \includegraphics[width=\linewidth]{phi-t}
-    \caption{Trend versus month: average mobility probability ($\phi_{t}$)}
+    \caption{Trend versus month: proportion of away time in home FSA ($\phi_{t}$)}
     \label{fig:phi-t}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.33\linewidth}
     \includegraphics[width=\linewidth]{R-phi-gt}
-    \caption{Trend versus month: relative differences in mobility by decile ($\phi_{gt} / \phi_{t}$)}
+    \caption{Trend versus month: relative differences in
+      proportion of away time in home FSA by decile ($\phi_{gt} / \phi_{t}$)}
     \label{fig:phi-gt}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.33\linewidth}
@@ -439,7 +453,8 @@ with (\subref{fig:Bggt-approx}) the approximated mobility matrix from Eq.~(\ref{
   \end{subfigure}
   \caption{Visual comparison of
     observed mobility matrix $B_{gg't}$, Eq.~(\ref{eq:Bgg.t}) and
-    approximated mobility matrix, Eq.~(\ref{eq:Bgg.t.approx})}
+    approximated mobility matrix, Eq.~(\ref{eq:Bgg.t.approx})
+    for Mar--Dec 2020, plus REF ($t_0$) as the average of Jan--Feb 2020}
   \label{fig:Bggt}
   \floatfoot{Derived from mobile device geolocation data;
     deciles represent groupings of Ontario forward sortation areas (FSAs)
@@ -459,7 +474,7 @@ with (\subref{fig:Bggt-approx}) the approximated mobility matrix from Eq.~(\ref{
   \floatfoot{Derived from mobile device geolocation data;
     deciles represent groupings of Ontario forward sortation areas (FSAs)
     by cumulative \covid cases between 15 Jan 2020--28 Mar 2021;
-    scales are log\textsubscript{10} transformed to improve perception of smaller values}
+    x-y scales are log\textsubscript{10} transformed to improve perception of smaller values}
 \end{figure}
 \clearpage
 % ==================================================================================================

@@ -361,18 +361,20 @@ in Eq.~(\ref{eq:P*}),
 as both are already reflected in the off-diagonal and diagonal elements of $B_{gg'}$, respectively.
 If we assume that mixing by residence patch $g$ within the pool is random,
 we need only consider age mixing within the pool.
-Under completely random mixing,
+Under completely random mixing and with 1 contact per person,
 % SM: do we mean proportionate mixing?
 % JK: see comment above about "random" vs "proportionate"
 the total number of contacts formed between $P^{\,g^*}_{gay}$ and $P^{\,g^*}_{g'a'y}$
 is given by the outer product:
+% JK: note: since actual # contacts are scaled by "C",
+%     this is actually only proportionate to the population sizes here, hence the edit
 \begin{equation}\label{eq:X*r.gagay}
   X^{g^*r}_{gag'a'y} = P^{\,g^*}_{gay} \otimes
     \left. P^{\,g^*}_{g'a'y} \middle/ \textstyle\sum_{g'a'} P^{\,g^*}_{g'a'y}\right.
 \end{equation}
 where the first term represents the absolute population size of ``self'',
 and the second term represents proportions of their contacts among ``other'' strata.
-Then, the patterns of age mixing can be applied via multiplication:
+Then, the numbers and patterns of contacts by age can be applied via multiplication:
 \begin{equation}\label{eq:X*.gagay}
   X^{g^*}_{gag'a'y} = X^{g^*r}_{gag'a'y}
     \left.C^{ub}_{aa'y} \middle/ \textstyle\sum_{a'_1} A_{a'a'_1}\right.
