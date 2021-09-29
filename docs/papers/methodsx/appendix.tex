@@ -93,7 +93,7 @@ especially when some patches can reduce mobility-related mixing while others can
     %     suggest either situation or issue for consistency...
     % JK: @SM I would say the three situations from 2.2.2 all pertain to
     %     the proposed solution to issue #3 (how changes to mobility are modelled) from 2.1,
-    %     so I reference both here now -- does that work?
+    %     so I reference both here now -- does that work? SM: yes
     no contacts with other patches (proposed here); vs
     ``stay within patch'' (\subref{fig:nm.half.stay},\subref{fig:nm.diff.stay},
     reflecting situation~\ref{situ:mob-at-home}):
@@ -288,14 +288,15 @@ inter-FSA mobility ($1 - \phi_{gt}$), respectively,
 and overall proportional to $\rho_{nt}$.
 % --------------------------------------------------------------------------------------------------
 \subsubsection{Dimensionality Reduction}\label{app.mob.reduce}
-% JK: @SM this section completely new -- and possibly out of scope,
+% JK: @SM this section completely new -- and possibly out of scope,  
 %     but the work needed to get done for the hotspot modelling,
 %     so might as well write it up...
+% SM: I actually really really liked that you did this [and yes, critical for the hotspot modeling!]. I like that you also put in here as an application (and that you write up everything you do!).
 As written, Eq.~(\ref{eq:Bgg.t}) requires an additional observation of
 $B^c_{gg't}$, $\phi_{gt}$, and $\rho_{gt}$ for each month $t$.
-If any retrospective data are missing,
+If any retrospective mobility data are missing,
 or for projecting $B_{gg't}$ into the future,
-we are interested to know whether any of these three parameters
+we may be interested to know whether any of these three parameters
 can be extrapolated based on a subset of the original inputs.
 \par
 First, we explored whether
@@ -404,7 +405,7 @@ in this case the approximation is worse, but still very reasonable
     \caption{Distribution of relative differences ($\phi_{gt} / \phi_{t}$)}
     \label{fig:phi-box}
   \end{subfigure}
-  \caption{Conditional probability of intra-FSA mobility for each decile $\phi_{gt}$
+  \caption{Conditional probability of intra-FSA mobility for each decile $\phi_{gt}$  %SM: clarify in footnote for Fig A.4.b that the panel label (1,2, et.c) refer to the home decile.
     versus the population average,
     showing relative stability over time}
   \label{fig:phi}
@@ -446,7 +447,7 @@ with (\subref{fig:Bggt-approx}) the approximated mobility matrix from Eq.~(\ref{
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\linewidth]{B-vs-Ba}
-  \caption{Comparison of element values ($g$, panels; $g'$, colours) in the
+  \caption{Comparison of element values ($g$, panels; $g'$, colours) in the  %SM: love this figure and cross-check!
     observed mobility matrix $B_{gg't}$, Eq.~(\ref{eq:Bgg.t}) and
     approximated mobility matrix, Eq.~(\ref{eq:Bgg.t.approx}),
     showing close agreement}
