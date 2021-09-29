@@ -1,0 +1,20 @@
+\frametitle{Total contacts across mixing pools}
+\begin{minipage}{0.45\linewidth}
+    \paragraph{Total \# Contacts}
+    \begin{equation*}
+      X_{gag'a'y} =
+      \ulabel{X^h_{gag'a'y}}{home pool} +
+      \ulabel{\textstyle\sum_{g^*} X^{\,g^*}_{gag'a'y}}{travel pools}
+    \end{equation*}
+    \paragraph{\# Contacts per Person}
+    \begin{equation*}
+      C_{gag'a'y} = \displaystyle\frac{X_{gag'a'y}}{P_{ga}}
+    \end{equation*}
+  \end{minipage}\hfill\Large$\bm{\rightarrow}$\hfill%
+  \begin{minipage}{0.45\linewidth}\footnotesize
+      \verb| g, g',  a, a',         y,   t,     C|
+      \verb| 1,  1, <4, <4, household, Jan, 0.592|
+      \verb| 1,  1, <4, <4, household, Feb, 0.541|
+      \verb| 1,  1, <4, <4, household, Mar, 0.604|
+      \verb|...|
+  \end{minipage}

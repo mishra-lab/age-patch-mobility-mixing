@@ -1,0 +1,58 @@
+\usetheme{Malmoe}
+% font
+\usepackage[osf]{gandhi}
+\frenchspacing
+% colors
+\definecolor{C0}{HTML}{001122}%{001122}%{00204E}
+\definecolor{C1}{HTML}{0099CC}%{0568AC}%{810075}
+\definecolor{C2}{HTML}{CC0033}%{AF061B}%{BB133E}
+\definecolor{C3}{HTML}{999999}
+\setbeamercolor{title}     {fg=C0}
+\setbeamercolor{frametitle}{fg=C0}
+\setbeamercolor{structure} {fg=C0}
+\setbeamercolor{section}   {fg=white,bg=C0}
+\setbeamercolor{link}      {fg=white,bg=C2}
+\setbeamersize{text margin left=2em,text margin right=2em}
+\setbeamercovered{transparent=5}
+% style
+\expandafter\def\expandafter\insertshorttitle\expandafter{%
+  \insertshorttitle\hskip 0pt plus 999fill\insertframenumber}
+\usepackage{textpos,mathtools,amsmath,bm}
+\addtobeamertemplate{headline}{}{%
+  \begin{textblock*}{1cm}(\paperwidth,-1.1cm)
+    \llap{\includegraphics[width=1cm]{mishra-lab}}
+  \end{textblock*}}
+\beamertemplatenavigationsymbolsempty
+\setbeamertemplate{enumerate subitem}{\alph{enumii}.}
+\setbeamertemplate{enumerate subsubitem}{\textsc{\roman{enumiii}}.}
+\newcommand{\sectionstyle}[1]{%
+  \centering\color{C0}\usebeamerfont{title}\huge\textbf{#1}}
+\AtBeginSection{%
+  \begin{frame}{~}
+    \sectionstyle{\insertsectionhead}
+  \end{frame}}
+% commands
+\newcommand{\bigpar}{\bigskip\par}
+\newcommand{\medpar}{\medskip\par}
+\newcommand{\smallpar}{\smallskip\par}
+\newcommand{\paragraph}[1]{\medpar\textbf{#1}\medpar}
+\newcommand{\textbc}[1]{\textbf{\color{C2}#1}}
+\newlength{\maxheight}\setlength{\maxheight}{0.667\paperheight}
+\newlength{\eqtabsep}\setlength{\eqtabsep}{2\bigskipamount}
+% links
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=,urlcolor=C2}
+% shorthand
+\usepackage{xspace}
+\newcommand{\covid}{\textsc{covid-19}\xspace}
+\newcommand{\Covid}{\textsc{Covid-19}\xspace}
+\newcommand{\ttilde}{\raisebox{-.7ex}{\textasciitilde}\xspace}
+\newcommand{\tss}[1]{\textsuperscript{#1}\xspace}
+\newcommand{\ulabel}[2]{\underbrace{#1}_{\clap{\textnormal{\footnotesize#2}}}}
+% figures
+\usepackage{graphicx}
+\graphicspath{
+  {fig}
+  {../../logo}
+  {../../papers/methodsx/fig}
+}
