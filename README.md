@@ -15,4 +15,4 @@ jesse.knight@mail.utoronto.ca
 Forthcoming paper (submitted to MethodsX):
 Jesse Knight, Huiting Ma, Amir Ghasemi, Mackenzie Hamilton, Kevin Brown, and Sharmistha Mishra.
 "Adaptive data-driven age and patch mixing in contact networks with recurrent mobility"
-preprint: TBD
+preprint: https://www.medrxiv.org/content/10.1101/2021.09.29.21264319v1
