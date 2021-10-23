@@ -243,7 +243,7 @@ main.mixing = function(figdir=''){
   clim=c(0,12.3)
   # load stuff
   config   = set.config(mode='10x10',n.y='4')
-  load(root.path('data','.rdata','Prem2017.rdata')) # -> Prem2017
+  load(root.path('data','.rdata','Prem2021.rdata'))
   pop      = load.fsa.pop()
   P.ga     = pop.to.Pga(pop)
   P.a      = colSums(P.ga)
@@ -256,7 +256,7 @@ main.mixing = function(figdir=''){
   C.aa.y = CAAy.to.Caay(C.AA.y)
   C.aa.y.p = lapply(C.aa.y,function(C){ sweep(C,2,P.a,'*') / weighted.mean(P.a,bin.size(config$age)) })
   # plot age distribution
-  P.A = data.frame(y=Prem2017$P.a,x=midpoint(config$age.contact))
+  P.A = data.frame(y=Prem2021$P.a,x=midpoint(config$age.contact))
   P.a = data.frame(y=colMeans(P.ga),x=midpoint(config$age))
   plot.pop.density() +
     geom_line(data=P.A,aes(x=x,y=y/mean(y)),linetype='dashed')
@@ -325,9 +325,9 @@ main.mixing = function(figdir=''){
     ggsave(figname('C4aay-diff',figdir),w=14,h=4) # should be white
   # void plots for tikz figure (grabstract)
   tikzpath = function(...){ root.path('code','tikz','methodsx','grabstract','fig',...) }
-  load(root.path('data','.rdata','Prem2017.rdata'))
+  load(root.path('data','.rdata','Prem2021.rdata'))
   C.list = list('0'=C.AA.y.0,'1'=C.AA.y.1,'2'=C.AA.y)
-  P.list = list('0'=Prem2017$P.a/mean(Prem2017$P.a),'1'=rep(1,16),'2'=rep(1,16))
+  P.list = list('0'=Prem2021$P.a/mean(Prem2021$P.a),'1'=rep(1,16),'2'=rep(1,16))
   lapply(names(C.list),function(n1){
     lapply(names(C.list[[n1]]),function(n2){
       C = C.list[[n1]][[n2]]
