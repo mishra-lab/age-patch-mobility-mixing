@@ -83,11 +83,11 @@ load.fsa.t.away = function(){
 
 load.contacts = function(c.map=NULL,P.norm=TRUE,sym=TRUE){
   if (is.null(c.map)){ c.map = config$c.map }
-  load(root.path('data','.rdata','Prem2017.rdata'))
+  load(root.path('data','.rdata','Prem2021.rdata'))
   C.AA.y = list()
   for (y in names(c.map)){
-    C.AA = Reduce('+',Prem2017$C.AA.y[c.map[[y]]])
-    if (P.norm){ C.AA = sweep(C.AA,2,Prem2017$P.a,'/') * mean(Prem2017$P.a) }
+    C.AA = Reduce('+',Prem2021$C.AA.y[c.map[[y]]])
+    if (P.norm){ C.AA = sweep(C.AA,2,Prem2021$P.a,'/') * mean(Prem2021$P.a) }
     if (sym){    C.AA = symmetric(C.AA) }
     dimnames(C.AA) = list('a'=names(config$age.contact),'a.'=names(config$age.contact))
     C.AA.y[[y]] = C.AA
@@ -128,8 +128,7 @@ clean.raw.pop = function(){
   write.csv(pop,root.path('data','pop_age_fsa.csv'),row.names=FALSE)
 }
 
-clean.Prem2017 = function(){
-  # TODO: why does rdata school =/= Prem2017 appendix for a > 30
+clean.Prem2021 = function(){
   rdata = function(name){
     load(root.path('data','.raw',paste0(name,'.rdata')))
     return(get(name))
@@ -137,14 +136,14 @@ clean.Prem2017 = function(){
   P.raw = rdata('poptotal')
   c.types = list('home','work','school','others')
   names(c.types) = c.types
-  Prem2017 = list(
+  Prem2021 = list(
     P.a = as.numeric(P.raw[P.raw$countryname=='Canada',paste0('age',seq(0,75,5))]),
     C.AA.y = lapply(c.types,function(c.type){
       return(rdata(paste0('contact_',c.type))$CAN)
     })
   )
-  # plot.mix(Prem2017$C.AA.y,'Ci','a',trans='sqrt'); ggsave('Rplots.pdf',w=14,h=4) # DEBUG
-  save(Prem2017,file=root.path('data','.rdata','Prem2017.rdata')) # TODO: save as CSV?
+  # plot.mix(Prem2021$C.AA.y,'Ci','a',trans='sqrt'); ggsave('Rplots.pdf',w=14,h=4) # DEBUG
+  save(Prem2021,file=root.path('data','.rdata','Prem2021.rdata'))
 }
 
 clean.shape = function(which='FSA'){
