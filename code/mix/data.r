@@ -11,7 +11,7 @@ aggr.age = function(pop,age=TRUE){
   }
 }
 
-aggr.mob.decile = function(B,pop){
+aggr.mob.decile = function(B){
   P = read.csv(root.path('data','pop_decile'))
   p = ave(P$pop,P$group,FUN=function(pop){pop/sum(pop)})
   A = t(tail(outer(c(0,config$group),seq(10),'<=') * outer(c(config$group,Inf),seq(10),'>'),-1))
