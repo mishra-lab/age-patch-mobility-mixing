@@ -181,7 +181,7 @@ gen.save.mixing = function(do.save=TRUE,norm=TRUE,t=NULL,...){
   C.AA.y = load.contacts()
   C.aa.y = CAAy.to.Caay(C.AA.y)
   RC.g.y = gen.RC.g.y()
-  B.gg.t = load.group.mob(pop,B='B')
+  B.gg.t = load.group.mob(B='B')
   if (missing(t)){ t = names(B.gg.t) }
   Ci.gaga.y.t = lapply(t,function(ti){
     CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,ti)
@@ -207,7 +207,7 @@ compare.mixing = function(figdir='compare'){
   C.AA.y = load.contacts()
   C.aa.y = CAAy.to.Caay(C.AA.y)
   RC.g.y = gen.RC.g.y()
-  B.gg.t = load.group.mob(pop)
+  B.gg.t = load.group.mob()
   mix.fun = function(key,t='REF',...){
     args = list(...)
     for (name in names(args))
@@ -298,9 +298,9 @@ main.mixing = function(figdir=''){
   plot.mix(C.AA.y.d02,'Ci','a',trans='nsqrt',clim=c(-2,+2),cmap='RdBu',gez=FALSE)
     ggsave(figname('C4AAy-d02',figdir),w=14,h=4)
   # mobility plots
-  Bc.gg.t = load.group.mob(pop,B='Bc')
-  Ba.gg.t = load.group.mob(pop,B='Ba')
-  B.gg.t  = load.group.mob(pop,B='B')
+  Bc.gg.t = load.group.mob(B='Bc')
+  Ba.gg.t = load.group.mob(B='Ba')
+  B.gg.t  = load.group.mob(B='B')
   plot.mix(Bc.gg.t[['REF']],'Bc','g'); ggsave(figname('Bcgg', figdir),w= 5,h=4)
   plot.mix(Ba.gg.t[['REF']],'B','g');  ggsave(figname('Bagg', figdir),w= 5,h=4)
   plot.mix(B.gg.t[['REF']], 'B','g');  ggsave(figname('Bgg',  figdir),w= 5,h=4)
