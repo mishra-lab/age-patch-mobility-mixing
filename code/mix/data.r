@@ -38,7 +38,7 @@ load.fsa.pop = function(age=TRUE,aggr=TRUE){
   }
 }
 
-load.group.mob = function(pop,B='B',do.ref=TRUE,rm.ref=TRUE){
+load.group.mob = function(B='B',do.ref=TRUE,rm.ref=TRUE){
   # TODO
   mob = read.csv(root.path('data','mobility_decile.csv'))
   mob = map.decile(mob)
