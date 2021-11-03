@@ -177,8 +177,7 @@ melt.mixing = function(X.gaga.y.t,what){
 
 gen.save.mixing = function(do.save=TRUE,norm=TRUE,t=NULL,...){
   config = set.config(...)
-  pop    = load.fsa.pop()
-  P.ga   = pop.to.Pga(pop)
+  P.ga   = decile.pop.to.Pga()
   C.AA.y = load.contacts()
   C.aa.y = CAAy.to.Caay(C.AA.y)
   RC.g.y = gen.RC.g.y()
@@ -204,8 +203,7 @@ compare.mixing = function(figdir='compare'){
   set.config(n.y = '4',
              age = config$age.contact,
              h.y = c('home'=1,'work'=0.1,'school'=0.5,'others'=0.3))
-  pop    = load.fsa.pop()
-  P.ga   = pop.to.Pga(pop)
+  P.ga   = decile.pop.to.Pga()
   C.AA.y = load.contacts()
   C.aa.y = CAAy.to.Caay(C.AA.y)
   RC.g.y = gen.RC.g.y()
@@ -253,8 +251,7 @@ main.mixing = function(figdir=''){
   # load stuff
   config   = set.config(mode='10x10',n.y='4')
   load(root.path('data','.rdata','Prem2021.rdata'))
-  pop      = load.fsa.pop()
-  P.ga     = pop.to.Pga(pop)
+  P.ga   = decile.pop.to.Pga()
   P.a      = colSums(P.ga)
   C.AA.y   = load.contacts()
   C.AA.y.0 = load.contacts(P.norm=FALSE,sym=FALSE)
