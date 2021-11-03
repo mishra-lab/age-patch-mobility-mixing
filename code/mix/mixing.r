@@ -23,6 +23,15 @@ pop.to.Pga = function(pop){
   return(P.ga)
 }
 
+decile.pop.to.Pga = function(){
+  # pop: dataframe with columns (at least): group, age, pop(ulation)
+  # P.ga: [value] matrix of population by group & age
+  P = read.csv(root.path('data', 'pop_decile.csv'))
+  P.ga = matrix(P[order(P$age,P$group),]$pop,nrow=config$N$g,
+                dimnames=list(g=names(config$group),a=names(config$age)))
+  return(P.ga)
+}
+
 resample.contacts = function(Ci,xi,xo){
   # Ci: contact matrix stratified by xi & xi (square)
   # xi: list of cut points in Ci (lower cut points of each strata)
