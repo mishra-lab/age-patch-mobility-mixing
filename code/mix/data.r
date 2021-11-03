@@ -46,7 +46,7 @@ load.group.mob = function(B='B',do.ref=TRUE,rm.ref=TRUE){
   B.gg.t = lapply(months,function(month){
     B.m = t(matrix(mob[mob$month==month,B],nrow=10,ncol=10))
     dimnames(B.m) = list(g=seq(10),g.=seq(10))
-    return(aggr.mob.decile(B.m,pop))
+    return(aggr.mob.decile(B.m))
   })
   names(B.gg.t) = months
   if (do.ref){ B.gg.t[['REF']] = Reduce('+',B.gg.t[config$t.ref]) / length(config$t.ref) }
