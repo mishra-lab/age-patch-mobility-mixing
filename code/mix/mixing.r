@@ -191,7 +191,7 @@ gen.save.mixing = function(do.save=TRUE,norm=TRUE,t=NULL,...){
   }
 }
 
-compare.mixing = function(figdir='compare'){
+mixing.assumptions = function(figdir='assumptions'){
   set.config(n.y = '4',
              age = config$age.contact,
              h.y = c('home'=1,'work'=0.1,'school'=0.5,'others'=0.3))
