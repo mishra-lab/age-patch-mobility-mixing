@@ -75,11 +75,11 @@ gen.mix.main = function(P.ga,C.aa.y,RC.g.y,B.gg.t,t){
   a.size = bin.size(config$age,norm=TRUE) # expected age distribution
   if (config$method$age.adapt){
     P.ga. = P.ga
-  } else {
+  } else { # A2
     P.ga. = replicate(N$a,rowMeans(P.ga))
     dimnames(P.ga.) = dimnames(P.ga)
   }
-  if (! config$method$age.by.type){
+  if (! config$method$age.by.type){ # A1
     C.aa.u = Reduce('+',C.aa.y)
     C.aa.y = lapply(C.aa.y,function(C){
       C.aa.u * rowSums(C)/rowSums(C.aa.u)
@@ -95,7 +95,7 @@ gen.mix.main = function(P.ga,C.aa.y,RC.g.y,B.gg.t,t){
       if (config$method$home.pool){ # pop of each "g" mixing in this pool ...
         Pt  = RC.g.y[[y]] * P.ga  * (1-h.y[y]) * B.gg[,g]
         Pt. = RC.g.y[[y]] * P.ga. * (1-h.y[y]) * B.gg[,g]
-      } else {
+      } else { # A3
         Pt  = RC.g.y[[y]] * P.ga  * ((1-h.y[y]) * B.gg[,g] + (h.y[y]) * B.hh[,g])
         Pt. = RC.g.y[[y]] * P.ga. * ((1-h.y[y]) * B.gg[,g] + (h.y[y]) * B.hh[,g])
       }
@@ -107,7 +107,7 @@ gen.mix.main = function(P.ga,C.aa.y,RC.g.y,B.gg.t,t){
       if (config$method$home.pool){
         Ph  = RC.g.y[[y]] * P.ga[g,]  * h.y[y] # pop (age groups) of this "g" at home
         Ph. = RC.g.y[[y]] * P.ga.[g,] * h.y[y]
-        ph. = Ph./a.size/sum(Ph)# normalize overall & age as C.aa.y already weighted by age
+        ph. = Ph./a.size/sum(Ph) # normalize overall & age as C.aa.y already weighted by age
         ph.[is.nan(ph.)] = 0
         X = outer(Ph,ph.) * C.aa.y[[y]] # proportionate mixing * age mixing
         X.gaga[g,,g,] = X.gaga[g,,g,] + X # add contribution of this pool to the total mixing
@@ -201,41 +201,59 @@ compare.mixing = function(figdir='compare'){
   C.aa.y = CAAy.to.Caay(C.AA.y)
   RC.g.y = gen.RC.g.y()
   B.gg.t = load.group.mob(pop)
-  mix.fun = function(key,t='REF',...){
+  clean = function(g){
+    return(g + labs(fill=NULL) + theme(
+        strip.background=element_blank(),
+        strip.text=element_text(size=11,color='grey30')) +
+      guides(fill=guide_colourbar(barwidth=1,barheight=11)))
+  }
+  mix.fun = function(key,t='2020-04',...){
     args = list(...)
     for (name in names(args))
     config$method[[name]] <<- args[[name]]
     CX = CX.norm(gen.mix.main(P.ga, C.aa.y, RC.g.y, B.gg.t, t),P.ga)
     CX. = Reduce('+',CX)
-    plot.mix(CX,'Ci','a',P.ga=P.ga,aggr=TRUE); ggsave(figname(paste0('C4iaa',key),figdir),w=14,h=4)
-    plot.mix(CX,'Ci','g',P.ga=P.ga,aggr=TRUE); ggsave(figname(paste0('C4igg',key),figdir),w=14,h=4)
-    plot.mix(CX.,'Ci','a',P.ga=P.ga,aggr=TRUE); ggsave(figname(paste0('Ciaa',key),figdir),w=5,h=4)
-    plot.mix(CX.,'Ci','g',P.ga=P.ga,aggr=TRUE); ggsave(figname(paste0('Cigg',key),figdir),w=5,h=4)
+    clean(plot.mix(CX, 'Ci','a',P.ga=P.ga,aggr=TRUE,clim=c(0, 6)));
+      ggsave(figname(paste0('C4aa',key),figdir),w=11,h=3.5)
+    clean(plot.mix(CX, 'Ci','g',P.ga=P.ga,aggr=TRUE,clim=c(0, 6)));
+      ggsave(figname(paste0('C4gg',key),figdir),w=11,h=3.5)
+    clean(plot.mix(CX.,'Ci','a',P.ga=P.ga,aggr=TRUE,clim=c(0,10)));
+      ggsave(figname(paste0('Caa',key),figdir),w=4,h=3.5)
+    clean(plot.mix(CX.,'Ci','g',P.ga=P.ga,aggr=TRUE,clim=c(0,10)));
+      ggsave(figname(paste0('Cgg',key),figdir),w=4,h=3.5)
     return(CX)
   }
-  Ci.gaga.y.m = list( # steps: home pool, age adapt, age by type
+  Ci.gaga.y.m = list( # A3 = home pool, A2 = age adapt, A1 = age by type
     '3' = mix.fun('3',home.pool=TRUE, age.adapt=TRUE, age.by.type=TRUE),
     '2' = mix.fun('2',home.pool=FALSE,age.adapt=TRUE, age.by.type=TRUE),
     '1' = mix.fun('1',home.pool=FALSE,age.adapt=FALSE,age.by.type=TRUE),
     '0' = mix.fun('0',home.pool=FALSE,age.adapt=FALSE,age.by.type=FALSE))
   comb = combn(names(Ci.gaga.y.m),2)
   max.abs = function(x){ max(abs(x)) }
-  cmfun = function(cm){ cm = max(cm,.2); return(c(-cm,+cm)) }
+  clim = c(-1.45,+1.45)
   for (m in c('a','g')){
+    Ci.diff = list()
     for (i in seq(ncol(comb))){
+      key = paste0(comb[2,i],'v',comb[1,i])
       Ci.y.diff = lapply(names(config$c.type),function(y){
-        aggr.mix(Ci.gaga.y.m[[comb[1,i]]][[y]],'Ci',m,P.ga) -
-        aggr.mix(Ci.gaga.y.m[[comb[2,i]]][[y]],'Ci',m,P.ga)
+        aggr.mix(Ci.gaga.y.m[[comb[2,i]]][[y]],'Ci',m,P.ga) -
+        aggr.mix(Ci.gaga.y.m[[comb[1,i]]][[y]],'Ci',m,P.ga)
       })
       names(Ci.y.diff) = names(config$c.type)
-      cm = max(sapply(Ci.y.diff,max.abs))
-      plot.mix(Ci.y.diff,'Ci',m,P.ga=P.ga,cmap='RdBu',trans='nsqrt',gez=FALSE,clim=cmfun(cm))
-        ggsave(figname(paste0('D4',m,m,comb[1,i],'v',comb[2,i]),figdir),w=14,h=4)
-      Ci.diff = Reduce('+',Ci.y.diff)
-      cm = max.abs(Ci.diff)
-      plot.mix(Ci.diff,'Ci',m,P.ga=P.ga,cmap='RdBu',trans='nsqrt',gez=FALSE,clim=cmfun(cm))
-        ggsave(figname(paste0('D',m,m,comb[1,i],'v',comb[2,i]),figdir),w=5,h=4)
+      clean(plot.mix(Ci.y.diff,'Ci',m,P.ga=P.ga,cmap='RdBu',trans='nsqrt',gez=FALSE,clim=clim))
+        ggsave(figname(paste0('D4',m,m,key),figdir),w=11,h=3.5)
+      Ci.diff[[key]] = Reduce('+',Ci.y.diff)
+      clean(plot.mix(Ci.diff[[key]],'Ci',m,P.ga=P.ga,cmap='RdBu',trans='nsqrt',gez=FALSE,clim=clim))
+        ggsave(figname(paste0('D',m,m,key),figdir),w=4,h=3.5)
     }
+    Ci.diff. = list(
+      '(*.i) Assumption A1 Effect'      = Ci.diff[['0v1']],
+      '(*.ii) Assumption A2 Effect'     = Ci.diff[['1v2']],
+      '(*.iii) Assumption A3 Effect'    = Ci.diff[['2v3']],
+      '(*.iv) Assumptions A1-3 Effects' = Ci.diff[['0v3']])
+    names(Ci.diff.) = gsub('\\*',ifelse(m=='a','a','b'),names(Ci.diff.))
+    clean(plot.mix(Ci.diff.,'Ci',m,P.ga=P.ga,cmap='RdBu',trans='nsqrt',gez=FALSE,clim=c(-1.2,+1.2)))
+      ggsave(figname(paste0('D',m,m,'-panel'),figdir),w=11,h=3.5)
   }
 }
 
