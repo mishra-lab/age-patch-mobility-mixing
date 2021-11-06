@@ -1,0 +1,27 @@
+\usepackage[lining,sfdefault,tabular]{gandhi}
+\usepackage[scale=.8]{FiraMono}
+\usepackage{sfmath,bm}
+\addbibresource{refs.bib}
+\graphicspath{
+  {fig/}
+  {../../../logo/}
+  {../../../../out/fig/mix/assumptions/}% TEMP
+}
+\renewcommand{\indent}{\hspace{\leftmargini}}
+\renewcommand{\paragraph}[1]{\unskip\bigskip\par\textbf{#1}}
+\usepackage{enumitem}
+\renewcommand{\labelitemi}{\textbullet}
+\renewcommand{\labelitemii}{\textbullet}
+\renewcommand{\labelitemiii}{\textbullet}
+\renewcommand{\labelitemiv}{\textbullet}
+\setlist[itemize]{labelsep=.8ex}
+\setlist[enumerate]{itemindent=1ex}
+\usepackage{graphbox,multicol,multirow}
+\definecolor{Rd}{HTML}{ca0020}
+\definecolor{Bu}{HTML}{0571b0}
+\def\g{g^{\smash{*}}}
+\renewcommand{\section}[3][]{\block[#1]{\textsc{\MakeLowercase{#2}}}{\input{#3}}}
+\newcommand{\ass}[1]{\textcolor{C3}{A#1}}
+\newenvironment{assumptions}
+  {\begin{enumerate}[itemindent=2ex,label=\color{C3}A\arabic*.]}
+  {\end{enumerate}}

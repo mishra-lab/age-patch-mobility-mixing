@@ -1,0 +1,78 @@
+\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+\ProvidesClass{poster}
+[2021/09/01 v0.0.0 custom poster class based on tikzposter]
+\newlength{\gap}\setlength{\gap}{1cm}
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{tikzposter}}
+\PassOptionsToClass{
+  a0paper,
+  landscape,
+  margin=0cm,
+  innermargin=\gap,
+  colspace=\gap,
+  subcolspace=\gap,
+  blockverticalspace=\gap,
+}{tikzposter}
+\ProcessOptions\relax
+\LoadClass[25pt]{tikzposter}
+\tikzposterlatexaffectionproofoff
+\useblockstyle[
+  linewidth=.2\gap,
+  titleinnersep=.5\gap,
+  roundedcorners=.5\gap,
+]{Default}
+\let\omaketitle\maketitle
+\renewcommand{\maketitle}{\omaketitle[%
+  width=\dimexpr\paperwidth-2\gap,
+  innersep=0mm,
+  linewidth=.2\gap,
+  roundedcorners=.5\gap,
+  titletotopverticalspace=\gap,
+  titletoblockverticalspace=\gap,
+  titlegraphictotitledistance=0cm,
+]}
+\definecolor{C1}{HTML}{00204E}
+\definecolor{C2}{HTML}{E31837}%{BB133E}
+\definecolor{C3}{HTML}{008BB0}
+\usecolorstyle[
+  colorOne=C1!20!white,
+  colorTwo=C1,
+  colorThree=C2,
+]{Default}
+\RequirePackage{authblk}
+\renewcommand\Affilfont{\Large}
+\renewcommand\AB@affilsepx{\enspace\protect\Affilfont}
+\AtBeginDocument{\renewcommand\maketitle{\AB@maketitle%
+  \begin{pgfonlayer}{notelayer}
+    \node[gray,anchor=north west]
+      at (\dimexpr1.5\gap-.5\paperwidth,\dimexpr-1.5\gap+.5\paperheight)
+      {\Large\poster@number};
+  \end{pgfonlayer}}}
+\newcommand{\posternumber}[1]{\gdef\poster@number{#1}}
+\posternumber{}
+\RequirePackage[
+  colorlinks=true,
+  citecolor=C2,
+  urlcolor=C2,
+]{hyperref}
+\RequirePackage[
+  backend=biber,
+  style=numeric,
+  sorting=none,
+  natbib=true,
+  url=false,
+  doi=true,
+  isbn=false,
+  locallabelwidth,
+]{biblatex}
+\renewcommand{\bibfont}{\footnotesize}
+\renewcommand\@biblabel[1]{#1}
+\let\oprintbibliography\printbibliography
+\def\printbibliography{%
+  \oprintbibliography[heading=none]}
+\newcounter{fig}
+\newenvironment{fig}[2][]{
+  \begin{minipage}[#1]{#2}}{\end{minipage}}
+\renewcommand{\caption}[1]{%
+  \refstepcounter{fig}%
+  {\small\textbf{Figure~\thefig.} #1\par}}
+\def\HyperFirstAtBeginDocument#1{#1} % BUG

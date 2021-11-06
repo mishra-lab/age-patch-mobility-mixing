@@ -1,0 +1,9 @@
+\newlength{\offset}\setlength{\offset}{.05\gap}%
+\centering%
+\vspace{\offset}%
+\begin{tikzpicture}
+  \clip [rounded corners=.5\gap] (0,0) rectangle coordinate (centerpoint)
+    (\dimexpr\linewidth-2\offset,\dimexpr.131\linewidth-2\offset); 
+  \node [inner sep=0pt] at (centerpoint) {\includegraphics[width=\linewidth]{epidemics-8}}; 
+\end{tikzpicture}%
+\vspace{\offset}
