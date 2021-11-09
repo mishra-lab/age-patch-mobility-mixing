@@ -2,9 +2,9 @@
 
 aggr.age = function(pop,age=TRUE){
   if (age){
-    pop = aggregate(pop~FSA+cut(age,breaks=c(config$age,Inf),right=FALSE),pop,sum)
+    pop = aggregate(pop~FSA+cut(age,breaks=config$age,right=FALSE),pop,sum)
     colnames(pop)[2] = 'age'
-    levels(pop$age) = names(config$age)
+    levels(pop$age) = age.names(config$age)
     return(pop)
   } else {
     return(aggregate(pop~FSA,pop,sum))
@@ -14,14 +14,14 @@ aggr.age = function(pop,age=TRUE){
 aggr.mob.decile = function(B,pop){
   P = aggregate(pop~decile+group,pop,sum)
   p = ave(P$pop,P$group,FUN=function(pop){pop/sum(pop)})
-  A = t(tail(outer(c(0,config$group),seq(10),'<=') * outer(c(config$group,Inf),seq(10),'>'),-1))
+  A = t(tail(outer(c(0,config$group),seq(10),'<=') * outer(c(config$group,11),seq(10),'>'),-1))
   B = t(p*A) %*% B %*% A
   dimnames(B)=list(g=config$group,g.=config$group)
   return(B)
 }
 
 map.decile = function(x){
-  x$group = cut(x$decile,breaks=c(config$group,Inf),right=FALSE)
+  x$group = cut(x$decile,breaks=c(config$group,11),right=FALSE)
   levels(x$group) = names(config$group)
   return(x)
 }
@@ -38,15 +38,33 @@ load.fsa.pop = function(age=TRUE,aggr=TRUE){
   }
 }
 
-load.group.mob = function(pop,B='B',do.ref=TRUE,rm.ref=TRUE){
-  # TODO
-  mob = read.csv(root.path('data','mobility_decile.csv'))
-  mob = map.decile(mob)
-  months = c(config$t.ref,config$t.covid)
+load.decile.pop = function(cat=1){
+  pop = read.csv(root.path('data','pop_age_decile.csv'))
+  pop = pop[pop$cat==cat,]; pop$cat = NULL
+  pop = map.decile(pop)
+  return(pop[order(pop$decile,pop$age),])
+}
+
+load.group.mob = function(pop,B='Ba',gen=TRUE,rho.src='veraset',
+                          months=NULL,do.ref=TRUE,rm.ref=TRUE){
+  if (gen){ # generate by approx factors: cond, rel, t
+    Xgg   = expand.grid(decile=seq(10),decile.visited=seq(10))
+    Bc    = read.csv(root.path('data','mobility_cond.csv'))
+    Rg    = read.csv(root.path('data','mobility_rel.csv'))
+    rho.t = read.csv(root.path('data','mobility_t.csv'))
+    Xgg   = merge(merge(Xgg,Bc),merge(rho.t[rho.t$src==rho.src,],Rg))
+    igg = Xgg$decile == Xgg$decile.visited
+    Xgg$Ba = Xgg$rho.t * Xgg$R.rho.g *
+      ((Xgg$phi.0 * Xgg$R.phi.0.g) * igg + (1 - (Xgg$phi.0 * Xgg$R.phi.0.g)) * Xgg$Bc)
+  } else { # observed
+    Xgg = read.csv(root.path('data','mobility_obs.csv'))
+  }
+  Xgg = Xgg[order(Xgg$month,Xgg$decile,Xgg$decile.visited),]
+  if (is.null(months)){ months = unique(Xgg$month) }
   B.gg.t = lapply(months,function(month){
-    B.m = t(matrix(mob[mob$month==month,B],nrow=10,ncol=10))
-    dimnames(B.m) = list(g=seq(10),g.=seq(10))
-    return(aggr.mob.decile(B.m,pop))
+    B.gg = t(matrix(Xgg[Xgg$month==month,B],nrow=10,ncol=10))
+    dimnames(B.gg) = list(g=seq(10),g.=seq(10))
+    return(aggr.mob.decile(B.gg,pop))
   })
   names(B.gg.t) = months
   if (do.ref){ B.gg.t[['REF']] = Reduce('+',B.gg.t[config$t.ref]) / length(config$t.ref) }
@@ -89,7 +107,8 @@ load.contacts = function(c.map=NULL,P.norm=TRUE,sym=TRUE){
     C.AA = Reduce('+',Prem2021$C.AA.y[c.map[[y]]])
     if (P.norm){ C.AA = sweep(C.AA,2,Prem2021$P.a,'/') * mean(Prem2021$P.a) }
     if (sym){    C.AA = symmetric(C.AA) }
-    dimnames(C.AA) = list('a'=names(config$age.contact),'a.'=names(config$age.contact))
+    a.names = age.names(config$age.contact)
+    dimnames(C.AA) = list('a'=a.names,'a.'=a.names)
     C.AA.y[[y]] = C.AA
   }
   names(C.AA.y) = names(config$c.type)

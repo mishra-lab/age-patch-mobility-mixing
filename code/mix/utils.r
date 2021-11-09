@@ -56,31 +56,21 @@ diag.pad = function(X,pre=0,post=0){
   }
   return(X1)
 }
-midpoint = function(x,ends=FALSE){
-  # get the midpoints of vector x, and repeat the last value
-  return(x+diff(bin.extrap(x))/2)
+lm1 = function(x){
+  return(x[1:(length(x)-1)])
 }
-bin.extrap = function(x,post=1,pre=0,x.max=NULL,x.min=NULL){
-  # e.g. if x = [0,5,10,15] represents 0-4, 5-9, 10-14, 15-19.
-  # then we extrapolate additional bins either n bins = pre/post,
-  # or up to x.min/x.max, however many are needed
-  l = length(x)
-  d.0 = x[2] - x[1]
-  d.1 = x[l] - x[l-1]
-  if (!is.null(x.min)) { x.pre  = seq(x[1]-d.0, x.min, -d.0) }
-  else if (pre > 0)    { x.pre  = seq(x[1]-d.0, x[1]-d.0*pre, -d.0) }
-  else                 { x.pre  = numeric(0) }
-  if (!is.null(x.max)) { x.post = seq(x[l]+d.1, x.max, +d.1) }
-  else if (post > 0)   { x.post = seq(x[l]+d.1, x[l]+d.1*post, +d.1) }
-  else                 { x.post = numeric(0) }
-  return(c(rev(x.pre),x,x.post))
+age.names = function(age){
+  return(lm1(names(age)))
+}
+midpoint = function(x){
+  # get the midpoints of vector x, and repeat the last value
+  return(lm1(x)+diff(x)/2)
 }
 bin.size = function(x,norm=FALSE){
   # get widths of a stratification "x", and possibly normalize.
-  # e.g. if [x] is [1,3,7], bs is [2,4,4], and if norm, bs is [.2,.4,.4]
-  # since bin.extrap repeats the last width (7-3=4)
-  bs = diff(bin.extrap(x))
-  names(bs) = names(x)
+  # e.g. if x & x.max are [1,3,7] & 11, bs is [2,4,4], and if norm, bs is [.2,.4,.4]
+  bs = diff(x)
+  names(bs) = lm1(names(x))
   if (norm){ bs = bs/sum(bs) }
   return(bs)
 }

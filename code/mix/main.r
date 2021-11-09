@@ -1,6 +1,6 @@
 args = commandArgs(trailingOnly=TRUE)
 source('config.r')
-set.config('10x10')
+set.config()
 
 if (args[1] == 'mobility'){
   source('mobility.r')
@@ -10,18 +10,13 @@ if (args[1] == 'mixing'){
   source('mixing.r')
   main.mixing()
 }
-if (args[1] == 'runtime'){
-  source('runtime.r')
-  test.runtime()
-}
-if (args[1] == 'contacts'){
-  source('contacts.r')
-  set.seed(123)
-  main.contacts()
+if (args[1] == 'assumptions'){
+  source('mixing.r')
+  mixing.assumptions()
 }
 if (args[1] == 'debug'){
-  # DEBUG
   source('mixing.r')
+  # gen.save.mixing(n.y=4)
   plot.map.main()
   plot.cases(load.cases());
   ggsave(figname('Yg'),w=8,h=4)

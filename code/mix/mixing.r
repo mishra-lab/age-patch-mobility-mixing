@@ -17,13 +17,12 @@ source('plot.r')
 pop.to.Pga = function(pop){
   # pop: dataframe with columns (at least): group, age, pop(ulation)
   # P.ga: [value] matrix of population by group & age
-  P = aggregate(pop~group+age,pop,sum)
-  P.ga = matrix(P[order(P$age,P$group),]$pop,nrow=config$N$g,
-    dimnames=list(g=names(config$group),a=names(config$age)))
+  P.ga = matrix(pop[order(pop$age,pop$group),]$pop,nrow=config$N$g,
+    dimnames=config$X.names[1:2])
   return(P.ga)
 }
 
-resample.contacts = function(Ci,xi,xo){
+resample.contacts = function(Ci,xi,xo,di=NULL){
   # Ci: contact matrix stratified by xi & xi (square)
   # xi: list of cut points in Ci (lower cut points of each strata)
   # xo: list of cut points in Co (lower cut points of each strata)
@@ -33,15 +32,17 @@ resample.contacts = function(Ci,xi,xo){
   # and normalize by the strata sizes (bin.size);
   # the number of contacts per person might change a little;
   # we also pad Ci diagonally before interp to avoid any NA or edge effects.
-  xie = bin.extrap(xi,x.max=max(bin.extrap(xo)))
-  xip = bin.extrap(xie,pre=1,post=1)
+  if (is.null(di)){ di = mean(diff(xi)) }
+  xi.max = xi[length(xi)]+di
+  xie = c(xi,seq(xi.max,max(xo,xi.max),di))
+  xip = c(xie[1]-di,xie,xie[length(xie)]+di)
   Cip = diag.pad(Ci,pre=1,post=1+length(xie)-length(xi))
   x1  = seq(min(xip),max(xip))
   m1  = midpoint(x1)
   C1  = interp2d(Cip/bin.size(xip),midpoint(xip),m1)
-  i   = (m1 > xie[1]) & (x1 < xie[length(xie)])
-  # plot.mix(C1[i,i],'Ci','a'); ggsave('Rplots.pdf'); # DEBUG
-  A  = tail(outer(c(0,xo),m1[i],'<') * outer(c(xo,Inf),m1[i],'>'),-1)
+  i   = (m1 > xie[1]) & (m1 < xie[length(xie)])
+  # plot.mix(C1[i,i],'Ci','a'); ggsave('Rplots.pdf',w=12,h=12); # DEBUG
+  A  = tail(outer(c(0,lm1(xo)),m1[i],'<') * outer(xo,m1[i],'>'),-1)
   Co = (A %*% C1[i,i] %*% t(A)) / bin.size(xo)
   return(Co)
 }
@@ -168,12 +169,12 @@ melt.mixing = function(X.gaga.y.t,what){
 
 gen.save.mixing = function(do.save=TRUE,norm=TRUE,t=NULL,...){
   config = set.config(...)
-  pop    = load.fsa.pop()
+  pop    = load.decile.pop()
   P.ga   = pop.to.Pga(pop)
   C.AA.y = load.contacts()
   C.aa.y = CAAy.to.Caay(C.AA.y)
   RC.g.y = gen.RC.g.y()
-  B.gg.t = load.group.mob(pop,B='B')
+  B.gg.t = load.group.mob(pop,rho.src='bluedot',do.ref=FALSE,rm.ref=FALSE)
   if (missing(t)){ t = names(B.gg.t) }
   Ci.gaga.y.t = lapply(t,function(ti){
     CX.gaga.y = gen.mix.main(P.ga,C.aa.y,RC.g.y,B.gg.t,ti)
@@ -192,10 +193,9 @@ gen.save.mixing = function(do.save=TRUE,norm=TRUE,t=NULL,...){
 }
 
 mixing.assumptions = function(figdir='assumptions'){
-  set.config(n.y = '4',
-             age = config$age.contact,
+  set.config(age.def = '5-year', n.y = '4',
              h.y = c('home'=1,'work'=0.1,'school'=0.5,'others'=0.3))
-  pop    = load.fsa.pop()
+  pop    = aggregate(pop~decile+group+age,load.fsa.pop(),sum)
   P.ga   = pop.to.Pga(pop)
   C.AA.y = load.contacts()
   C.aa.y = CAAy.to.Caay(C.AA.y)
@@ -258,11 +258,10 @@ mixing.assumptions = function(figdir='assumptions'){
 }
 
 main.mixing = function(figdir=''){
-  clim=c(0,12.3)
   # load stuff
-  config   = set.config(mode='10x10',n.y='4')
+  config   = set.config(n.y='4')
   load(root.path('data','.rdata','Prem2021.rdata'))
-  pop      = load.fsa.pop()
+  pop      = load.decile.pop()
   P.ga     = pop.to.Pga(pop)
   P.a      = colSums(P.ga)
   C.AA.y   = load.contacts()
@@ -272,13 +271,13 @@ main.mixing = function(figdir=''){
   age.1  = seq(100); names(age.1) = age.1;
   C.11.y = CAAy.to.Caay(C.AA.y,age.1)
   C.aa.y = CAAy.to.Caay(C.AA.y)
-  C.aa.y.p = lapply(C.aa.y,function(C){ sweep(C,2,P.a,'*') / weighted.mean(P.a,bin.size(config$age)) })
+  C.aa.y.p = lapply(C.aa.y,function(C){
+    sweep(C,2,P.a,'*') / weighted.mean(P.a,bin.size(config$age)) })
   # plot age distribution
   P.A = data.frame(y=Prem2021$P.a,x=midpoint(config$age.contact))
   P.a = data.frame(y=colMeans(P.ga),x=midpoint(config$age))
-  plot.pop.density() +
-    geom_line(data=P.A,aes(x=x,y=y/mean(y)),linetype='dashed')
-  ggsave(figname('Pga',figdir),w=8,h=4)
+  plot.pop.density() + geom_line(data=P.A,aes(x=x,y=y/mean(y)),linetype='dashed')
+    ggsave(figname('Pga',figdir),w=8,h=4)
   # compare margins
   C.list   = list(C.AA.y.0, C.AA.y.1, C.AA.y, C.aa.y, C.aa.y.p)
   age.list = list(config$age.contact,config$age.contact,config$age.contact,config$age,config$age)
@@ -287,10 +286,11 @@ main.mixing = function(figdir=''){
   plot.contact.margins(C.list,age.list,style='dots') +
     guides(color=guide_legend(title='',keyheight=2)) +
     scale_x_continuous(minor_breaks=NULL,
-      breaks=unname(bin.extrap(config$age.contact),minor),
-      sec.axis=sec_axis(~.,breaks=unname(bin.extrap(config$age))))
+      breaks=unname(config$age.contact),
+      sec.axis=sec_axis(~.,breaks=unname(config$age)))
     ggsave(figname('C4ay',figdir),w=14,h=4)
   # compare the various versions of C.AA.y
+  clim=c(0,12.3)
   b.1 = seq(0,length(age.1),5)
   plot.mix(C.AA.y.0,'Ci','a',clim=clim); ggsave(figname('C4AAy0',figdir),w=14,h=4)
   plot.mix(C.AA.y.1,'Ci','a',clim=clim); ggsave(figname('C4AAy1',figdir),w=14,h=4)
@@ -310,9 +310,9 @@ main.mixing = function(figdir=''){
   plot.mix(C.AA.y.d02,'Ci','a',trans='nsqrt',clim=c(-2,+2),cmap='RdBu',gez=FALSE)
     ggsave(figname('C4AAy-d02',figdir),w=14,h=4)
   # mobility plots
-  Bc.gg.t = load.group.mob(pop,B='Bc')
-  Ba.gg.t = load.group.mob(pop,B='Ba')
-  B.gg.t  = load.group.mob(pop,B='B')
+  Bc.gg.t = load.group.mob(pop,gen=FALSE,B='Bc')
+  Ba.gg.t = load.group.mob(pop,gen=FALSE,B='Ba')
+  B.gg.t  = load.group.mob(pop,gen=FALSE,B='B')
   plot.mix(Bc.gg.t[['REF']],'Bc','g'); ggsave(figname('Bcgg', figdir),w= 5,h=4)
   plot.mix(Ba.gg.t[['REF']],'B','g');  ggsave(figname('Bagg', figdir),w= 5,h=4)
   plot.mix(B.gg.t[['REF']], 'B','g');  ggsave(figname('Bgg',  figdir),w= 5,h=4)
@@ -338,7 +338,8 @@ main.mixing = function(figdir=''){
   # compare 2D to 4D: should be exactly the same for REF
   P.a = replicate(config$N$a,colSums(P.ga)/mean(P.ga))
   C.aa.y. = lapply(C.aa.y,'*',P.a)
-  C.aa.y.diff = mapply(function(C4,C2){ aggr.mix(C4,'Ci','a',P.ga) - C2 }, Ci.gaga.y, C.aa.y., SIMPLIFY=FALSE)
+  C.aa.y.diff = mapply(function(C4,C2){ aggr.mix(C4,'Ci','a',P.ga) - C2 },
+    Ci.gaga.y, C.aa.y., SIMPLIFY=FALSE)
   plot.mix(C.aa.y.diff,'Ci','a',trans='nsqrt',clim=c(-1,+1),cmap='RdBu');
     ggsave(figname('C4aay-diff',figdir),w=14,h=4) # should be white
   # void plots for tikz figure (grabstract)

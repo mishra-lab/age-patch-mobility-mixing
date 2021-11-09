@@ -113,7 +113,7 @@ gen.Bc = function(X,by){
   return(X)
 }
 
-main.mobility = function(do.plot=TRUE,do.csv=TRUE){
+main.mobility = function(do.plot=FALSE,do.data=TRUE){
   pop = load.fsa.pop(age=FALSE)
   pop$decile = as.factor(pop$decile)
   # time away data -> relative mobility vs REF (p.mob) & % mobility intra (p.intra)
@@ -136,8 +136,12 @@ main.mobility = function(do.plot=TRUE,do.csv=TRUE){
     # Xnn = gen.Bc(Xnn,'FSA') # unused & expensive
     plot.mobility(Tg,Tn,Xgg,Xnn)
   }
-  if (do.csv){
-    Xgg = Xgg[,c('decile','month','decile.visited','rho.t','phi.0','Bc','B','Ba')]
-    write.csv(Xgg,root.path('data','mobility_decile.csv'),row.names=FALSE)
+  if (do.data){
+    Xgg = Xgg[,c('month','decile','decile.visited','rho.t','phi.0','Bc','B','Ba')]
+    write.csv(Xgg,root.path('data','mobility_obs.csv'),row.names=FALSE)
+    Rg = Tg[Tg$month=='2020-01',c('decile','R.rho.g','phi.0','R.phi.0.g')]
+    write.csv(Rg,root.path('data','mobility_rel.csv'),row.names=FALSE)
+    Bc = aggregate(Bc~decile+decile.visited,Xgg,mean)
+    write.csv(Bc,root.path('data','mobility_cond.csv'),row.names=FALSE)
   }
 }
