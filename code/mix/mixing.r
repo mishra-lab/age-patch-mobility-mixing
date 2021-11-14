@@ -77,7 +77,7 @@ gen.mix.main = function(P.ga,C.aa.y,RC.g.y,B.gg.t,t){
   if (config$method$age.adapt){
     P.ga. = P.ga
   } else { # A2
-    P.ga. = replicate(N$a,rowMeans(P.ga))
+    P.ga. = t(replicate(N$g,colMeans(P.ga)))
     dimnames(P.ga.) = dimnames(P.ga)
   }
   if (! config$method$age.by.type){ # A1
@@ -170,6 +170,7 @@ melt.mixing = function(X.gaga.y.t,what){
 gen.save.mixing = function(do.save=TRUE,norm=TRUE,t=NULL,...){
   config = set.config(...)
   pop    = load.decile.pop()
+  # pop    = aggregate(pop~decile+group+age,load.fsa.pop(),sum)
   P.ga   = pop.to.Pga(pop)
   C.AA.y = load.contacts()
   C.aa.y = CAAy.to.Caay(C.AA.y)
@@ -252,7 +253,7 @@ mixing.assumptions = function(figdir='assumptions'){
       '(*.iii) Assumption A3 Effect'    = Ci.diff[['2v3']],
       '(*.iv) Assumptions A1-3 Effects' = Ci.diff[['0v3']])
     names(Ci.diff.) = gsub('\\*',ifelse(m=='a','a','b'),names(Ci.diff.))
-    clean(plot.mix(Ci.diff.,'Ci',m,P.ga=P.ga,cmap='RdBu',trans='nsqrt',gez=FALSE,clim=c(-1.2,+1.2)))
+    clean(plot.mix(Ci.diff.,'Ci',m,P.ga=P.ga,cmap='RdBu',trans='nsqrt',gez=FALSE,clim=c(-.5,+.5)))
       ggsave(figname(paste0('D',m,m,'-panel'),figdir),w=11,h=3.5)
   }
 }
