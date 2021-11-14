@@ -53,6 +53,7 @@
   colorlinks=true,
   citecolor=C2,
   urlcolor=C2,
+  linkcolor=C2,
 ]{hyperref}
 \RequirePackage[
   backend=biber,
@@ -71,7 +72,7 @@
   \oprintbibliography[heading=none]}
 \newcounter{fig}
 \newenvironment{fig}[2][]{
-  \begin{minipage}[#1]{#2}}{\end{minipage}}
+  \begin{minipage}[#1]{#2}\small}{\end{minipage}}
 \renewcommand{\caption}[1]{%
   \refstepcounter{fig}%
   {\small\textbf{Figure~\thefig.} #1\par}}

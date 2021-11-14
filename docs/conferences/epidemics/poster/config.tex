@@ -15,13 +15,15 @@
 \renewcommand{\labelitemiii}{\textbullet}
 \renewcommand{\labelitemiv}{\textbullet}
 \setlist[itemize]{labelsep=.8ex}
-\setlist[enumerate]{itemindent=1ex}
+\setlist[enumerate]{itemindent=0pt}
 \usepackage{graphbox,multicol,multirow}
 \definecolor{Rd}{HTML}{ca0020}
 \definecolor{Bu}{HTML}{0571b0}
 \def\g{g^{\smash{*}}}
+\newcommand{\hreftt}[2][http://]{\href{#1#2}{\texttt{#2}}}
 \renewcommand{\section}[3][]{\block[#1]{\textsc{\MakeLowercase{#2}}}{\input{#3}}}
-\newcommand{\ass}[1]{\textcolor{C3}{A#1}}
-\newenvironment{assumptions}
-  {\begin{enumerate}[itemindent=2ex,label=\color{C3}A\arabic*.]}
+\colorlet{A}{C3}
+\newcommand{\ass}[1]{\textcolor{A}{A#1}}
+\newenvironment{assumptions}[1][]
+  {\begin{enumerate}[itemindent=2ex,label=\color{A}A\arabic*.,#1]}
   {\end{enumerate}}

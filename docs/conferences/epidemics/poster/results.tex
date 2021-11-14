@@ -1,43 +1,58 @@
 \newlength{\fh}\setlength{\fh}{95mm}%
 \begin{fig}{\linewidth}
-  \begin{minipage}[b]{.69\linewidth}\null
+  \begin{minipage}[t]{.69\linewidth}\null
     \includegraphics[height=\fh]{C4aa3}
     \vskip-\bigskipamount
     \includegraphics[height=\fh]{C4gg3}
   \end{minipage}%
-  \begin{minipage}[b]{.31\linewidth}\null
-    \begin{fig}{\linewidth}
-      \includegraphics[width=\linewidth]{Pga}
-      \caption{Relative age distribution by
-        patch (colours \cite{StatsCan2016}) and
-        overall (dotted \cite{Prem2021})}
-      \label{fig:Pga}
-    \end{fig}
-    \bigskip\bigskip\bigskip\par
-    \caption{Contact patterns: \# daily contacts per person, stratified by type,
-      after relaxing all 3 assumptions.
-      (a) Age patterns are similar to inputs from \cite{Prem2021}.
-      (b) Patch patterns are dominated by within-patch contacts,
-      due to both within-patch mobility and the home mixing pool model.
-      Colour scale is square-root-transformed to improve perception.}
-    \label{fig:panel-mix}\bigskip\bigskip
+  \begin{minipage}[t]{.31\linewidth}\null\bigskip\bigskip
+    \caption{\# daily contacts per person, stratified by type,
+      after relaxing all 3 assumptions}
+    \label{fig:panel-mix}
+    \begin{enumerate}[label=(\alph*),leftmargin=3.5ex]
+      \item Age patterns: similar to inputs from \cite{Prem2021}
+      \begin{itemize}
+        \item intergenerational contacts at home
+        \item roughly random mixing at work
+        \item like-with-like at school
+        \item roughly like-with-like elsewhere
+      \end{itemize}
+      \item Patch (decile) patterns:
+      \begin{itemize}
+        \item within-patch contacts dominate due to
+              within-patch mobility \& home pools
+        \item inter-patch also roughly like-with-like
+      \end{itemize}
+    \end{enumerate}
+    * Colour scale is square-root-transformed\\to improve perception of small values
   \end{minipage}
 \end{fig}
 \begin{fig}{\linewidth}
-  \begin{minipage}[b]{.69\linewidth}\null
+  \begin{minipage}[t]{.69\linewidth}\null
     \includegraphics[height=\fh]{Daa-panel}
     \vskip-\bigskipamount
     \includegraphics[height=\fh]{Dgg-panel}
   \end{minipage}%
-  \begin{minipage}[b]{.31\linewidth}
-    \caption{Differences in \# daily contacts per person (overall)
-      estimated with vs (minus) without each assumption. Therefore:\\
-      positive: \textcolor{Rd}{overestimation with assumption}\\
-      negative: \textcolor{Bu}{underestimation with assumption}.\\
-      Differences in (a) age patterns and (b) patch patterns.
-      Individual effects of assumptions \ass1,~\ass2,~\ass3 in (i), (ii), and (iii);
-      net effect of all three in (iv).
-      Colour scale is square-root-transformed to improve perception.}
-    \label{fig:panel-diff}\bigskip\bigskip
+  \begin{minipage}[t]{.31\linewidth}\null\bigskip\bigskip
+    \caption{Differences in \# daily contacts per person (all types)
+      estimated with vs (minus) without each assumption}
+    \label{fig:panel-diff}
+    \begin{enumerate}[label=(\alph*),leftmargin=3ex]
+      \item Differences in age patterns by \ass{1-3}:
+      \begin{assumptions}[leftmargin=-1ex]
+        \item non-home contacts overrepresented
+        \item patch-specific effects (not shown)
+        \item no effect
+      \end{assumptions}
+      \item Differences in patch patterns by \ass{1-3}:
+      \begin{assumptions}[leftmargin=-1ex]
+        \item within-patch contacts overrepresented
+        \item older patches' contacts overrepresented
+        \item inter-patch contacts overrepresented
+      \end{assumptions}
+    \end{enumerate}
+    Positive: \textcolor{Rd}{overestimation with assumption}\par
+    Negative: \textcolor{Bu}{underestimation with assumption}\par
+    * Colour scale is square-root-transformed\\to improve perception of small values
   \end{minipage}
 \end{fig}\vskip-1ex
